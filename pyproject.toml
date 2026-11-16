@@ -1,0 +1,14 @@
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+# E/W/F = PEP 8 formatting, N = Naming convention, D = Docstrings, PLW = Shadowing/redefinition warnings
+select = ["E", "W", "F", "N", "D", "PLW"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.11"
+allow_redefinition = false
+warn_unused_ignores = true
