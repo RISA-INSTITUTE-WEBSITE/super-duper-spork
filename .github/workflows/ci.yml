@@ -31,8 +31,13 @@ jobs:
       - name: Check naming conventions & docstrings
         run: ruff check .
 
-      - name: Check variable reuse & types
-        run: mypy --allow-empty-defs .
+      - name: Check variable reuse & type
+        run: |
+            if find . -name "*.py" -not -path "./git/**" | grep -q .; then
+              mypy .
+            else
+              echo "No Python files found, skipping mypy."
+            fi
 
       - name: Run unit tests (if present)
         run: |
