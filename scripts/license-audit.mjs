@@ -91,4 +91,6 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-process.stdout.write(`License audit passed: ${checked} packages have approved SPDX licenses.\n`);
+process.stdout.write(
+  `License audit passed: ${checked} packages have approved SPDX licenses.\n`,
+);
