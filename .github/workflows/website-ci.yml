@@ -10,32 +10,131 @@ permissions:
   contents: read
 
 jobs:
-  website:
-    name: Lint, Typecheck, Test and Build
+  required-quality-gate:
+    name: RISA Required Quality Gate
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
 
     steps:
-      - name: Check out repository
+      - name: Checkout full repository history
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Set up Node.js
+      - name: Set up supported Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
 
-      # Replace with npm ci after committing a generated package-lock.json.
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Lint
-        run: npm run lint
+      # Temporary bootstrapping step: capture a real npm-generated lockfile.
+      # Remove this step once package-lock.json is committed to the branch.
+      - name: Export generated lockfile chunks
+        run: |
+          test -s package-lock.json
+          base64 -w0 package-lock.json | fold -w 3800 | awk '{print "RISA_LOCK_CHUNK|" NR "|" $0}'
 
-      - name: Typecheck
-        run: npm run typecheck
+      # Phase 1 - fastest, read-only static checks.
+      - name: Phase 1 - Formatting without modifications
+        run: npm run format:check
 
-      - name: Unit tests
-        run: npm run test
+      - name: Phase 1 - ESLint, complexity and TypeScript
+        run: |
+          npm run lint
+          npm run typecheck
 
-      - name: Production build
+      # Phase 2 - secrets, dependencies and source security.
+      - name: Phase 2 - Full-history secret scan
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo" -w /repo \
+            ghcr.io/gitleaks/gitleaks:v8.28.0 \
+            git --redact --exit-code 1 .
+
+      - name: Phase 2 - Dependency vulnerability audit
+        run: npm audit --audit-level=high
+
+      - name: Phase 2 - Dependency license audit
+        run: node scripts/license-audit.mjs
+
+      - name: Phase 2 - Semgrep SAST rules
+        run: |
+          python3 -m pip install --quiet semgrep
+          semgrep scan --config .semgrep.yml --error --metrics off src
+
+      # Phase 3 - build and unit verification.
+      - name: Phase 3 - Production build
         run: npm run build
+
+      - name: Phase 3 - Unit coverage threshold
+        run: npm run test:coverage
+
+      # Phase 4 - integration and infrastructure tests.
+      - name: Phase 4 - Infrastructure-as-code scan (when applicable)
+        run: |
+          if find . -type f \( -name 'Dockerfile*' -o -name '*.tf' -o -name '*.tf.json' -o -name 'kustomization.yaml' \) -not -path './node_modules/*' | grep -q .; then
+            python3 -m pip install --quiet checkov
+            checkov -d . --framework dockerfile,terraform,kubernetes --quiet --compact
+          else
+            echo "No Docker/Terraform/Kubernetes deployment files yet; IaC scan not applicable."
+          fi
+
+      - name: Phase 4 - Production HTTP smoke and response headers
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 0.0.0.0 --port 3000 > /tmp/risa-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid || true' EXIT
+          ready=0
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" -ne 1 ]; then
+            cat /tmp/risa-next.log
+            exit 1
+          fi
+          for page in / /about /contact /programmes; do
+            curl --fail --silent --show-error "http://127.0.0.1:3000$page" > /dev/null
+          done
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/missing-route)" = "404"
+          curl -fsSI http://127.0.0.1:3000/ | grep -qi '^x-content-type-options: nosniff'
+          curl -fsSI http://127.0.0.1:3000/ | grep -qi '^x-frame-options: DENY'
+          curl -fsSI http://127.0.0.1:3000/ | grep -qi '^content-security-policy:'
+
+      # Phase 5 - dynamic baseline and real-browser critical journeys.
+      - name: Phase 5 - OWASP ZAP local baseline security scan
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 0.0.0.0 --port 3000 > /tmp/risa-zap-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill $server_pid || true' EXIT
+          ready=0
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:3000/ > /dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          test "$ready" -eq 1
+          docker run --rm --network host \
+            -v "$PWD:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://127.0.0.1:3000 \
+              -c .zap/rules.conf -m 1 -I -J zap-report.json
+
+      - name: Phase 5 - Install Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Phase 5 - Playwright end-to-end tests
+        run: npm run test:e2e
