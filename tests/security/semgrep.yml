@@ -1,0 +1,26 @@
+# QA-SAST-01: additional project-specific SAST policies, executed by Semgrep in
+# .github/workflows/website-ci.yml. Semgrep scans src/ and fails on ERROR findings.
+# These rules supplement, rather than replace, a full security review.
+rules:
+  - id: risa-no-dynamic-code-execution
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Never evaluate dynamic code from untrusted sources.
+    # Dynamic evaluation turns user-controlled data into executable code.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+  - id: risa-no-unreviewed-raw-html
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Raw HTML rendering requires an explicit, audited sanitization layer.
+    # Untrusted HTML may enable cross-site scripting.
+    pattern-regex: >-
+      dangerouslySetInnerHTML\s*=
+  - id: risa-no-insecure-http-client
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Avoid insecure HTTP endpoints in application sources.
+    # Reject plaintext HTTP destinations except local development addresses.
+    pattern-regex: >-
+      ['"]http://(?!127\.0\.0\.1|localhost)
