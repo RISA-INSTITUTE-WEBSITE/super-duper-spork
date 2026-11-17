@@ -8,10 +8,10 @@ export default defineConfig([
   {
     files: ["**/*.{js,mjs,ts,tsx}"],
     rules: {
-      "complexity": ["error", { max: 10 }],
+      complexity: ["error", { max: 10 }],
       "max-params": ["error", { max: 3 }],
-      "eqeqeq": ["error", "always"],
-      "curly": ["error", "all"],
+      eqeqeq: ["error", "always"],
+      curly: ["error", "all"],
       "no-eval": "error",
       "no-implied-eval": "error",
       "no-new-func": "error",
