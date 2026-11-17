@@ -12,6 +12,8 @@ describe("proposed learning pathways", () => {
 
   it("provides a title and description for every pathway", () => {
     expect(pathways.length).toBeGreaterThan(0);
-    expect(pathways.every(({ title, description }) => title.trim() && description.trim())).toBe(true);
+    expect(
+      pathways.every(({ title, description }) => title.trim() && description.trim()),
+    ).toBe(true);
   });
 });
