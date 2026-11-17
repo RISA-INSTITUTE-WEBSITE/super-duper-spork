@@ -12,53 +12,53 @@ for evidence and unfinished work.
 
 ## Source map: where to maintain the checks
 
-| Location | Responsibility |
-| --- | --- |
-| [`.github/workflows/website-ci.yml`](../../.github/workflows/website-ci.yml) | Ordered Node/web PR/push quality job; all steps are sequential and fail fast |
-| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) | Separate Python lint, formatting, mypy and pytest job |
-| [`.pre-commit-config.yaml`](../../.pre-commit-config.yaml) | Local staged-file hygiene, Ruff, mypy, Gitleaks, Prettier and ESLint |
-| [`eslint.config.mjs`](../../eslint.config.mjs) | TypeScript/React lint, complexity <=10, <=3 parameters and unsafe construct restrictions |
-| [`.prettierrc.json`](../../.prettierrc.json) | Website source formatting standard (CI checks without rewriting) |
-| [`tsconfig.json`](../../tsconfig.json) | Strict TypeScript compiler options |
-| [`vitest.config.ts`](../../vitest.config.ts) | Unit discovery in `tests/unit/`, V8 coverage of `src/lib/` at >=80% |
-| [`playwright.config.ts`](../../playwright.config.ts) | Chromium E2E discovery in `tests/e2e/`, production server and failure traces |
-| [`pyproject.toml`](../../pyproject.toml) | Python Ruff, mypy, style, naming and McCabe complexity |
-| [`next.config.ts`](../../next.config.ts) | HTTP headers asserted by integration/E2E tests |
-| [`.github/CODEOWNERS`](../../.github/CODEOWNERS) | Maintainers to review sensitive paths (enforcement needs branch rules) |
+| Location                                                                     | Responsibility                                                                           |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| [`.github/workflows/website-ci.yml`](../../.github/workflows/website-ci.yml) | Ordered Node/web PR/push quality job; all steps are sequential and fail fast             |
+| [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)                 | Separate Python lint, formatting, mypy and pytest job                                    |
+| [`.pre-commit-config.yaml`](../../.pre-commit-config.yaml)                   | Local staged-file hygiene, Ruff, mypy, Gitleaks, Prettier and ESLint                     |
+| [`eslint.config.mjs`](../../eslint.config.mjs)                               | TypeScript/React lint, complexity <=10, <=3 parameters and unsafe construct restrictions |
+| [`.prettierrc.json`](../../.prettierrc.json)                                 | Website source formatting standard (CI checks without rewriting)                         |
+| [`tsconfig.json`](../../tsconfig.json)                                       | Strict TypeScript compiler options                                                       |
+| [`vitest.config.ts`](../../vitest.config.ts)                                 | Unit discovery in `tests/unit/`, V8 coverage of `src/lib/` at >=80%                      |
+| [`playwright.config.ts`](../../playwright.config.ts)                         | Chromium E2E discovery in `tests/e2e/`, production server and failure traces             |
+| [`pyproject.toml`](../../pyproject.toml)                                     | Python Ruff, mypy, style, naming and McCabe complexity                                   |
+| [`next.config.ts`](../../next.config.ts)                                     | HTTP headers asserted by integration/E2E tests                                           |
+| [`.github/CODEOWNERS`](../../.github/CODEOWNERS)                             | Maintainers to review sensitive paths (enforcement needs branch rules)                   |
 
 ## Ordered checks and what a failure means
 
-| ID | Phase | Source and command | Intent and failure behavior |
-| --- | --- | --- | --- |
-| QA-LOCAL-01 | Pre-commit | [`.pre-commit-config.yaml`](../../.pre-commit-config.yaml) | Fix/check whitespace, YAML/JSON, key material, Python style and website lint before local commit; user must install hooks |
-| QA-LOCAL-02 | Pre-commit | Same file, Gitleaks hook | Detect likely secrets in staged files; CI separately scans history |
-| QA-PY-01 | Python CI | [`ci.yml`](../../.github/workflows/ci.yml), `ruff format --check .` | Fail formatting drift against Python style |
-| QA-PY-02 | Python CI | [`ci.yml`](../../.github/workflows/ci.yml), `ruff check .` | Fail Python naming, docstrings, complexity, errors and unused code |
-| QA-PY-03 | Python CI | [`ci.yml`](../../.github/workflows/ci.yml), `mypy .` | Type-check Python files **if any exist**; skipped if none |
-| QA-PY-04 | Python CI | [`ci.yml`](../../.github/workflows/ci.yml), `pytest` | Test Python files **if the workflow detects tests**; otherwise skipped |
-| QA-REPRO-01 | Setup | [`website-ci.yml`](../../.github/workflows/website-ci.yml), `npm ci` | Fail if `package-lock.json` and dependency manifest disagree |
-| QA-STATIC-01 | 1 | [`website-ci.yml`](../../.github/workflows/website-ci.yml), `npm run format:check` | Fail Prettier style drift without changing code |
-| QA-STATIC-02 | 1 | [`eslint.config.mjs`](../../eslint.config.mjs), `npm run lint` | Fail ESLint complexity, anti-pattern and style violations |
-| QA-STATIC-03 | 1 | [`tsconfig.json`](../../tsconfig.json), `npm run typecheck` | Fail TypeScript type errors |
-| QA-SEC-01 | 2 | [`website-ci.yml`](../../.github/workflows/website-ci.yml), Gitleaks Docker | Scan Git history for exposed credentials; fail findings |
-| QA-SEC-02 | 2 | Same workflow, `npm audit --audit-level=high` | Reject reported high/critical package vulnerabilities; not zero-risk assurance |
-| QA-SEC-03 | 2 | [`scripts/quality/license-audit.mjs`](../../scripts/quality/license-audit.mjs) | Fail unreviewed/missing SPDX licenses; requires maintainer legal/compliance review (issue #3) |
-| QA-SAST-01 | 2 | [`tests/security/semgrep.yml`](../../tests/security/semgrep.yml) | Detect disallowed dynamic code, raw HTML and insecure source URLs |
-| QA-BUILD-01 | 3 | [`website-ci.yml`](../../.github/workflows/website-ci.yml), `npm run build` | Fail if Next.js cannot produce a production build |
-| QA-UNIT-01 | 3 | [`tests/unit/pathways.test.ts`](../../tests/unit/pathways.test.ts) | Prevent duplicate or malformed public pathway slugs |
-| QA-UNIT-02 | 3 | Same unit test file | Ensure pathway display fields are present |
-| QA-COV-01 | 3 | [`vitest.config.ts`](../../vitest.config.ts), `npm run test:coverage` | Enforce 80% lines/functions/branches/statements **for `src/lib/` only**, not the entire platform |
-| QA-IAC-01 | 4 | [`website-ci.yml`](../../.github/workflows/website-ci.yml), Checkov | Detect IaC/container configuration flaws **only if** supported deployment files exist; otherwise N/A |
-| QA-HTTP-01 | 4 | [`tests/integration/http-smoke.sh`](../../tests/integration/http-smoke.sh) | Confirm local built server becomes ready |
-| QA-HTTP-02 | 4 | Same shell test | Confirm public pages resolve and missing routes return 404 |
-| QA-HTTP-03 | 4 | Same shell test | Assert CSP, anti-framing and anti-sniffing response headers |
-| QA-DAST-01 | 5 | [`tests/security/run-zap.sh`](../../tests/security/run-zap.sh), [ZAP rule policy](../../tests/security/zap/rules.conf) | Active OWASP ZAP check of disposable localhost server; fail configured findings, save report |
-| QA-E2E-01 | 5 | [`tests/e2e/public-pages.spec.ts`](../../tests/e2e/public-pages.spec.ts) | Check homepage heading and landmarks |
-| QA-E2E-02 | 5 | Same Playwright test file | Check navigation to programmes |
-| QA-E2E-03 | 5 | Same Playwright test file | Check genuine 404 status and message |
-| QA-E2E-04 | 5 | Same Playwright test file | Check basic security headers in Chromium test run |
-| QA-PORT-01 | 5 | [`website-ci.yml`](../../.github/workflows/website-ci.yml) | Re-run clean install, types, coverage, build under Node.js 24 |
-| QA-GOV-01 | Repository settings | [CODEOWNERS](../../.github/CODEOWNERS) + [issue #2](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/2) | Require PR, successful jobs, independent approval and no bypass on `main`; **not enabled by files alone** |
+| ID           | Phase               | Source and command                                                                                                        | Intent and failure behavior                                                                                               |
+| ------------ | ------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| QA-LOCAL-01  | Pre-commit          | [`.pre-commit-config.yaml`](../../.pre-commit-config.yaml)                                                                | Fix/check whitespace, YAML/JSON, key material, Python style and website lint before local commit; user must install hooks |
+| QA-LOCAL-02  | Pre-commit          | Same file, Gitleaks hook                                                                                                  | Detect likely secrets in staged files; CI separately scans history                                                        |
+| QA-PY-01     | Python CI           | [`ci.yml`](../../.github/workflows/ci.yml), `ruff format --check .`                                                       | Fail formatting drift against Python style                                                                                |
+| QA-PY-02     | Python CI           | [`ci.yml`](../../.github/workflows/ci.yml), `ruff check .`                                                                | Fail Python naming, docstrings, complexity, errors and unused code                                                        |
+| QA-PY-03     | Python CI           | [`ci.yml`](../../.github/workflows/ci.yml), `mypy .`                                                                      | Type-check Python files **if any exist**; skipped if none                                                                 |
+| QA-PY-04     | Python CI           | [`ci.yml`](../../.github/workflows/ci.yml), `pytest`                                                                      | Test Python files **if the workflow detects tests**; otherwise skipped                                                    |
+| QA-REPRO-01  | Setup               | [`website-ci.yml`](../../.github/workflows/website-ci.yml), `npm ci`                                                      | Fail if `package-lock.json` and dependency manifest disagree                                                              |
+| QA-STATIC-01 | 1                   | [`website-ci.yml`](../../.github/workflows/website-ci.yml), `npm run format:check`                                        | Fail Prettier style drift without changing code                                                                           |
+| QA-STATIC-02 | 1                   | [`eslint.config.mjs`](../../eslint.config.mjs), `npm run lint`                                                            | Fail ESLint complexity, anti-pattern and style violations                                                                 |
+| QA-STATIC-03 | 1                   | [`tsconfig.json`](../../tsconfig.json), `npm run typecheck`                                                               | Fail TypeScript type errors                                                                                               |
+| QA-SEC-01    | 2                   | [`website-ci.yml`](../../.github/workflows/website-ci.yml), Gitleaks Docker                                               | Scan Git history for exposed credentials; fail findings                                                                   |
+| QA-SEC-02    | 2                   | Same workflow, `npm audit --audit-level=high`                                                                             | Reject reported high/critical package vulnerabilities; not zero-risk assurance                                            |
+| QA-SEC-03    | 2                   | [`scripts/quality/license-audit.mjs`](../../scripts/quality/license-audit.mjs)                                            | Fail unreviewed/missing SPDX licenses; requires maintainer legal/compliance review (issue #3)                             |
+| QA-SAST-01   | 2                   | [`tests/security/semgrep.yml`](../../tests/security/semgrep.yml)                                                          | Detect disallowed dynamic code, raw HTML and insecure source URLs                                                         |
+| QA-BUILD-01  | 3                   | [`website-ci.yml`](../../.github/workflows/website-ci.yml), `npm run build`                                               | Fail if Next.js cannot produce a production build                                                                         |
+| QA-UNIT-01   | 3                   | [`tests/unit/pathways.test.ts`](../../tests/unit/pathways.test.ts)                                                        | Prevent duplicate or malformed public pathway slugs                                                                       |
+| QA-UNIT-02   | 3                   | Same unit test file                                                                                                       | Ensure pathway display fields are present                                                                                 |
+| QA-COV-01    | 3                   | [`vitest.config.ts`](../../vitest.config.ts), `npm run test:coverage`                                                     | Enforce 80% lines/functions/branches/statements **for `src/lib/` only**, not the entire platform                          |
+| QA-IAC-01    | 4                   | [`website-ci.yml`](../../.github/workflows/website-ci.yml), Checkov                                                       | Detect IaC/container configuration flaws **only if** supported deployment files exist; otherwise N/A                      |
+| QA-HTTP-01   | 4                   | [`tests/integration/http-smoke.sh`](../../tests/integration/http-smoke.sh)                                                | Confirm local built server becomes ready                                                                                  |
+| QA-HTTP-02   | 4                   | Same shell test                                                                                                           | Confirm public pages resolve and missing routes return 404                                                                |
+| QA-HTTP-03   | 4                   | Same shell test                                                                                                           | Assert CSP, anti-framing and anti-sniffing response headers                                                               |
+| QA-DAST-01   | 5                   | [`tests/security/run-zap.sh`](../../tests/security/run-zap.sh), [ZAP rule policy](../../tests/security/zap/rules.conf)    | Active OWASP ZAP check of disposable localhost server; fail configured findings, save report                              |
+| QA-E2E-01    | 5                   | [`tests/e2e/public-pages.spec.ts`](../../tests/e2e/public-pages.spec.ts)                                                  | Check homepage heading and landmarks                                                                                      |
+| QA-E2E-02    | 5                   | Same Playwright test file                                                                                                 | Check navigation to programmes                                                                                            |
+| QA-E2E-03    | 5                   | Same Playwright test file                                                                                                 | Check genuine 404 status and message                                                                                      |
+| QA-E2E-04    | 5                   | Same Playwright test file                                                                                                 | Check basic security headers in Chromium test run                                                                         |
+| QA-PORT-01   | 5                   | [`website-ci.yml`](../../.github/workflows/website-ci.yml)                                                                | Re-run clean install, types, coverage, build under Node.js 24                                                             |
+| QA-GOV-01    | Repository settings | [CODEOWNERS](../../.github/CODEOWNERS) + [issue #2](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/2) | Require PR, successful jobs, independent approval and no bypass on `main`; **not enabled by files alone**                 |
 
 ## Test commands for developers
 
