@@ -12,25 +12,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # QA-PY-SETUP: inspect repository files before checking Python style.
       - name: Checkout repository code
         uses: actions/checkout@v4
 
+      # QA-PY-PORT: use the version declared in pyproject.toml.
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      # Install Ruff, mypy and pytest used by the Python quality policy.
       - name: Install linters and test runner
         run: |
           python -m pip install --upgrade pip
           pip install ruff mypy pytest
 
+      # QA-PY-01: read-only Ruff format check, enforcing PEP 8-oriented style.
       - name: Check formatting (PEP 8 & 79-char limit)
         run: ruff format --check .
 
+      # QA-PY-02: Ruff lint checks errors, names, docstrings and complexity.
       - name: Check naming conventions & docstrings
         run: ruff check .
 
+      # QA-PY-03: mypy checks present Python modules; no Python means N/A.
       - name: Check variable reuse & type
         run: |
           if find . -name "*.py" -not -path "./git/**" | grep -q .; then
@@ -39,6 +45,7 @@ jobs:
             echo "No Python files found, skipping mypy."
           fi
 
+      # QA-PY-04: pytest verifies Python tests when present; otherwise N/A.
       - name: Run unit tests (if present)
         run: |
           if ls test_*.py *_test.py tests/*.py 1> /dev/null 2>&1; then
