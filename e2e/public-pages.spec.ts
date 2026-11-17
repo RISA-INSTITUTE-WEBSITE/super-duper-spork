@@ -6,7 +6,9 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
     "Learn the science",
   );
   await expect(page.getByRole("main")).toHaveCount(1);
-  await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Primary navigation" }),
+  ).toBeVisible();
 });
 
 test("primary navigation works", async ({ page }) => {
@@ -21,9 +23,7 @@ test("primary navigation works", async ({ page }) => {
 test("not-found page does not masquerade as an existing course", async ({ page }) => {
   const response = await page.goto("/not-a-real-course");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Page not found",
-  );
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Page not found");
 });
 
 test("basic security response headers are present", async ({ request }) => {
