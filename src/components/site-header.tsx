@@ -16,11 +16,17 @@ export function SiteHeader() {
           className="flex items-center gap-3 rounded-md font-semibold text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
           aria-label="RISA Institute of Applied Sciences homepage"
         >
-          <span className="flex size-11 items-center justify-center rounded-xl bg-blue-900 text-lg font-bold text-white" aria-hidden="true">
+          <span
+            className="flex size-11 items-center justify-center rounded-xl bg-blue-900 text-lg font-bold text-white"
+            aria-hidden="true"
+          >
             R
           </span>
           <span className="max-w-48 text-sm leading-tight">
-            RISA <span className="block font-normal text-slate-600">Institute of Applied Sciences</span>
+            RISA{" "}
+            <span className="block font-normal text-slate-600">
+              Institute of Applied Sciences
+            </span>
           </span>
         </Link>
         <nav aria-label="Primary navigation">
