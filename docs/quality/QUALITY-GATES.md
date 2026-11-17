@@ -39,7 +39,7 @@ npm exec playwright install chromium
 npm run test:e2e
 ```
 
-Install Python `pre-commit` if desired, then run
+Install Python `pre-commit` for local staged-file checks, then run
 `pre-commit install` and `pre-commit run --all-files`. Local hooks can
 auto-fix formatting; CI never modifies code.
 
@@ -51,7 +51,7 @@ auto-fix formatting; CI never modifies code.
 3. **Build and unit:** Next.js production build, Vitest unit coverage >=80%
    **of current src/lib modules**, not the entire website.
 4. **Integration:** HTTP route smoke and basic security-header validation.
-5. **Runtime:** Playwright Chromium E2E; active OWASP ZAP DAST against a localhost
+5. **Runtime:** Playwright Chromium E2E; active OWASP ZAP DAST against an isolated localhost
    production-mode server, followed by Node.js 24 portability validation.
 
 The thresholds apply to **the currently tested code only**. As the platform
