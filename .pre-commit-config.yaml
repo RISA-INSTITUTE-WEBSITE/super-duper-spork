@@ -26,3 +26,19 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+
+  # JavaScript/TypeScript hooks use locally installed npm dependencies.
+  - repo: local
+    hooks:
+      - id: risa-prettier
+        name: Format website sources with Prettier
+        entry: npx --no-install prettier --write
+        language: system
+        types_or: [javascript, jsx, ts, tsx, css, json, yaml, markdown]
+        require_serial: true
+      - id: risa-eslint
+        name: ESLint staged JavaScript and TypeScript
+        entry: npx --no-install eslint --fix
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        require_serial: true
