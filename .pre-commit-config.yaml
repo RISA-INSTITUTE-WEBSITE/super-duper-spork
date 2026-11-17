@@ -7,16 +7,16 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
       - id: detect-private-key
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.21.2
+    rev: v8.28.0
     hooks:
       - id: gitleaks
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev : v0.8.4
+    rev: v0.8.4
     hooks:
       - id: ruff
         args: [--fix]
@@ -34,11 +34,11 @@ repos:
         name: Format website sources with Prettier
         entry: npx --no-install prettier --write
         language: system
-        types_or: [javascript, jsx, ts, tsx, css, json, yaml, markdown]
+        files: '\.(?:[cm]?[jt]sx?|css|json|ya?ml|md)$'
         require_serial: true
       - id: risa-eslint
         name: ESLint staged JavaScript and TypeScript
         entry: npx --no-install eslint --fix
         language: system
-        types_or: [javascript, jsx, ts, tsx]
+        files: '\.(?:[cm]?[jt]sx?)$'
         require_serial: true
