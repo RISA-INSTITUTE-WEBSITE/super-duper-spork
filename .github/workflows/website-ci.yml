@@ -6,6 +6,10 @@ on:
   push:
     branches: [main, "chore/**", "feature/**"]
 
+concurrency:
+  group: risa-website-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -20,40 +24,19 @@ jobs:
 
     steps:
       - name: Checkout full repository history
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Set up supported Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
-
-      # Temporary: export Prettier results to adopt repository-wide formatting.
-      - name: Export deterministic formatting changes
-        run: |
-          npx prettier --write .
-          python3 - <<'PY'
-          import base64
-          import subprocess
-
-          paths = subprocess.check_output(
-              ["git", "diff", "--name-only"], text=True
-          ).splitlines()
-          for file_path in paths:
-              with open(file_path, "rb") as file:
-                  text = base64.b64encode(file.read()).decode("ascii")
-              for position in range(0, len(text), 3400):
-                  index = position // 3400 + 1
-                  print(
-                      f"RISA_FMT_CHUNK|{file_path}|{index}|"
-                      f"{text[position:position + 3400]}"
-                  )
-          PY
 
       # Phase 1 - fastest, read-only static checks.
       - name: Phase 1 - Formatting without modifications
