@@ -33,11 +33,11 @@ jobs:
 
       - name: Check variable reuse & type
         run: |
-            if find . -name "*.py" -not -path "./git/**" | grep -q .; then
-              mypy .
-            else
-              echo "No Python files found, skipping mypy."
-            fi
+          if find . -name "*.py" -not -path "./git/**" | grep -q .; then
+            mypy .
+          else
+            echo "No Python files found, skipping mypy."
+          fi
 
       - name: Run unit tests (if present)
         run: |
