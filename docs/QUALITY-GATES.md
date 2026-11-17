@@ -39,8 +39,8 @@ auto-fix formatting; CI never modifies code.
 3. **Build and unit:** Next.js production build, Vitest unit coverage >=80%
    **of current src/lib modules**, not the entire website.
 4. **Integration:** HTTP route smoke and basic security-header validation.
-5. **Runtime:** Playwright Chromium E2E; ZAP baseline against a localhost
-   production-mode server.
+5. **Runtime:** Playwright Chromium E2E; active OWASP ZAP DAST against a localhost
+   production-mode server, followed by Node.js 24 portability validation.
 
 The thresholds apply to **the currently tested code only**. As the platform
 gains accounts, databases and APIs, expand coverage to route handlers, services,
@@ -73,10 +73,10 @@ The owners must adjust the GitHub plan or repository visibility as appropriate.
 - GitHub CodeQL in a private repository needs eligible GitHub Code Security.
   This starter uses a local Semgrep rule pack instead. Expand rules and consider
   paid CodeQL when available.
-- An HTTP ZAP baseline is not a substitute for authenticated penetration testing.
+- An automated ZAP active scan against a throwaway localhost service is not a substitute for authenticated penetration testing; never target live student data.
 - License auditing flags non-approved SPDX licenses for manual review; consult
   counsel for redistribution obligations.
-- The repo currently lacks a tracked `package-lock.json`; generate and commit
-  it, then replace `npm install` with `npm ci` before merging.
+- The lockfile is committed and CI uses reproducible `npm ci` installs.
+- The initial license scan flagged LGPL, MPL, CC-BY and Python-2.0 package declarations. Resolve issue #3 before merging.
 - Security scanners can generate false positives; review findings, avoid silently
   disabling checks, and document justified exceptions.
