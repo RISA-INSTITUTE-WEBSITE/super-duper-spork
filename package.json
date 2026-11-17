@@ -12,7 +12,11 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run lint && npm run typecheck && npm run test"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage && npm run build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -29,6 +33,9 @@
     "tailwindcss": "4.3.3",
     "typescript": "~5.9.3",
     "vitest": "^5.1.0",
-    "postcss": "^8.5.0"
+    "postcss": "^8.5.0",
+    "prettier": "^3.6.2",
+    "@vitest/coverage-v8": "^5.1.0",
+    "@playwright/test": "^1.56.0"
   }
 }
