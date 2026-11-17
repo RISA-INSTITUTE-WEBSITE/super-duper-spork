@@ -49,6 +49,23 @@ that their tests have passed.
 All QA IDs and exact file responsibilities are defined in
 [TESTING-GUIDE.md](../quality/TESTING-GUIDE.md).
 
+## Verification addendum — 17 November 2026
+
+The [post-reorganization website run #139](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/43997419148)
+provides additional dated evidence:
+
+- [x] Reproducible `npm ci` completed.
+- [x] Read-only Prettier formatting passed on the reorganized files and checklist.
+- [x] ESLint and TypeScript static checks passed.
+- [x] Gitleaks full-history scan passed.
+- [x] High-severity npm vulnerability audit passed.
+- [ ] The dependency-license gate failed, as tracked in issue #3.
+- [ ] SAST, build, unit coverage, integration, DAST, E2E and Node 24 tests
+      were **skipped**, not passed, because the license gate stopped the job.
+
+The [Python coding-standards run #51](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/43997419176)
+also completed successfully. This does **not** close the release blockers.
+
 ## C. Release-blocking action checklist
 
 - [ ] RISA maintainer reviews the exception list for LGPL, MPL, CC-BY and
