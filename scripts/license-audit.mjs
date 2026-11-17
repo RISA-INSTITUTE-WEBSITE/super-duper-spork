@@ -52,13 +52,19 @@ async function walkNodeModules(directory) {
   try {
     entries = await readdir(directory, { withFileTypes: true });
   } catch (error) {
-    if (error?.code === "ENOENT") return;
+    if (error?.code === "ENOENT") {
+      return;
+    }
     throw error;
   }
 
   for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    if (entry.name.startsWith(".")) continue;
+    if (!entry.isDirectory()) {
+      continue;
+    }
+    if (entry.name.startsWith(".")) {
+      continue;
+    }
 
     const absolute = path.join(directory, entry.name);
     if (entry.name.startsWith("@")) {
@@ -78,9 +84,11 @@ if (checked === 0) {
 
 if (errors.length > 0) {
   console.error(`License audit flagged ${errors.length} / ${checked} packages:`);
-  for (const error of errors) console.error(`- ${error}`);
+  for (const error of errors) {
+    console.error(`- ${error}`);
+  }
   console.error("Review and approve exception requests; do not disable this gate.");
   process.exit(1);
 }
 
-console.log(`License audit passed: ${checked} packages have approved SPDX licenses.`);
+process.stdout.write(`License audit passed: ${checked} packages have approved SPDX licenses.\n`);
