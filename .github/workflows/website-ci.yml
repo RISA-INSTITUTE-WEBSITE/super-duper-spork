@@ -1,0 +1,41 @@
+name: RISA Website CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "chore/**", "feature/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  website:
+    name: Lint, Typecheck, Test and Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # Replace with npm ci after committing a generated package-lock.json.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build
