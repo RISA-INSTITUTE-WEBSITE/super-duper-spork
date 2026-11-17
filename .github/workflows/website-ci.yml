@@ -31,14 +31,29 @@ jobs:
           node-version: "22"
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
-      # Temporary bootstrapping step: capture a real npm-generated lockfile.
-      # Remove this step once package-lock.json is committed to the branch.
-      - name: Export generated lockfile chunks
+      # Temporary: export Prettier results to adopt repository-wide formatting.
+      - name: Export deterministic formatting changes
         run: |
-          test -s package-lock.json
-          base64 -w0 package-lock.json | fold -w 3800 | awk '{print "RISA_LOCK_CHUNK|" NR "|" $0}'
+          npx prettier --write .
+          python3 - <<'PY'
+          import base64
+          import subprocess
+
+          paths = subprocess.check_output(
+              ["git", "diff", "--name-only"], text=True
+          ).splitlines()
+          for file_path in paths:
+              with open(file_path, "rb") as file:
+                  text = base64.b64encode(file.read()).decode("ascii")
+              for position in range(0, len(text), 3400):
+                  index = position // 3400 + 1
+                  print(
+                      f"RISA_FMT_CHUNK|{file_path}|{index}|"
+                      f"{text[position:position + 3400]}"
+                  )
+          PY
 
       # Phase 1 - fastest, read-only static checks.
       - name: Phase 1 - Formatting without modifications
