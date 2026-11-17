@@ -9,14 +9,12 @@ export const pathways: readonly Pathway[] = [
   {
     slug: "physics",
     title: "Physics & Measurement",
-    description:
-      "Explore forces, energy, physical quantities and practical measurement.",
+    description: "Explore forces, energy, physical quantities and practical measurement.",
   },
   {
     slug: "mathematics",
     title: "Applied Mathematics",
-    description:
-      "Build the mathematical foundations used in engineering and science.",
+    description: "Build the mathematical foundations used in engineering and science.",
   },
   {
     slug: "computer-science",
