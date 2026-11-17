@@ -23,8 +23,7 @@ async function inspectPackage(directory) {
 
   try {
     const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-    const license =
-      typeof manifest.license === "string" ? manifest.license : undefined;
+    const license = typeof manifest.license === "string" ? manifest.license : undefined;
     const packageName = manifest.name ?? directory;
     checked += 1;
 
@@ -36,8 +35,7 @@ async function inspectPackage(directory) {
     const identifiers = license.match(/[A-Za-z0-9][A-Za-z0-9.+-]*/g) ?? [];
     const rejected = identifiers.filter(
       (identifier) =>
-        !allowedLicenseIds.has(identifier) &&
-        !allowedOperators.has(identifier),
+        !allowedLicenseIds.has(identifier) && !allowedOperators.has(identifier),
     );
     if (rejected.length > 0) {
       errors.push(`${packageName}: review license "${license}"`);
