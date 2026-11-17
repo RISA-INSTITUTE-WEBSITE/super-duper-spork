@@ -110,7 +110,7 @@ jobs:
           curl -fsSI http://127.0.0.1:3000/ | grep -qi '^content-security-policy:'
 
       # Phase 5 - dynamic baseline and real-browser critical journeys.
-      - name: Phase 5 - OWASP ZAP local baseline security scan
+      - name: Phase 5 - OWASP ZAP isolated active DAST scan
         run: |
           set -euo pipefail
           npm run start -- --hostname 0.0.0.0 --port 3000 > /tmp/risa-zap-next.log 2>&1 &
@@ -128,11 +128,32 @@ jobs:
           docker run --rm --network host \
             -v "$PWD:/zap/wrk:rw" \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://127.0.0.1:3000 \
-              -c .zap/rules.conf -m 1 -I -J zap-report.json
+            zap-full-scan.py -t http://127.0.0.1:3000 \
+              -c .zap/rules.conf -m 1 -J zap-report.json
 
       - name: Phase 5 - Install Chromium browser
         run: npx playwright install --with-deps chromium
 
       - name: Phase 5 - Playwright end-to-end tests
         run: npm run test:e2e
+
+      - name: Phase 5 - Node.js 24 portability build and tests
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Phase 5 - Validate portable build on Node.js 24
+        run: |
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm run test:coverage
+          npm run build
+
+      - name: Preserve DAST scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: risa-zap-report
+          path: zap-report.json
+          if-no-files-found: ignore
