@@ -14,9 +14,9 @@ export default function HomePage() {
             Learn the science. Apply the knowledge.
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-blue-100">
-            Welcome to RISA Institute of Applied Sciences. We are preparing a
-            practical learning experience that connects fundamental concepts to
-            real engineering and scientific problems.
+            Welcome to RISA Institute of Applied Sciences. We are preparing a practical
+            learning experience that connects fundamental concepts to real engineering and
+            scientific problems.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Link
@@ -36,16 +36,23 @@ export default function HomePage() {
       </section>
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <div className="mb-8">
-          <p className="font-semibold uppercase tracking-widest text-blue-800">In development</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">Proposed learning pathways</h2>
+          <p className="font-semibold uppercase tracking-widest text-blue-800">
+            In development
+          </p>
+          <h2 className="mt-3 text-3xl font-bold tracking-tight">
+            Proposed learning pathways
+          </h2>
           <p className="mt-3 max-w-2xl text-slate-600">
-            These examples illustrate our direction. Course content, enrollment,
-            and availability will be confirmed before launch.
+            These examples illustrate our direction. Course content, enrollment, and
+            availability will be confirmed before launch.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-3">
           {pathways.map(({ slug, title, description }) => (
-            <article key={slug} className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
+            <article
+              key={slug}
+              className="rounded-2xl border border-slate-200 bg-white p-7 shadow-sm"
+            >
               <span className="text-xs font-semibold uppercase tracking-widest text-blue-800">
                 Proposed
               </span>
@@ -60,8 +67,8 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold">Built for applied learning</h2>
           <p className="mt-3 max-w-3xl leading-relaxed text-slate-600">
             Our planned learning platform will bring together clear explanations,
-            real-world examples, structured modules, and opportunities to
-            practice what you learn.
+            real-world examples, structured modules, and opportunities to practice what
+            you learn.
           </p>
         </div>
       </section>
