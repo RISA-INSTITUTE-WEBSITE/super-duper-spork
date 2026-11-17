@@ -8,3 +8,6 @@ npm-debug.log*
 .env*
 !.env.example
 .DS_Store
+playwright-report/
+test-results/
+zap-report.json
