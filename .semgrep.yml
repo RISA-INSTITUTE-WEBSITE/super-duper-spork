@@ -1,0 +1,18 @@
+rules:
+  - id: risa-no-dynamic-code-execution
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Never evaluate dynamic code from untrusted sources.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+  - id: risa-no-unreviewed-raw-html
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Raw HTML rendering requires an explicit, audited sanitization layer.
+    pattern-regex: 'dangerouslySetInnerHTML\\s*='
+  - id: risa-no-insecure-http-client
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Avoid insecure HTTP endpoints in application sources.
+    pattern-regex: '["\x27]http://(?!127\\.0\\.0\\.1|localhost)'
