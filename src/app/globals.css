@@ -46,12 +46,7 @@ body {
 }
 
 .risa-navbar {
-  background: radial-gradient(
-    ellipse 85% 175% at 50% 45%,
-    #f3f4f6 12%,
-    #dbeafe 58%,
-    #bfdbfe 100%
-  );
+  background: #fff;
 }
 
 .risa-hero {

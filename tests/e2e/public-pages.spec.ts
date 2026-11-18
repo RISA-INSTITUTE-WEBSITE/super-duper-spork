@@ -60,3 +60,21 @@ test("landing page labels pathways as proposed and links to project information"
   await page.getByRole("link", { name: "Discover RISA" }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
 });
+
+test("site search finds a proposed learning pathway", async ({ page }) => {
+  // QA-E2E-06: the header search must lead to real, relevant public content.
+  await page.goto("/");
+  const search = page.getByRole("search");
+  await expect(search).toBeVisible();
+  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("physics");
+  await search.getByRole("button", { name: "Search" }).click();
+  await expect(page).toHaveURL(/\/search\?q=physics$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Search RISA");
+  await expect(page.getByRole("link", { name: /Physics & Measurement/ })).toBeVisible();
+});
+
+test("site search handles unmatched keywords", async ({ page }) => {
+  // QA-E2E-07: an empty result is explained instead of linking to nonexistent content.
+  await page.goto("/search?q=nomatchingrisakeyword");
+  await expect(page.getByRole("status")).toContainText("No matching pages found");
+});
