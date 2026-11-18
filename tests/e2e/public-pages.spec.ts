@@ -79,7 +79,6 @@ test("site search handles unmatched keywords", async ({ page }) => {
   await expect(page.getByRole("status")).toContainText("No matching pages found");
 });
 
-
 test("mobile header opens search only when its icon is tapped", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
@@ -92,10 +91,14 @@ test("mobile header opens search only when its icon is tapped", async ({ page })
   await page.getByRole("button", { name: "Open search" }).click();
   const search = page.getByRole("search");
   await expect(search).toBeVisible();
-  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("physics");
+  await search
+    .getByRole("searchbox", { name: "Search RISA website" })
+    .fill("physics");
   await search.getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search\?q=physics$/);
-  await expect(page.getByRole("link", { name: /Physics & Measurement/ })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Physics & Measurement/ }),
+  ).toBeVisible();
 });
 
 test("mobile menu opens a sidebar and closes after navigation", async ({ page }) => {
@@ -106,10 +109,14 @@ test("mobile menu opens a sidebar and closes after navigation", async ({ page })
   await expect(
     page.getByRole("dialog", { name: "RISA navigation menu" }),
   ).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "Mobile navigation" })).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Mobile navigation" }),
+  ).toBeVisible();
 
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog", { name: "RISA navigation menu" })).toHaveCount(0);
+  await expect(
+    page.getByRole("dialog", { name: "RISA navigation menu" }),
+  ).toHaveCount(0);
 
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await page
