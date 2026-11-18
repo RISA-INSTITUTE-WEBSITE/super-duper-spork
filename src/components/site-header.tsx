@@ -29,7 +29,7 @@ export function SiteHeader() {
           />
           <span className="text-base font-extrabold leading-tight tracking-tight text-[#0A0F1D]">
             RISA
-            <span className="block text-xs font-medium tracking-normal text-slate-500">
+            <span className="hidden text-xs font-medium tracking-normal text-slate-500 min-[380px]:block">
               Institute of Applied Sciences
             </span>
           </span>
