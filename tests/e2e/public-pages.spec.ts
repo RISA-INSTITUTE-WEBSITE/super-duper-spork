@@ -43,11 +43,17 @@ test("basic security response headers are present", async ({ request }) => {
   expect(response.headers()["x-frame-options"]).toBe("DENY");
 });
 
-test("landing page labels pathways as proposed and links to project information", async ({ page }) => {
+test("landing page labels pathways as proposed and links to project information", async ({
+  page,
+}) => {
   // QA-E2E-05: avoid suggesting that enrollment and applications are live.
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Explore proposed learning pathways." })).toBeVisible();
-  await expect(page.getByText("Student accounts and applications are not available yet.")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Explore proposed learning pathways." }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Student accounts and applications are not available yet."),
+  ).toBeVisible();
   await page.getByRole("link", { name: "Discover RISA" }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
 });
