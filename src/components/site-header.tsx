@@ -77,7 +77,7 @@ export function SiteHeader() {
           aria-label="Primary navigation"
           className="hidden md:col-span-2 md:block lg:col-span-1 lg:justify-self-end"
         >
-          <ul className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm font-semibold text-slate-700 sm:gap-x-3">
+          <ul className="flex flex-wrap items-center gap-x-2 gap-y-2 font-heading text-base font-semibold text-slate-700 sm:gap-x-3">
             {navigation.map(({ href, label }) => (
               <li key={href}>
                 <Link
