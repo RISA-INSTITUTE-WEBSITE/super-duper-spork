@@ -27,14 +27,14 @@ The [website quality-gate run](https://github.com/RISA-INSTITUTE-WEBSITE/super-d
 
 The following unique installed-package families are recorded by `package-lock.json`, and are outside the initial licence allowlist. Versions are **not** legal approvals:
 
-| Family | Lockfile version(s) | Declared licence | Review items |
-| --- | --- | --- | --- |
-| `@img/sharp-libvips-*` | 1.3.4 | LGPL-3.0-or-later | Bundled binary and redistribution/linking obligations; source and notices |
-| `@img/sharp-wasm32`, `@img/sharp-win32-*` | 0.35.5 | Apache-2.0 AND LGPL-3.0-or-later (plus MIT for wasm32) | Multiple licence conditions and binaries |
-| `lightningcss` plus platform packages | 1.32.0; 1.33.0 under Vite | MPL-2.0 | File-level copyleft, notices and availability of covered source |
-| `axe-core` | 4.14.1 | MPL-2.0 | Notices and covered source obligations |
-| `caniuse-lite` | 1.0.30001826 | CC-BY-4.0 | Attribution and licence copy |
-| `argparse` | 2.0.1 | Python-2.0 | Required notices and licence text |
+| Family                                    | Lockfile version(s)       | Declared licence                                       | Review items                                                              |
+| ----------------------------------------- | ------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `@img/sharp-libvips-*`                    | 1.3.4                     | LGPL-3.0-or-later                                      | Bundled binary and redistribution/linking obligations; source and notices |
+| `@img/sharp-wasm32`, `@img/sharp-win32-*` | 0.35.5                    | Apache-2.0 AND LGPL-3.0-or-later (plus MIT for wasm32) | Multiple licence conditions and binaries                                  |
+| `lightningcss` plus platform packages     | 1.32.0; 1.33.0 under Vite | MPL-2.0                                                | File-level copyleft, notices and availability of covered source           |
+| `axe-core`                                | 4.14.1                    | MPL-2.0                                                | Notices and covered source obligations                                    |
+| `caniuse-lite`                            | 1.0.30001826              | CC-BY-4.0                                              | Attribution and licence copy                                              |
+| `argparse`                                | 2.0.1                     | Python-2.0                                             | Required notices and licence text                                         |
 
 The lockfile includes platform-specific optional packages for machines other than the production host. **Do not infer what will actually be redistributed** merely from a lockfile entry.
 
