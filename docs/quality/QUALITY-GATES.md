@@ -62,6 +62,29 @@ IaC/container security scans will be mandatory when Docker, Terraform or
 Kubernetes files are introduced; no such deployment artifacts were verified
 in the initial website scaffold.
 
+## Temporary dependency and licence audit exception (18 November 2026)
+
+At the repository owner's explicit request, the two GitHub Actions steps
+`Phase 2 - Dependency vulnerability audit` and
+`Phase 2 - Dependency license audit` are temporarily **non-blocking** using
+`continue-on-error: true`. Both commands still execute, and failed outcomes
+produce conspicuous GitHub Actions warnings. No vulnerabilities were fixed, no
+licences were reviewed or approved, and no audit findings were suppressed from
+the logs.
+
+This override applies to the workflow in `.github/workflows/website-ci.yml`
+until it is explicitly reverted. The underlying findings in
+[issue #4](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/4)
+and the legal review in
+[issue #3](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/3)
+remain open. Branch protection and independent review in
+[issue #2](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/2)
+are unchanged, and this exception does **not** approve a production release.
+
+After resolving these dependencies and licence obligations, remove the two
+`continue-on-error` properties and the temporary reporting step, then rerun
+all checks.
+
 ## GitHub merge rules (configuration outside the repository)
 
 Quality-gate workflows DO NOT themselves prevent administrator bypasses or
