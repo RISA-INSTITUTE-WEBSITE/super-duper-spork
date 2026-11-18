@@ -57,11 +57,7 @@ function ScienceIllustration() {
         <span>RISA / Exploration</span>
         <span>001</span>
       </div>
-      <svg
-        className="relative mt-4 w-full"
-        viewBox="0 0 460 440"
-        fill="none"
-      >
+      <svg className="relative mt-4 w-full" viewBox="0 0 460 440" fill="none">
         <defs>
           <linearGradient id="risa-ring" x1="78" y1="75" x2="391" y2="360">
             <stop stopColor="#67E8F9" />
