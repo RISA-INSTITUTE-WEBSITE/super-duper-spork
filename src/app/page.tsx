@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { pathways } from "@/lib/pathways";
@@ -46,98 +47,17 @@ function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   );
 }
 
-function ScienceIllustration() {
+function RisaHeroLogo() {
   return (
-    <div
-      aria-hidden="true"
-      className="risa-science-glass relative mx-auto w-full max-w-[480px] overflow-hidden rounded-[2rem] p-6 sm:p-8"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(34,211,238,0.14),transparent_50%)]" />
-      <div className="relative flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.2em] text-[#5274C3]">
-        <span>RISA / Exploration</span>
-        <span>001</span>
-      </div>
-      <svg className="relative mt-4 w-full" viewBox="0 0 460 440" fill="none">
-        <defs>
-          <linearGradient id="risa-ring" x1="78" y1="75" x2="391" y2="360">
-            <stop stopColor="#67E8F9" />
-            <stop offset="1" stopColor="#60A5FA" stopOpacity=".22" />
-          </linearGradient>
-          <radialGradient id="risa-core">
-            <stop stopColor="#1D4ED8" />
-            <stop offset="1" stopColor="#0C2867" />
-          </radialGradient>
-        </defs>
-        <circle cx="230" cy="215" r="178" stroke="#93C5FD" strokeOpacity=".16" />
-        <circle cx="230" cy="215" r="128" stroke="#93C5FD" strokeOpacity=".23" />
-        <circle cx="230" cy="215" r="77" stroke="#67E8F9" strokeOpacity=".37" />
-        <ellipse
-          cx="230"
-          cy="215"
-          rx="185"
-          ry="74"
-          transform="rotate(-35 230 215)"
-          stroke="url(#risa-ring)"
-          strokeWidth="2"
-        />
-        <ellipse
-          cx="230"
-          cy="215"
-          rx="176"
-          ry="88"
-          transform="rotate(50 230 215)"
-          stroke="#60A5FA"
-          strokeOpacity=".48"
-          strokeWidth="1.5"
-        />
-        <circle
-          cx="230"
-          cy="215"
-          r="61"
-          fill="url(#risa-core)"
-          stroke="#67E8F9"
-          strokeOpacity=".7"
-        />
-        <text
-          x="230"
-          y="221"
-          fill="#FFFFFF"
-          textAnchor="middle"
-          fontSize="30"
-          fontWeight="750"
-          letterSpacing="2"
-        >
-          RISA
-        </text>
-        <circle cx="82" cy="318" r="9" fill="#67E8F9" />
-        <circle cx="357" cy="128" r="7" fill="#93C5FD" />
-        <circle cx="375" cy="300" r="6" fill="#5EEAD4" />
-        <circle cx="148" cy="64" r="5" fill="#93C5FD" />
-        <path
-          d="M95 318H132M363 128h33M375 307v29"
-          stroke="#67E8F9"
-          strokeOpacity=".55"
-        />
-        <path
-          d="M63 80h51M63 91h32M354 370h42M365 381h31"
-          stroke="#93C5FD"
-          strokeOpacity=".3"
-          strokeWidth="2"
-        />
-      </svg>
-      <div className="relative flex items-center justify-between gap-4 border-t border-white/70 pt-5">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#155DFC]">
-            Our direction
-          </p>
-          <p className="mt-1 text-sm font-medium text-[#253b64]">
-            Curiosity meets application.
-          </p>
-        </div>
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white bg-white/70 text-[#155DFC] shadow-sm">
-          <ArrowIcon diagonal />
-        </div>
-      </div>
+    <div className="risa-science-glass relative mx-auto flex w-full max-w-[480px] items-center justify-center overflow-hidden rounded-[2rem] p-5 sm:p-8">
+      <Image
+        src="/risa-logo.svg"
+        alt="RISA Institute official logo"
+        width={420}
+        height={420}
+        className="h-auto w-full max-w-[360px] rounded-full object-contain"
+        priority
+      />
     </div>
   );
 }
@@ -194,17 +114,17 @@ export default function HomePage() {
                 ideas
               </div>
               <div>
-                <span className="block font-bold text-white">Connect</span>Theory and
+                <span className="block font-bold text-[#143361]">Connect</span>Theory and
                 practice
               </div>
               <div>
-                <span className="block font-bold text-white">Create</span>New
+                <span className="block font-bold text-[#143361]">Create</span>New
                 possibilities
               </div>
             </div>
           </div>
-          <div className="hidden md:block">
-            <ScienceIllustration />
+          <div className="mx-auto w-full max-w-[420px] md:block">
+            <RisaHeroLogo />
           </div>
         </div>
       </section>
