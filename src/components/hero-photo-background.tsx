@@ -1,10 +1,10 @@
 import Image from "next/image";
 
 const heroPhotos = [
-  { src: "/images/risa-home/innovation.avif", label: "Applied technology learning" },
-  { src: "/images/risa-home/laboratory.avif", label: "Science laboratory research" },
-  { src: "/images/risa-home/devops.avif", label: "Software engineering and DevOps" },
-  { src: "/images/risa-home/mathematics.avif", label: "Mathematics and physics" },
+  { src: "/images/risa-home/innovation.jpg", label: "Applied technology learning" },
+  { src: "/images/risa-home/laboratory.webp", label: "Science laboratory research" },
+  { src: "/images/risa-home/devops.png", label: "Software engineering and DevOps" },
+  { src: "/images/risa-home/mathematics.webp", label: "Mathematics and physics" },
 ] as const;
 
 /**
