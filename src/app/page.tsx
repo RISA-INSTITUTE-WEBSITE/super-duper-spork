@@ -61,7 +61,6 @@ function ScienceIllustration() {
         className="relative mt-4 w-full"
         viewBox="0 0 460 440"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <linearGradient id="risa-ring" x1="78" y1="75" x2="391" y2="360">
