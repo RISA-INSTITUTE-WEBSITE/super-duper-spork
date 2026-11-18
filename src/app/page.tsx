@@ -237,7 +237,12 @@ export default function HomePage() {
                 key={number}
                 className="risa-glass-card group relative isolate overflow-hidden rounded-[1.6rem] p-7 transition duration-200 hover:-translate-y-1 sm:p-8"
               >
-                <span aria-hidden="true" className="pointer-events-none absolute -right-2 top-0 select-none text-[110px] font-black leading-none tracking-tight text-[#155DFC]/[0.07]">{number}</span>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-2 top-0 select-none text-[110px] font-black leading-none tracking-tight text-[#155DFC]/[0.07]"
+                >
+                  {number}
+                </span>
                 <span className="relative inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
                   {number}
                 </span>
@@ -251,7 +256,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="pathways-heading" className="risa-pathways-section py-20 sm:py-24">
+      <section
+        aria-labelledby="pathways-heading"
+        className="risa-pathways-section py-20 sm:py-24"
+      >
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
@@ -289,7 +297,12 @@ export default function HomePage() {
                     pathwayAccents[index % pathwayAccents.length]
                   }
                 />
-                <span aria-hidden="true" className="pointer-events-none absolute -right-3 top-10 select-none text-[130px] font-black leading-none tracking-tight text-[#155DFC]/[0.08]">0{index + 1}</span>
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-3 top-10 select-none text-[130px] font-black leading-none tracking-tight text-[#155DFC]/[0.08]"
+                >
+                  0{index + 1}
+                </span>
                 <div className="relative flex items-center justify-between">
                   <span className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-800">
                     Proposed
@@ -301,7 +314,9 @@ export default function HomePage() {
                 <h3 className="relative mt-9 text-2xl font-bold tracking-tight text-slate-950">
                   {title}
                 </h3>
-                <p className="relative mt-4 flex-1 leading-7 text-slate-600">{description}</p>
+                <p className="relative mt-4 flex-1 leading-7 text-slate-600">
+                  {description}
+                </p>
                 <Link
                   href="/programmes"
                   className="relative mt-9 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"

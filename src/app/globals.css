@@ -46,11 +46,22 @@ body {
 }
 
 .risa-navbar {
-  background: radial-gradient(ellipse 85% 175% at 50% 45%, #f3f4f6 12%, #dbeafe 58%, #bfdbfe 100%);
+  background: radial-gradient(
+    ellipse 85% 175% at 50% 45%,
+    #f3f4f6 12%,
+    #dbeafe 58%,
+    #bfdbfe 100%
+  );
 }
 
 .risa-hero {
-  background: radial-gradient(ellipse at 60% 10%, #ffffff 0%, #eef6ff 43%, #cee5ff 80%, #c1daf8 100%);
+  background: radial-gradient(
+    ellipse at 60% 10%,
+    #ffffff 0%,
+    #eef6ff 43%,
+    #cee5ff 80%,
+    #c1daf8 100%
+  );
 }
 
 .risa-hero-grid {
@@ -63,12 +74,20 @@ body {
 
 .risa-hero-glow {
   background:
-    radial-gradient(ellipse 50% 65% at 84% 50%, rgba(255, 255, 255, 0.9), transparent 80%),
+    radial-gradient(
+      ellipse 50% 65% at 84% 50%,
+      rgba(255, 255, 255, 0.9),
+      transparent 80%
+    ),
     radial-gradient(ellipse 43% 57% at 4% 85%, rgba(21, 93, 252, 0.06), transparent 80%);
 }
 
 .risa-science-glass {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(225, 239, 255, 0.64));
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(225, 239, 255, 0.64)
+  );
   border: 1px solid rgba(255, 255, 255, 0.96);
   box-shadow:
     0 20px 60px rgba(44, 93, 157, 0.14),
@@ -79,10 +98,15 @@ body {
 
 .risa-glass-card,
 .risa-pathway-card {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.83) 0%, rgba(247, 251, 255, 0.77) 45%, rgba(220, 236, 252, 0.63) 100%);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.83) 0%,
+    rgba(247, 251, 255, 0.77) 45%,
+    rgba(220, 236, 252, 0.63) 100%
+  );
   border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 12px 29px rgba(61, 103, 152, 0.10),
+    0 12px 29px rgba(61, 103, 152, 0.1),
     inset 0 2px 8px rgba(255, 255, 255, 0.95),
     inset 0 -14px 24px rgba(107, 158, 211, 0.08);
   backdrop-filter: blur(8px) saturate(150%);
