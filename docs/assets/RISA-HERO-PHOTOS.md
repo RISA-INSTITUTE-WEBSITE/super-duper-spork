@@ -9,12 +9,12 @@ see the first photo as a static background.
 
 The site looks for these exact files, relative to the repository root:
 
-| Sequence | Path | Original supplied file |
-| --- | --- | --- |
-| 1 | `public/images/risa-home/innovation.jpg` | `48035309701_7a5bae0d61_k.jpg` |
-| 2 | `public/images/risa-home/laboratory.webp` | `GettyImages-135018895 (1).webp` |
-| 3 | `public/images/risa-home/devops.png` | `Go DevOps Coding Workstation.png` |
-| 4 | `public/images/risa-home/mathematics.webp` | `Maths.webp` |
+| Sequence | Path                                       | Original supplied file             |
+| -------- | ------------------------------------------ | ---------------------------------- |
+| 1        | `public/images/risa-home/innovation.jpg`   | `48035309701_7a5bae0d61_k.jpg`     |
+| 2        | `public/images/risa-home/laboratory.webp`  | `GettyImages-135018895 (1).webp`   |
+| 3        | `public/images/risa-home/devops.png`       | `Go DevOps Coding Workstation.png` |
+| 4        | `public/images/risa-home/mathematics.webp` | `Maths.webp`                       |
 
 **All four original images are committed** at these exact paths. Their
 Git blob SHA-1 identifiers match the original file bytes (no image editing or
