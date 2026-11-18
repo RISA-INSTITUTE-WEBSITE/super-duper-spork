@@ -43,6 +43,8 @@ separate in [ci.yml](.github/workflows/ci.yml).
 - [17 November 2026 milestone traceability checklist](docs/milestones/2026-11-17-development-quality-traceability.md)
 - [GitHub branch-protection blocker](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/2)
 - [Dependency-license review blocker](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/3)
+- [Unpatched picomatch dependency vulnerability](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/4)
+- [18 November remediation evidence](docs/quality/REMEDIATION-2026-11-18.md)
 
 Tests are grouped in `tests/unit/`, `tests/e2e/`, `tests/integration/`,
 and `tests/security/`. Keep Next.js and tooling configuration files at the
@@ -55,8 +57,8 @@ to `main`. Read the [development guide](docs/DEVELOPMENT.md) for the
 folder structure, planned next steps, and guidelines.
 
 **Before merging:** The dependency lockfile is tracked and CI uses `npm ci`,
-but the licence-compliance gate and repository-level required-check rules
-are still outstanding. **Do not merge Draft PR #1** until all checks pass and
+but the vulnerability audit, licence-compliance gate, and repository-level
+required-check rules are still outstanding. **Do not merge Draft PR #1** until all checks pass and
 the private `main` branch is protected.
 
 The initial team feature requests live in
