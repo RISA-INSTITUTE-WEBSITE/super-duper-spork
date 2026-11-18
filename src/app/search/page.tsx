@@ -19,7 +19,7 @@ const pages = [
   {
     href: "/programmes",
     title: "Programmes",
-    description: "Explore proposed science, mathematics and computing pathways.",
+    description: "Explore science, mathematics and computing pathways.",
     keywords: "programmes courses pathways",
     category: "Page",
   },
@@ -56,12 +56,16 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string | string[] }>;
 }) {
   const params = await searchParams;
-  const query = typeof params.q === "string" ? params.q.trim().slice(0, 100) : "";
+  const value = typeof params.q === "string" ? params.q : "";
+  const query = value.trim().slice(0, 100);
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   const results = entries.filter((entry) => {
     const content = [entry.title, entry.description, entry.keywords].join(" ");
-    return terms.length > 0 && terms.every((term) => content.toLowerCase().includes(term));
+    const text = content.toLowerCase();
+    return terms.length > 0 && terms.every((term) => text.includes(term));
   });
+
+  const explanation = query ? "Results for: " + query : "Search RISA pages and pathways.";
 
   return (
     <main
@@ -73,7 +77,7 @@ export default async function SearchPage({
       </p>
       <h1 className="mt-3 text-4xl font-bold">Search RISA</h1>
       <p className="mt-5 text-slate-600">
-        {query ? "Results for: " + query : "Use the search bar above to explore RISA."}
+        {explanation}
       </p>
       {results.length > 0 && (
         <ul className="mt-8 grid gap-4">
@@ -96,7 +100,7 @@ export default async function SearchPage({
         </ul>
       )}
       {query && results.length === 0 && (
-        <p role="status" className="mt-8 rounded-xl bg-white p-6 text-slate-700">
+        <p role="status" className="mt-8 bg-white p-6 text-slate-700">
           No matching pages found. Try another keyword.
         </p>
       )}
