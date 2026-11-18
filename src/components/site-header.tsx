@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { MobileNavigation } from "@/components/mobile-navigation";
+
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/programmes", label: "Programmes" },
@@ -11,7 +13,7 @@ const navigation = [
 export function SiteHeader() {
   return (
     <header className="risa-navbar relative z-20 border-b border-[#78eb29]">
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-4 px-5 py-4 sm:px-8 md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-8 lg:grid-cols-[minmax(0,1fr)_minmax(14rem,21rem)_minmax(0,1fr)] lg:gap-x-6">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-8 md:grid md:grid-cols-[auto_minmax(0,1fr)] md:gap-x-8 md:py-4 lg:grid-cols-[minmax(0,1fr)_minmax(14rem,21rem)_minmax(0,1fr)] lg:gap-x-6">
         <Link
           href="/"
           className="flex w-fit items-center gap-3 rounded-md text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
@@ -32,11 +34,12 @@ export function SiteHeader() {
             </span>
           </span>
         </Link>
+        <MobileNavigation />
         <form
           role="search"
           action="/search"
           method="get"
-          className="relative w-full md:max-w-md md:justify-self-end lg:max-w-none lg:justify-self-center"
+          className="relative hidden w-full md:block md:max-w-md md:justify-self-end lg:max-w-none lg:justify-self-center"
         >
           <label htmlFor="risa-site-search" className="sr-only">
             Search RISA website
@@ -72,7 +75,7 @@ export function SiteHeader() {
         </form>
         <nav
           aria-label="Primary navigation"
-          className="md:col-span-2 lg:col-span-1 lg:justify-self-end"
+          className="hidden md:col-span-2 md:block lg:col-span-1 lg:justify-self-end"
         >
           <ul className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm font-semibold text-slate-700 sm:gap-x-3">
             {navigation.map(({ href, label }) => (
