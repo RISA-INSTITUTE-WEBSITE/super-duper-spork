@@ -14,7 +14,10 @@ const heroPhotos = [
  */
 export function HeroPhotoBackground() {
   return (
-    <div aria-hidden="true" className="risa-hero-photos pointer-events-none absolute inset-0">
+    <div
+      aria-hidden="true"
+      className="risa-hero-photos pointer-events-none absolute inset-0"
+    >
       {heroPhotos.map((photo, index) => (
         <div
           key={photo.src}

@@ -9,24 +9,21 @@ see the first photo as a static background.
 
 The site looks for these exact files, relative to the repository root:
 
-| Sequence | Path | Original supplied file |
-| --- | --- | --- |
-| 1 | `public/images/risa-home/innovation.jpg` | `48035309701_7a5bae0d61_k.jpg` |
-| 2 | `public/images/risa-home/laboratory.webp` | `GettyImages-135018895 (1).webp` |
-| 3 | `public/images/risa-home/devops.png` | `Go DevOps Coding Workstation.png` |
-| 4 | `public/images/risa-home/mathematics.webp` | `Maths.webp` |
+| Sequence | Path                                       | Original supplied file             |
+| -------- | ------------------------------------------ | ---------------------------------- |
+| 1        | `public/images/risa-home/innovation.jpg`   | `48035309701_7a5bae0d61_k.jpg`     |
+| 2        | `public/images/risa-home/laboratory.webp`  | `GettyImages-135018895 (1).webp`   |
+| 3        | `public/images/risa-home/devops.png`       | `Go DevOps Coding Workstation.png` |
+| 4        | `public/images/risa-home/mathematics.webp` | `Maths.webp`                       |
 
-**Asset upload remains pending.** The uploaded photographs are provided
-separately in the user's four-file ZIP package with the exact paths above.
-The connected GitHub text-file editor cannot upload these binary files.
-Do not merge this feature branch until those four assets are committed;
-otherwise browsers will request missing image paths.
+**All four original images are committed** at these exact paths. Their
+Git blob SHA-1 identifiers match the original file bytes (no image editing or
+recompression).
 
-To finish, extract the ZIP, upload the four image files into this exact
-folder in the `feat/homepage-four-photo-fade` branch and rerun CI.
-Confirm image paths return HTTP 200 before approving the pull request.
-Use properly licensed imagery; the photo labelled GettyImages should be
-checked for the institution's intended website publication rights.
+Before public distribution, confirm the institution holds the necessary
+publication rights to each photo, especially the one labelled GettyImages.
+Confirm the deployed paths respond with HTTP 200 and check legibility on
+desktop and mobile.
 
 ## Implementation notes
 
