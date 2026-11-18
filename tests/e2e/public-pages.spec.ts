@@ -126,3 +126,26 @@ test("mobile menu opens a sidebar and closes after navigation", async ({ page })
   await expect(page).toHaveURL(/\/programmes\/?$/);
   await expect(page.getByRole("dialog", { name: "RISA navigation menu" })).toHaveCount(0);
 });
+
+test("navigation links use larger Outfit SemiBold text on desktop and mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const desktopLink = page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Home" });
+  await expect(desktopLink).toHaveCSS("font-family", /Outfit/);
+  await expect(desktopLink).toHaveCSS("font-size", "16px");
+  await expect(desktopLink).toHaveCSS("font-weight", "600");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  const mobileLink = page
+    .getByRole("navigation", { name: "Mobile navigation" })
+    .getByRole("link", { name: "Home" });
+  await expect(mobileLink).toHaveCSS("font-family", /Outfit/);
+  await expect(mobileLink).toHaveCSS("font-size", "18px");
+  await expect(mobileLink).toHaveCSS("font-weight", "600");
+});
