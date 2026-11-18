@@ -5,28 +5,28 @@ import { pathways } from "@/lib/pathways";
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search public pages and proposed learning pathways on the RISA website.",
+  description: "Search public RISA pages and proposed learning pathways.",
 };
 
 const sitePages = [
   {
     href: "/",
     title: "RISA homepage",
-    description: "Learn the science. Shape what comes next. Explore applied learning at RISA.",
+    description: "Learn the science and explore applied learning at RISA.",
     keywords: "home science applied learning RISA",
     category: "Page",
   },
   {
     href: "/programmes",
     title: "Programmes",
-    description: "Explore proposed learning pathways in science, mathematics and computing.",
+    description: "Explore proposed science, mathematics and computing pathways.",
     keywords: "programmes courses pathways learning",
     category: "Page",
   },
   {
     href: "/about",
     title: "About RISA",
-    description: "Learn about RISA's vision for practical, application-oriented education.",
+    description: "Learn about RISA's vision for practical education.",
     keywords: "about institute mission vision",
     category: "Page",
   },
@@ -56,7 +56,8 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string | string[] }>;
 }) {
   const params = await searchParams;
-  const query = (typeof params.q === "string" ? params.q : "").trim().slice(0, 100);
+  const value = typeof params.q === "string" ? params.q : "";
+  const query = value.trim().slice(0, 100);
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const results = words.length
     ? searchItems.filter((item) =>
@@ -106,8 +107,12 @@ export default async function SearchPage({
           ))}
         </ul>
       ) : query ? (
-        <p role="status" className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
-          No matching pages found. Try another keyword, such as physics or programmes.
+        <p
+          role="status"
+          className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700"
+        >
+          No matching pages found. Try another keyword, such as physics or
+          programmes.
         </p>
       ) : null}
     </main>
