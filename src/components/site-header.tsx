@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const navigation = [
@@ -16,12 +17,14 @@ export function SiteHeader() {
           className="flex w-fit items-center gap-3 rounded-md text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
           aria-label="RISA Institute of Applied Sciences homepage"
         >
-          <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#155DFC] text-xl font-black text-white shadow-[0_5px_14px_rgba(21,93,252,0.25)]"
-            aria-hidden="true"
-          >
-            R<span className="text-white">.</span>
-          </span>
+          <Image
+            src="/risa-logo.svg"
+            alt=""
+            width={64}
+            height={64}
+            className="size-14 shrink-0 rounded-full object-contain"
+            priority
+          />
           <span className="text-base font-extrabold leading-tight tracking-tight text-[#0A0F1D]">
             RISA
             <span className="block text-xs font-medium tracking-normal text-slate-500">
