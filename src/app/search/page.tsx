@@ -5,22 +5,22 @@ import { pathways } from "@/lib/pathways";
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search public RISA pages and proposed learning pathways.",
+  description: "Search the public RISA website and proposed learning pathways.",
 };
 
-const sitePages = [
+const pages = [
   {
     href: "/",
     title: "RISA homepage",
-    description: "Learn the science and explore applied learning at RISA.",
-    keywords: "home science applied learning RISA",
+    description: "Learn the science and discover applied learning at RISA.",
+    keywords: "home learn applied education",
     category: "Page",
   },
   {
     href: "/programmes",
     title: "Programmes",
     description: "Explore proposed science, mathematics and computing pathways.",
-    keywords: "programmes courses pathways learning",
+    keywords: "programmes courses pathways",
     category: "Page",
   },
   {
@@ -34,18 +34,18 @@ const sitePages = [
     href: "/contact",
     title: "Contact RISA",
     description: "Find information about contacting the RISA team.",
-    keywords: "contact help team information",
+    keywords: "contact team help",
     category: "Page",
   },
 ] as const;
 
-const searchItems = [
-  ...sitePages,
+const entries = [
+  ...pages,
   ...pathways.map((pathway) => ({
     href: "/programmes",
     title: pathway.title,
     description: pathway.description,
-    keywords: "proposed learning pathway science programme planned",
+    keywords: "proposed learning pathway programme",
     category: "Proposed pathway",
   })),
 ];
@@ -56,18 +56,12 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string | string[] }>;
 }) {
   const params = await searchParams;
-  const value = typeof params.q === "string" ? params.q : "";
-  const query = value.trim().slice(0, 100);
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const results = words.length
-    ? searchItems.filter((item) =>
-        words.every((word) =>
-          (item.title + " " + item.description + " " + item.keywords)
-            .toLowerCase()
-            .includes(word),
-        ),
-      )
-    : [];
+  const query = typeof params.q === "string" ? params.q.trim().slice(0, 100) : "";
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const results = entries.filter((entry) => {
+    const content = [entry.title, entry.description, entry.keywords].join(" ");
+    return terms.length > 0 && terms.every((term) => content.toLowerCase().includes(term));
+  });
 
   return (
     <main
@@ -79,42 +73,33 @@ export default async function SearchPage({
       </p>
       <h1 className="mt-3 text-4xl font-bold">Search RISA</h1>
       <p className="mt-5 text-slate-600">
-        {query ? (
-          <>
-            Results for <strong className="text-slate-900">{query}</strong>
-          </>
-        ) : (
-          "Use the search bar above to find RISA pages and proposed learning pathways."
-        )}
+        {query ? "Results for: " + query : "Use the search bar above to explore RISA."}
       </p>
-      {results.length > 0 ? (
+      {results.length > 0 && (
         <ul className="mt-8 grid gap-4">
-          {results.map((result) => (
-            <li key={result.category + result.title}>
+          {results.map((entry) => (
+            <li key={entry.category + entry.title}>
               <Link
-                href={result.href}
-                className="block rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-[#78eb29] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+                href={entry.href}
+                className="block rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-[#78eb29] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-[#286518]"
               >
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#286518]">
-                  {result.category}
-                </span>
+                <p className="text-xs font-semibold uppercase text-[#286518]">
+                  {entry.category}
+                </p>
                 <h2 className="mt-2 text-xl font-semibold text-slate-950">
-                  {result.title}
+                  {entry.title}
                 </h2>
-                <p className="mt-2 text-slate-600">{result.description}</p>
+                <p className="mt-2 text-slate-600">{entry.description}</p>
               </Link>
             </li>
           ))}
         </ul>
-      ) : query ? (
-        <p
-          role="status"
-          className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700"
-        >
-          No matching pages found. Try another keyword, such as physics or
-          programmes.
+      )}
+      {query && results.length === 0 && (
+        <p role="status" className="mt-8 rounded-xl bg-white p-6 text-slate-700">
+          No matching pages found. Try another keyword.
         </p>
-      ) : null}
+      )}
     </main>
   );
 }
