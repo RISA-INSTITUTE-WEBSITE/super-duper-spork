@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { HeroPhotoBackground } from "@/components/hero-photo-background";
 import { pathways } from "@/lib/pathways";
 
 const principles = [
@@ -66,14 +67,7 @@ export default function HomePage() {
   return (
     <main id="main-content" className="flex-1">
       <section className="risa-hero relative isolate overflow-hidden text-[#0A0F1D]">
-        <div
-          aria-hidden="true"
-          className="risa-hero-grid pointer-events-none absolute inset-0"
-        />
-        <div
-          aria-hidden="true"
-          className="risa-hero-glow pointer-events-none absolute inset-0"
-        />
+        <HeroPhotoBackground />
         <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12 lg:py-24">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/95 bg-white/65 px-4 py-2 text-xs font-semibold tracking-wide text-[#34569E] shadow-sm backdrop-blur-md">
