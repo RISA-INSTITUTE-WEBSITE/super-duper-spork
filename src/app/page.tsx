@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
@@ -48,27 +47,12 @@ function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   );
 }
 
-function RisaHeroLogo() {
-  return (
-    <div className="risa-science-glass relative mx-auto flex w-full max-w-[480px] items-center justify-center overflow-hidden rounded-[2rem] p-5 sm:p-8">
-      <Image
-        src="/risa-logo.svg"
-        alt="RISA Institute official logo"
-        width={420}
-        height={420}
-        className="h-auto w-full max-w-[360px] rounded-full object-contain"
-        priority
-      />
-    </div>
-  );
-}
-
 export default function HomePage() {
   return (
     <main id="main-content" className="flex-1">
       <section className="risa-hero relative isolate overflow-hidden text-[#0A0F1D]">
         <HeroPhotoBackground />
-        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12 lg:py-24">
+        <div className="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/95 bg-white/65 px-4 py-2 text-xs font-semibold tracking-wide text-[#34569E] shadow-sm backdrop-blur-md">
               <span className="size-2 rounded-full bg-[#155DFC]" aria-hidden="true" />
@@ -116,9 +100,6 @@ export default function HomePage() {
                 possibilities
               </div>
             </div>
-          </div>
-          <div className="mx-auto w-full max-w-[420px] md:block">
-            <RisaHeroLogo />
           </div>
         </div>
       </section>
