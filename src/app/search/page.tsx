@@ -65,7 +65,7 @@ export default async function SearchPage({
     return terms.length > 0 && terms.every((term) => text.includes(term));
   });
 
-  const explanation = query ? "Results for: " + query : "Search RISA pages and pathways.";
+  const explanation = query ? "Results for: " + query : "Search the site.";
 
   return (
     <main
