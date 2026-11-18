@@ -1,0 +1,45 @@
+name: Format landing page source (temporary maintenance)
+
+on:
+  push:
+    branches: [chore/website-foundation]
+
+permissions:
+  contents: write
+
+jobs:
+  format-landing-page:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout development branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Format only landing page files
+        run: |
+          npx prettier --write \
+            src/app/page.tsx \
+            src/app/globals.css \
+            src/components/site-header.tsx \
+            src/components/site-footer.tsx \
+            tests/e2e/public-pages.spec.ts
+          git diff --check
+      - name: Commit formatting
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/app/page.tsx src/app/globals.css src/components/site-header.tsx src/components/site-footer.tsx tests/e2e/public-pages.spec.ts
+            git commit -m "style(website): apply Prettier formatting to landing page"
+            git push origin HEAD:chore/website-foundation
+          else
+            echo "Landing page files already formatted."
+          fi
