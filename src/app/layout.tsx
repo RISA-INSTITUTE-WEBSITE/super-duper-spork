@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Outfit } from "next/font/google";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 import "./globals.css";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: "600",
+  display: "swap",
+  variable: "--font-outfit",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -19,7 +27,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body className="flex min-h-screen flex-col bg-slate-50 text-slate-900 antialiased">
+      <body
+        className={`${outfit.variable} flex min-h-screen flex-col bg-slate-50 text-slate-900 antialiased`}
+      >
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
