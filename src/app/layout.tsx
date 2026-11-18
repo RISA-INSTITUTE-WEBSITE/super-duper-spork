@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   },
   description:
     "RISA Institute of Applied Sciences — a developing platform for practical learning in science, engineering and technology.",
+  icons: { icon: "/risa-logo.svg" },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
