@@ -131,9 +131,71 @@ body {
   background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
 }
 
+/* Option 01: original Orbital Spin loader (not the later redesign). */
+.risa-orbital-spin {
+  --risa-loader-blue: #38b6ff;
+  --risa-loader-dark: #383838;
+  --risa-loader-green: #78eb29;
+  position: relative;
+  display: grid;
+  width: 68px;
+  height: 68px;
+  place-items: center;
+}
+
+.risa-orbital-spin__core {
+  position: absolute;
+  display: grid;
+  width: 53px;
+  height: 53px;
+  place-items: center;
+  border: 3px solid var(--risa-loader-dark);
+  border-radius: 50%;
+}
+
+.risa-orbital-spin__core::after {
+  content: "";
+  width: 26px;
+  height: 12px;
+  border-radius: 5px 5px 13px 13px;
+  background: var(--risa-loader-dark);
+  transform: translateY(8px);
+}
+
+.risa-orbital-spin__orbit {
+  position: absolute;
+  inset: -1px;
+  border: 2px solid transparent;
+  border-top-color: var(--risa-loader-blue);
+  border-right-color: var(--risa-loader-blue);
+  border-radius: 50%;
+  animation: risa-orbital-spin 1.4s linear infinite;
+}
+
+.risa-orbital-spin__orbit::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 26px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--risa-loader-green);
+}
+
+@keyframes risa-orbital-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .risa-orbital-spin__orbit {
+    animation: none;
   }
 
   .risa-glass-card,
