@@ -61,13 +61,30 @@ jobs:
             ghcr.io/gitleaks/gitleaks:v8.28.0 \
             git --redact --exit-code 1 .
 
-      # QA-SEC-02: reject npm dependencies with high/critical advisories.
+      # QA-SEC-02: temporarily non-blocking by explicit owner request.
+      # The scan still runs and reports failures; issue #4 stays open.
       - name: Phase 2 - Dependency vulnerability audit
+        id: dependency_audit
+        continue-on-error: true
         run: npm audit --audit-level=high
 
-      # QA-SEC-03: reject unknown licenses pending compliance review (issue #3).
+      # QA-SEC-03: temporarily non-blocking by explicit owner request.
+      # This does NOT constitute legal approval; issue #3 stays open.
       - name: Phase 2 - Dependency license audit
+        id: license_audit
+        continue-on-error: true
         run: node scripts/quality/license-audit.mjs
+
+      # Preserve visible warnings even though these two audit steps are non-blocking.
+      - name: Report temporary audit exceptions
+        if: ${{ always() && (steps.dependency_audit.outcome == 'failure' || steps.license_audit.outcome == 'failure') }}
+        run: |
+          if [ "${{ steps.dependency_audit.outcome }}" = "failure" ]; then
+            echo "::warning title=Dependency audit exception::The dependency audit failed but is temporarily non-blocking. Issue #4 remains unresolved."
+          fi
+          if [ "${{ steps.license_audit.outcome }}" = "failure" ]; then
+            echo "::warning title=Licence audit exception::The licence audit failed but is temporarily non-blocking. Issue #3 still requires approval."
+          fi
 
       # QA-SAST-01: project-specific source security rules from tests/security/.
       - name: Phase 2 - Semgrep SAST rules
