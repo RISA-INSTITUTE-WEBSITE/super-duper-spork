@@ -20,7 +20,10 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
 test("primary navigation works", async ({ page }) => {
   // QA-E2E-02: visitors can reach the learning-pathway listing.
   await page.goto("/");
-  await page.getByRole("link", { name: "Programmes" }).click();
+  await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Programmes" })
+    .click();
   await expect(page).toHaveURL(/\/programmes\/?$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Proposed learning pathways",
