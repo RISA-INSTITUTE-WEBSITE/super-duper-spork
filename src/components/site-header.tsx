@@ -9,7 +9,7 @@ const navigation = [
 
 export function SiteHeader() {
   return (
-    <header className="relative z-20 border-b border-slate-200 bg-white">
+    <header className="risa-navbar relative z-20 border-b border-[#cdddf5]/80">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-5 py-4 sm:px-8 md:flex-row md:items-center md:justify-between md:py-5">
         <Link
           href="/"
@@ -17,12 +17,12 @@ export function SiteHeader() {
           aria-label="RISA Institute of Applied Sciences homepage"
         >
           <span
-            className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#0b2450] text-xl font-black text-white shadow-sm"
+            className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#155DFC] text-xl font-black text-white shadow-[0_5px_14px_rgba(21,93,252,0.25)]"
             aria-hidden="true"
           >
-            R<span className="text-cyan-300">.</span>
+            R<span className="text-white">.</span>
           </span>
-          <span className="text-base font-extrabold leading-tight tracking-tight">
+          <span className="text-base font-extrabold leading-tight tracking-tight text-[#0A0F1D]">
             RISA
             <span className="block text-xs font-medium tracking-normal text-slate-500">
               Institute of Applied Sciences
@@ -30,12 +30,12 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav aria-label="Primary navigation">
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-semibold text-slate-700 sm:gap-x-8">
+          <ul className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm font-semibold text-slate-700 sm:gap-x-3">
             {navigation.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
-                  className="rounded-sm transition hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
+                  className="inline-flex min-h-10 items-center rounded-xl px-3 py-2 transition hover:bg-white/70 hover:text-[#155DFC] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]"
                 >
                   {label}
                 </Link>
