@@ -1,5 +1,5 @@
 /**
- * RISA browser acceptance tests (QA-E2E-01 through QA-E2E-04).
+ * RISA browser acceptance tests (QA-E2E-01 through QA-E2E-05).
  * Playwright starts a built Next.js app via playwright.config.ts.
  * These are smoke tests for the public scaffold, NOT a full security audit.
  */
@@ -41,4 +41,13 @@ test("basic security response headers are present", async ({ request }) => {
   expect(response.ok()).toBeTruthy();
   expect(response.headers()["x-content-type-options"]).toBe("nosniff");
   expect(response.headers()["x-frame-options"]).toBe("DENY");
+});
+
+test("landing page labels pathways as proposed and links to project information", async ({ page }) => {
+  // QA-E2E-05: avoid suggesting that enrollment and applications are live.
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Explore proposed learning pathways." })).toBeVisible();
+  await expect(page.getByText("Student accounts and applications are not available yet.")).toBeVisible();
+  await page.getByRole("link", { name: "Discover RISA" }).click();
+  await expect(page).toHaveURL(/\/about\/?$/);
 });
