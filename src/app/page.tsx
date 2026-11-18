@@ -50,10 +50,10 @@ function ScienceIllustration() {
   return (
     <div
       aria-hidden="true"
-      className="relative mx-auto w-full max-w-[480px] overflow-hidden rounded-[2rem] border border-white/15 bg-white/[0.055] p-6 shadow-[0_35px_100px_rgba(0,0,0,0.3)] backdrop-blur-md sm:p-8"
+      className="risa-science-glass relative mx-auto w-full max-w-[480px] overflow-hidden rounded-[2rem] p-6 sm:p-8"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(34,211,238,0.14),transparent_50%)]" />
-      <div className="relative flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-200/85">
+      <div className="relative flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.2em] text-[#5274C3]">
         <span>RISA / Exploration</span>
         <span>001</span>
       </div>
@@ -130,16 +130,16 @@ function ScienceIllustration() {
           strokeWidth="2"
         />
       </svg>
-      <div className="relative flex items-center justify-between gap-4 border-t border-white/15 pt-5">
+      <div className="relative flex items-center justify-between gap-4 border-t border-white/70 pt-5">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-cyan-300">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#155DFC]">
             Our direction
           </p>
-          <p className="mt-1 text-sm font-medium text-white/90">
+          <p className="mt-1 text-sm font-medium text-[#253b64]">
             Curiosity meets application.
           </p>
         </div>
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-cyan-200">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white bg-white/70 text-[#155DFC] shadow-sm">
           <ArrowIcon diagonal />
         </div>
       </div>
@@ -150,7 +150,7 @@ function ScienceIllustration() {
 export default function HomePage() {
   return (
     <main id="main-content" className="flex-1">
-      <section className="risa-hero relative isolate overflow-hidden bg-[#071936] text-white">
+      <section className="risa-hero relative isolate overflow-hidden text-[#0A0F1D]">
         <div
           aria-hidden="true"
           className="risa-hero-grid pointer-events-none absolute inset-0"
@@ -159,20 +159,20 @@ export default function HomePage() {
           aria-hidden="true"
           className="risa-hero-glow pointer-events-none absolute inset-0"
         />
-        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-14 px-5 py-18 sm:px-8 sm:py-24 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:py-28">
+        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12 lg:py-24">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200/25 bg-cyan-300/10 px-4 py-2 text-xs font-semibold tracking-wide text-cyan-100">
-              <span className="size-2 rounded-full bg-cyan-300" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/95 bg-white/65 px-4 py-2 text-xs font-semibold tracking-wide text-[#34569E] shadow-sm backdrop-blur-md">
+              <span className="size-2 rounded-full bg-[#155DFC]" aria-hidden="true" />
               Building the future of applied learning
             </span>
-            <p className="mt-8 text-sm font-semibold uppercase tracking-[0.25em] text-sky-200">
+            <p className="mt-8 text-xs font-bold uppercase tracking-[0.22em] text-[#5274C3]">
               RISA Institute of Applied Sciences
             </p>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.12] tracking-[-0.04em] sm:text-5xl lg:text-[4.25rem]">
+            <h1 className="risa-display mt-5 max-w-3xl text-[3rem] font-bold leading-[1.05] tracking-[-0.035em] sm:text-[4rem] lg:text-[4.8rem]">
               Learn the science.
-              <span className="mt-2 block text-cyan-300">Shape what comes next.</span>
+              <span className="mt-2 block text-[#155DFC]">Shape what comes next.</span>
             </h1>
-            <p className="mt-7 max-w-xl text-base leading-8 text-slate-200 sm:text-lg">
+            <p className="mt-7 max-w-xl text-base leading-8 text-[#465d7b] sm:text-lg">
               Science makes more sense when you can put it to work. RISA is developing an
               accessible learning experience that connects strong foundations with
               practical thinking.
@@ -180,22 +180,22 @@ export default function HomePage() {
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
                 href="/programmes"
-                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-cyan-300 px-6 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-[#155DFC] px-6 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(21,93,252,0.2)] transition hover:bg-[#154cbe] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#155DFC]"
               >
                 Explore learning pathways
                 <ArrowIcon />
               </Link>
               <Link
                 href="/about"
-                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl border border-white/35 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl border border-white/90 bg-white/70 px-6 py-3 text-sm font-semibold text-[#204472] shadow-sm backdrop-blur-md transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#155DFC]"
               >
                 Discover RISA
                 <ArrowIcon diagonal />
               </Link>
             </div>
-            <div className="mt-12 grid gap-5 border-t border-white/20 pt-7 text-sm text-slate-200 sm:grid-cols-3 sm:gap-6">
+            <div className="mt-12 grid gap-5 border-t border-white/75 pt-7 text-sm text-[#516b8b] sm:grid-cols-3 sm:gap-6">
               <div>
-                <span className="block font-bold text-white">Explore</span>Scientific
+                <span className="block font-bold text-[#143361]">Explore</span>Scientific
                 ideas
               </div>
               <div>
@@ -208,7 +208,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             <ScienceIllustration />
           </div>
         </div>
@@ -222,7 +222,7 @@ export default function HomePage() {
             </p>
             <h2
               id="approach-heading"
-              className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
+              className="risa-display mt-3 text-[2.6rem] font-bold tracking-tight text-[#0A0F1D] sm:text-[3.5rem]"
             >
               Knowledge that goes beyond the classroom.
             </h2>
@@ -235,22 +235,23 @@ export default function HomePage() {
             {principles.map(({ number, title, description }) => (
               <article
                 key={number}
-                className="group rounded-[1.5rem] border border-slate-200 bg-slate-50 p-7 transition hover:border-blue-200 hover:bg-blue-50/60 sm:p-8"
+                className="risa-glass-card group relative isolate overflow-hidden rounded-[1.6rem] p-7 transition duration-200 hover:-translate-y-1 sm:p-8"
               >
-                <span className="inline-flex size-12 items-center justify-center rounded-xl border border-blue-100 bg-white text-sm font-bold text-blue-800 shadow-sm">
+                <span aria-hidden="true" className="pointer-events-none absolute -right-2 top-0 select-none text-[110px] font-black leading-none tracking-tight text-[#155DFC]/[0.07]">{number}</span>
+                <span className="relative inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
                   {number}
                 </span>
-                <h3 className="mt-7 text-xl font-bold tracking-tight text-slate-950">
+                <h3 className="relative mt-7 text-xl font-bold tracking-tight text-slate-950">
                   {title}
                 </h3>
-                <p className="mt-3 leading-7 text-slate-600">{description}</p>
+                <p className="relative mt-3 leading-7 text-slate-600">{description}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section aria-labelledby="pathways-heading" className="bg-[#f3f7fc] py-20 sm:py-24">
+      <section aria-labelledby="pathways-heading" className="risa-pathways-section py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
@@ -280,29 +281,30 @@ export default function HomePage() {
             {pathways.map(({ slug, title, description }, index) => (
               <article
                 key={slug}
-                className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white p-7 shadow-[0_12px_35px_rgba(15,23,42,0.04)] sm:p-8"
+                className="risa-pathway-card group relative isolate flex flex-col overflow-hidden rounded-[1.6rem] p-7 transition duration-200 hover:-translate-y-1 sm:p-8"
               >
                 <div
                   className={
-                    "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r " +
+                    "absolute inset-x-0 top-0 h-1.5 rounded-t-[1.6rem] bg-gradient-to-r " +
                     pathwayAccents[index % pathwayAccents.length]
                   }
                 />
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-blue-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-800">
+                <span aria-hidden="true" className="pointer-events-none absolute -right-3 top-10 select-none text-[130px] font-black leading-none tracking-tight text-[#155DFC]/[0.08]">0{index + 1}</span>
+                <div className="relative flex items-center justify-between">
+                  <span className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-800">
                     Proposed
                   </span>
                   <span className="text-sm font-semibold text-slate-400">
                     0{index + 1}
                   </span>
                 </div>
-                <h3 className="mt-9 text-2xl font-bold tracking-tight text-slate-950">
+                <h3 className="relative mt-9 text-2xl font-bold tracking-tight text-slate-950">
                   {title}
                 </h3>
-                <p className="mt-4 flex-1 leading-7 text-slate-600">{description}</p>
+                <p className="relative mt-4 flex-1 leading-7 text-slate-600">{description}</p>
                 <Link
                   href="/programmes"
-                  className="mt-9 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
+                  className="relative mt-9 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
                   aria-label={"Read about proposed " + title + " learning pathway"}
                 >
                   Learn more <ArrowIcon diagonal />
