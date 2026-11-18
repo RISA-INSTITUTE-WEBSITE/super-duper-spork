@@ -76,9 +76,7 @@ export default async function SearchPage({
         Explore RISA
       </p>
       <h1 className="mt-3 text-4xl font-bold">Search RISA</h1>
-      <p className="mt-5 text-slate-600">
-        {explanation}
-      </p>
+      <p className="mt-5 text-slate-600">{explanation}</p>
       {results.length > 0 && (
         <ul className="mt-8 grid gap-4">
           {results.map((entry) => (
