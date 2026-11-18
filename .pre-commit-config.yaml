@@ -1,3 +1,5 @@
+# QA-LOCAL-01: staged-file checks before code reaches GitHub.
+# Local hooks can auto-correct files; CI always checks without modifying.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -7,16 +9,18 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
       - id: detect-private-key
 
+  # QA-LOCAL-02: block likely credentials and tokens in staged changes.
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.21.2
+    rev: v8.28.0
     hooks:
       - id: gitleaks
 
+  # QA-PY-01/02: enforce Python naming, style and documentation rules.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev : v0.8.4
+    rev: v0.8.4
     hooks:
       - id: ruff
         args: [--fix]
@@ -26,3 +30,19 @@ repos:
     rev: v1.13.0
     hooks:
       - id: mypy
+
+  # JavaScript/TypeScript hooks use locally installed npm dependencies.
+  - repo: local
+    hooks:
+      - id: risa-prettier
+        name: Format website sources with Prettier
+        entry: npx --no-install prettier --write
+        language: system
+        files: '\.(?:[cm]?[jt]sx?|css|json|ya?ml|md)$'
+        require_serial: true
+      - id: risa-eslint
+        name: ESLint staged JavaScript and TypeScript
+        entry: npx --no-install eslint --fix
+        language: system
+        files: '\.(?:[cm]?[jt]sx?)$'
+        require_serial: true

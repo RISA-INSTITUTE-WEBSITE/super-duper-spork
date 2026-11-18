@@ -3,7 +3,7 @@ line-length = 79
 
 [tool.ruff.lint]
 # E/W/F = PEP 8 formatting, N = Naming convention, D = Docstrings, PLW = Shadowing/redefinition warnings
-select = ["E", "W", "F", "N", "D", "PLW"]
+select = ["E", "W", "F", "N", "D", "PLW", "C90", "PLR0913"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -12,3 +12,9 @@ convention = "google"
 python_version = "3.11"
 allow_redefinition = false
 warn_unused_ignores = true
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-args = 3

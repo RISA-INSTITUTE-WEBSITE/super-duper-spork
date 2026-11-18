@@ -1,0 +1,9 @@
+node_modules
+.next
+coverage
+out
+playwright-report
+test-results
+package-lock.json
+*.tsbuildinfo
+zap-report.json

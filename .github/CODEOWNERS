@@ -1,0 +1,8 @@
+# Initial code owner. Replace with a RISA maintainers team as membership grows.
+* @learnxul-lang
+/.github/ @learnxul-lang
+/src/ @learnxul-lang
+/scripts/ @learnxul-lang
+# Keep testing policies and evidence under independent review.
+/tests/ @learnxul-lang
+/docs/quality/ @learnxul-lang

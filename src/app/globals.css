@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* RISA adopts the visual language of the owner's Edu-ca-te site, not its brand/assets. */
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
+  --font-heading: "Outfit", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #bfdbfe;
+  color: #0a0f1d;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -5rem;
+  z-index: 100;
+  border-radius: 0.5rem;
+  background: #155dfc;
+  padding: 0.75rem 1rem;
+  color: white;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.risa-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 700;
+}
+
+.risa-navbar {
+  background: radial-gradient(
+    ellipse 85% 175% at 50% 45%,
+    #f3f4f6 12%,
+    #dbeafe 58%,
+    #bfdbfe 100%
+  );
+}
+
+.risa-hero {
+  background: radial-gradient(
+    ellipse at 60% 10%,
+    #ffffff 0%,
+    #eef6ff 43%,
+    #cee5ff 80%,
+    #c1daf8 100%
+  );
+}
+
+.risa-hero-grid {
+  background-image:
+    linear-gradient(rgba(81, 126, 198, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(81, 126, 198, 0.06) 1px, transparent 1px);
+  background-size: 62px 62px;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 28%, #000 80%, transparent);
+}
+
+.risa-hero-glow {
+  background:
+    radial-gradient(
+      ellipse 50% 65% at 84% 50%,
+      rgba(255, 255, 255, 0.9),
+      transparent 80%
+    ),
+    radial-gradient(ellipse 43% 57% at 4% 85%, rgba(21, 93, 252, 0.06), transparent 80%);
+}
+
+.risa-science-glass {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.72),
+    rgba(225, 239, 255, 0.64)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 20px 60px rgba(44, 93, 157, 0.14),
+    inset 0 2px 10px rgba(255, 255, 255, 0.94),
+    inset 0 -12px 26px rgba(125, 165, 221, 0.08);
+  backdrop-filter: blur(12px) saturate(155%);
+}
+
+.risa-glass-card,
+.risa-pathway-card {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.83) 0%,
+    rgba(247, 251, 255, 0.77) 45%,
+    rgba(220, 236, 252, 0.63) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 12px 29px rgba(61, 103, 152, 0.1),
+    inset 0 2px 8px rgba(255, 255, 255, 0.95),
+    inset 0 -14px 24px rgba(107, 158, 211, 0.08);
+  backdrop-filter: blur(8px) saturate(150%);
+}
+
+.risa-glass-card:hover,
+.risa-pathway-card:hover {
+  box-shadow:
+    0 17px 35px rgba(37, 87, 149, 0.16),
+    inset 0 2px 8px rgba(255, 255, 255, 0.95);
+}
+
+.risa-pathways-section {
+  background: linear-gradient(135deg, #f7fbff 0%, #eaf4ff 60%, #f4f8ff 100%);
+}
+
+.risa-pathway-card {
+  background: linear-gradient(45deg, #eafdff 0%, #eafdff 12%, #cbe9ff 66%, #cfcbff 100%);
+}
+
+.risa-footer {
+  background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .risa-glass-card,
+  .risa-pathway-card {
+    transition: none;
+  }
+
+  .risa-glass-card:hover,
+  .risa-pathway-card:hover {
+    transform: none;
+  }
+}

@@ -1,0 +1,156 @@
+name: RISA Website CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "chore/**", "feature/**"]
+
+concurrency:
+  group: risa-website-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  required-quality-gate:
+    name: RISA Required Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      # QA-SEC-01: complete Git history is necessary for meaningful secret scanning.
+      - name: Checkout full repository history
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # Use an explicitly supported runtime and cache npm downloads.
+      - name: Set up supported Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      # QA-REPRO-01: npm ci rejects drift from the committed package-lock.json.
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      # Phase 1 - fastest, read-only static checks.
+      # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
+      - name: Phase 1 - Formatting without modifications
+        run: npm run format:check
+
+      # QA-STATIC-02/03: enforce lint and strict TS typing before slower checks.
+      - name: Phase 1 - ESLint, complexity and TypeScript
+        run: |
+          npm run lint
+          npm run typecheck
+
+      # Phase 2 - secrets, dependencies and source security.
+      # QA-SEC-01: Gitleaks checks Git history for credentials, failing on findings.
+      - name: Phase 2 - Full-history secret scan
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo" -w /repo \
+            ghcr.io/gitleaks/gitleaks:v8.28.0 \
+            git --redact --exit-code 1 .
+
+      # QA-SEC-02: temporarily non-blocking by explicit owner request.
+      # The scan still runs and reports failures; issue #4 stays open.
+      - name: Phase 2 - Dependency vulnerability audit
+        id: dependency_audit
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      # QA-SEC-03: temporarily non-blocking by explicit owner request.
+      # This does NOT constitute legal approval; issue #3 stays open.
+      - name: Phase 2 - Dependency license audit
+        id: license_audit
+        continue-on-error: true
+        run: node scripts/quality/license-audit.mjs
+
+      # Preserve visible warnings even though these two audit steps are non-blocking.
+      - name: Report temporary audit exceptions
+        if: ${{ always() && (steps.dependency_audit.outcome == 'failure' || steps.license_audit.outcome == 'failure') }}
+        run: |
+          if [ "${{ steps.dependency_audit.outcome }}" = "failure" ]; then
+            echo "::warning title=Dependency audit exception::The dependency audit failed but is temporarily non-blocking. Issue #4 remains unresolved."
+          fi
+          if [ "${{ steps.license_audit.outcome }}" = "failure" ]; then
+            echo "::warning title=Licence audit exception::The licence audit failed but is temporarily non-blocking. Issue #3 still requires approval."
+          fi
+
+      # QA-SAST-01: project-specific source security rules from tests/security/.
+      - name: Phase 2 - Semgrep SAST rules
+        run: |
+          python3 -m pip install --quiet semgrep
+          semgrep scan --config tests/security/semgrep.yml --error --metrics off src
+
+      # Phase 3 - build and unit verification.
+      # QA-BUILD-01: verify Next.js can build a deployable application.
+      - name: Phase 3 - Production build
+        run: npm run build
+
+      # QA-UNIT-01/02: enforce >=80% coverage of src/lib (not entire app).
+      - name: Phase 3 - Unit coverage threshold
+        run: npm run test:coverage
+
+      # Phase 4 - integration and infrastructure tests.
+      # QA-IAC-01: run Checkov when Docker/Terraform/Kubernetes manifests exist.
+      - name: Phase 4 - Infrastructure-as-code scan (when applicable)
+        run: |
+          if find . -type f \( -name 'Dockerfile*' -o -name '*.tf' -o -name '*.tf.json' -o -name 'kustomization.yaml' \) -not -path './node_modules/*' | grep -q .; then
+            python3 -m pip install --quiet checkov
+            checkov -d . --framework dockerfile,terraform,kubernetes --quiet --compact
+          else
+            echo "No Docker/Terraform/Kubernetes deployment files yet; IaC scan not applicable."
+          fi
+
+      # QA-HTTP-01..03: run a built server, assert routes, 404 and security headers.
+      # The executable assertions are documented in tests/integration/http-smoke.sh.
+      - name: Phase 4 - Production HTTP smoke and response headers
+        run: bash tests/integration/http-smoke.sh
+
+      # Phase 5 - dynamic baseline and real-browser critical journeys.
+      # QA-DAST-01: scan an isolated localhost server with project ZAP rules.
+      # tests/security/run-zap.sh manages the server and Docker lifetime.
+      - name: Phase 5 - OWASP ZAP isolated active DAST scan
+        run: bash tests/security/run-zap.sh
+
+      # Provision the actual browser used for end-to-end acceptance.
+      - name: Phase 5 - Install Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      # QA-E2E-01..04: exercise navigation, error page, landmarks and headers.
+      - name: Phase 5 - Playwright end-to-end tests
+        run: npm run test:e2e
+
+      # QA-PORT-01: re-check build/type/tests under a second supported Node major.
+      - name: Phase 5 - Node.js 24 portability build and tests
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      # QA-PORT-01: fresh npm ci + typecheck + coverage + production build.
+      - name: Phase 5 - Validate portable build on Node.js 24
+        run: |
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm run test:coverage
+          npm run build
+
+      # Persist the ZAP report for review even if a security check fails.
+      - name: Preserve DAST scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: risa-zap-report
+          path: zap-report.json
+          if-no-files-found: ignore
