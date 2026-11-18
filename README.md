@@ -36,6 +36,10 @@ Automated checks run via
 [Website CI](.github/workflows/website-ci.yml). Existing Python CI remains
 separate in [ci.yml](.github/workflows/ci.yml).
 
+## Vercel deployment preparation
+
+See [Vercel import settings, preview precautions and launch verification](docs/deployment/VERCEL.md). This is a standard Next.js application at the repository root; it does not need a custom `vercel.json` file. Deployments require a connected RISA-owned Vercel account and an intentional decision to publish or protect the resulting URL.
+
 ## Testing and milestone records
 
 - [Testing guide and per-check file references](docs/quality/TESTING-GUIDE.md)
@@ -56,10 +60,11 @@ Contribute through feature branches and pull requests; do not commit directly
 to `main`. Read the [development guide](docs/DEVELOPMENT.md) for the
 folder structure, planned next steps, and guidelines.
 
-**Before merging:** The dependency lockfile is tracked and CI uses `npm ci`,
-but the vulnerability audit, licence-compliance gate, and repository-level
-required-check rules are still outstanding. **Do not merge Draft PR #1** until all checks pass and
-the private `main` branch is protected.
+**Current release risks:** Website foundation PR #1 has already been merged into
+`main`. The dependency and licence audits run with documented **non-blocking
+exceptions**, but their findings remain unresolved. Branch protection is not
+enabled on `main`. Do not treat CI success or a preview URL as sign-off for
+an unrestricted production launch; see the deployment checklist.
 
 The initial team feature requests live in
 [`RISA-Institution-website/.github/team_requirements.md`](https://github.com/RISA-INSTITUTE-WEBSITE/RISA-Institution-website/blob/main/.github/team_requirements.md).
