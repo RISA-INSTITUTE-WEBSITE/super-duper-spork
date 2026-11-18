@@ -228,7 +228,7 @@ export function MobileNavigation() {
                     <Link
                       href={href}
                       onClick={() => setMenuOpen(false)}
-                      className="flex min-h-12 items-center rounded-xl px-4 py-3 text-base font-semibold text-slate-800 transition hover:bg-[#eefce5] hover:text-[#286518] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
+                      className="flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold text-slate-800 transition hover:bg-[#eefce5] hover:text-[#286518] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
                     >
                       {label}
                     </Link>
