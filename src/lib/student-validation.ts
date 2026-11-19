@@ -9,6 +9,24 @@ export type RegistrationDetails = {
   acceptedPrivacy: boolean;
 };
 
+function hasValidEmail(email: string): boolean {
+  return (
+    email.length >= 6 &&
+    email.length <= 254 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  );
+}
+
+function hasStrongPassword(password: string): boolean {
+  return (
+    password.length >= 10 &&
+    password.length <= 128 &&
+    /[a-zA-Z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^a-zA-Z0-9]/.test(password)
+  );
+}
+
 export function validateRegistration(
   details: RegistrationDetails,
 ): RegistrationError | null {
@@ -16,26 +34,12 @@ export function validateRegistration(
   if (name.length < 2 || name.length > 80) {
     return "name";
   }
-
-  const email = details.email.trim();
-  if (
-    email.length > 254 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
-    email.length < 6
-  ) {
+  if (!hasValidEmail(details.email.trim())) {
     return "email";
   }
-
-  if (
-    details.password.length < 10 ||
-    details.password.length > 128 ||
-    !/[a-zA-Z]/.test(details.password) ||
-    !/[0-9]/.test(details.password) ||
-    !/[^a-zA-Z0-9]/.test(details.password)
-  ) {
+  if (!hasStrongPassword(details.password)) {
     return "password";
   }
-
   if (details.password !== details.confirmPassword) {
     return "confirmation";
   }
@@ -47,10 +51,5 @@ export function validateRegistration(
 }
 
 export function validateLogin(email: string, password: string): boolean {
-  return (
-    email.length <= 254 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
-    password.length > 0 &&
-    password.length <= 128
-  );
+  return hasValidEmail(email) && password.length > 0 && password.length <= 128;
 }
