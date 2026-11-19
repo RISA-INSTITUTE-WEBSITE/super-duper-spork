@@ -63,7 +63,7 @@ export function isStudentAuthConfigured(): boolean {
 
 type AuthRequestOptions = {
   path: string;
-  method: "GET" | "POST";
+  method: "GET" | "POST" | "PUT";
   body?: Record<string, unknown>;
   bearer?: string;
 };
@@ -297,4 +297,24 @@ export async function requestStudentBackend(
   } catch {
     return null;
   }
+}
+
+/** Update learner-owned display metadata (never used for authorization). */
+export async function updateStudentAuthMetadata(
+  accessToken: string,
+  fullName: string,
+  avatarPath?: string,
+): Promise<boolean> {
+  const response = await requestAuth({
+    path: "/user",
+    method: "PUT",
+    bearer: accessToken,
+    body: {
+      data: {
+        full_name: fullName,
+        ...(avatarPath ? { avatar_path: avatarPath } : {}),
+      },
+    },
+  });
+  return response?.ok === true;
 }
