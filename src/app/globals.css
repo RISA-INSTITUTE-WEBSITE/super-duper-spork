@@ -3,7 +3,8 @@
 /* RISA adopts the visual language of the owner's Edu-ca-te site, not its brand/assets. */
 @theme {
   --font-sans: "Plus Jakarta Sans", "Segoe UI", Arial, sans-serif;
-  --font-heading: var(--font-outfit), "Outfit", "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --font-heading:
+    var(--font-outfit), "Outfit", "Plus Jakarta Sans", "Segoe UI", sans-serif;
   --font-display: "Cormorant Garamond", Georgia, serif;
 }
 
