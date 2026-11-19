@@ -44,13 +44,19 @@ export default async function StudentLoginPage({
           </p>
 
           {!enabled && (
-            <p role="status" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <p
+              role="status"
+              className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+            >
               Student sign-in is not active yet. RISA is preparing its authentication
               service.
             </p>
           )}
           {error && (
-            <p role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <p
+              role="alert"
+              className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+            >
               {error === "setup"
                 ? "Student sign-in is not active yet."
                 : error === "verify"
@@ -61,7 +67,10 @@ export default async function StudentLoginPage({
             </p>
           )}
           {status === "signed-out" && (
-            <p role="status" className="mt-6 rounded-xl bg-[#eefce5] p-4 text-sm text-[#286518]">
+            <p
+              role="status"
+              className="mt-6 rounded-xl bg-[#eefce5] p-4 text-sm text-[#286518]"
+            >
               You have signed out.
             </p>
           )}
@@ -69,7 +78,10 @@ export default async function StudentLoginPage({
           <form action={signInStudent} className="mt-8 space-y-5">
             <fieldset disabled={!enabled} className="space-y-5">
               <div>
-                <label htmlFor="login-email" className="text-sm font-semibold text-slate-800">
+                <label
+                  htmlFor="login-email"
+                  className="text-sm font-semibold text-slate-800"
+                >
                   Email address
                 </label>
                 <input
