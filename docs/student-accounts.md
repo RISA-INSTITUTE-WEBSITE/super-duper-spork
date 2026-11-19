@@ -34,6 +34,7 @@ payment, enrol users in programmes, or grant administrative privileges.
    Never put a database password, service-role key or sb_secret key in public
    environment variables or the Git repository. The publishable key is a
    restricted public-project credential, NOT an admin credential.
+
 6. Review the draft student privacy notice and POPIA obligations before launch:
    lawful basis, vendor arrangement, hosting/data transfers, retention,
    correction/deletion requests, and guardian-consent handling if any students
