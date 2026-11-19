@@ -13,11 +13,6 @@ export type CourseCreationState = {
   message: string;
 };
 
-export const initialCourseCreationState: CourseCreationState = {
-  status: "idle",
-  message: "",
-};
-
 /** Called by the protected administrator form; checks role on each submission. */
 export async function createCourseAction(
   _previous: CourseCreationState,
