@@ -1,9 +1,5 @@
 export type RegistrationError =
-  | "name"
-  | "email"
-  | "password"
-  | "confirmation"
-  | "consent";
+  "name" | "email" | "password" | "confirmation" | "consent";
 
 export type RegistrationDetails = {
   fullName: string;
@@ -13,9 +9,13 @@ export type RegistrationDetails = {
   acceptedPrivacy: boolean;
 };
 
-export function validateRegistration(details: RegistrationDetails): RegistrationError | null {
+export function validateRegistration(
+  details: RegistrationDetails,
+): RegistrationError | null {
   const name = details.fullName.trim();
-  if (name.length < 2 || name.length > 80) return "name";
+  if (name.length < 2 || name.length > 80) {
+    return "name";
+  }
 
   const email = details.email.trim();
   if (
@@ -36,8 +36,12 @@ export function validateRegistration(details: RegistrationDetails): Registration
     return "password";
   }
 
-  if (details.password !== details.confirmPassword) return "confirmation";
-  if (!details.acceptedPrivacy) return "consent";
+  if (details.password !== details.confirmPassword) {
+    return "confirmation";
+  }
+  if (!details.acceptedPrivacy) {
+    return "consent";
+  }
 
   return null;
 }
