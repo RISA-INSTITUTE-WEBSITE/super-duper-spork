@@ -42,8 +42,6 @@ export type CourseCurriculum = {
 };
 
 type JsonRow = Record<string, unknown>;
-type Publishable = { is_published: boolean };
-
 function asRecord(item: unknown): JsonRow | null {
   return item && typeof item === "object" && !Array.isArray(item)
     ? (item as JsonRow)
@@ -268,6 +266,27 @@ export async function getCourseCurriculum(
   return questions ? { topics, videos, quizzes, questions } : null;
 }
 
+function youtubeUrlCandidate(url: URL): string | null {
+  const host = url.hostname.toLowerCase();
+  if (host === "youtu.be") {
+    return url.pathname.split("/")[1] || null;
+  }
+  const hosts = [
+    "www.youtube.com",
+    "youtube.com",
+    "m.youtube.com",
+    "www.youtube-nocookie.com",
+  ];
+  if (!hosts.includes(host)) {
+    return null;
+  }
+  const parts = url.pathname.split("/").filter(Boolean);
+  if (parts[0] === "watch") {
+    return url.searchParams.get("v");
+  }
+  return ["shorts", "embed", "live"].includes(parts[0]) ? parts[1] || null : null;
+}
+
 export function parseYouTubeId(input: string): string | null {
   const text = input.trim();
   if (/^[A-Za-z0-9_-]{11}$/.test(text)) {
@@ -278,17 +297,7 @@ export function parseYouTubeId(input: string): string | null {
     if (url.protocol !== "https:" || url.port || url.username || url.password) {
       return null;
     }
-    const host = url.hostname.toLowerCase();
-    let candidate: string | null = null;
-    if (host === "youtu.be") {
-      candidate = url.pathname.split("/")[1] || null;
-    } else if (["www.youtube.com", "youtube.com", "m.youtube.com", "www.youtube-nocookie.com"].includes(host)) {
-      const parts = url.pathname.split("/").filter(Boolean);
-      candidate = parts[0] === "watch" ? url.searchParams.get("v") : null;
-      if (["shorts", "embed", "live"].includes(parts[0])) {
-        candidate = parts[1] || null;
-      }
-    }
+    const candidate = youtubeUrlCandidate(url);
     return candidate && /^[A-Za-z0-9_-]{11}$/.test(candidate) ? candidate : null;
   } catch {
     return null;
