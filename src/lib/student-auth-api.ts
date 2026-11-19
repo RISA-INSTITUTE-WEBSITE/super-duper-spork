@@ -131,7 +131,7 @@ export async function registerStudentWithAuth(
     email,
     password,
     data: { full_name: fullName, account_type: "student" },
-  });
+  }});
   return response?.ok ?? false;
 }
 
@@ -142,7 +142,7 @@ export async function signInStudentWithAuth(
   const response = await requestAuth({ path: "/token?grant_type=password", method: "POST", body: {
     email,
     password,
-  });
+  }});
   return parseSession(response);
 }
 
@@ -151,7 +151,7 @@ export async function refreshStudentSession(
 ): Promise<StudentSession | null> {
   const response = await requestAuth({ path: "/token?grant_type=refresh_token", method: "POST", body: {
     refresh_token: refreshToken,
-  });
+  }});
   return parseSession(response);
 }
 
@@ -161,7 +161,7 @@ export async function verifyStudentEmail(
   const response = await requestAuth({ path: "/verify", method: "POST", body: {
     token_hash: tokenHash,
     type: "email",
-  });
+  }});
   return parseSession(response);
 }
 
