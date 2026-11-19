@@ -88,11 +88,7 @@ function StudentTopic({
   );
 }
 
-export default async function StudentCoursePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+async function verifiedLearnerSession() {
   if (!isStudentAuthConfigured()) {
     redirect("/students/login");
   }
@@ -105,7 +101,15 @@ export default async function StudentCoursePage({
   if (!identity) {
     redirect("/students/login");
   }
+  return { token, identity };
+}
 
+export default async function StudentCoursePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { token, identity } = await verifiedLearnerSession();
   const { id } = await params;
   const enrolled = await getEnrolledCourses(token, identity.id);
   if (!enrolled?.some((course) => course.id === id)) {
