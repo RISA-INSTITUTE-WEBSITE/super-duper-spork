@@ -210,8 +210,13 @@ test("RISA section animates original black liquid and green sphere without chang
   expect(svg).toContain('class="risa-original-black-liquid" fill="#383838"');
   expect(svg).toContain('class="risa-green-orb" cx="974" cy="442" r="84"');
   expect(svg).toContain("risa-natural-surface");
-  expect(svg).toContain("risa-natural-slosh");
   expect(svg).toContain("risa-liquid-3d");
+  expect(svg).toContain('class="risa-emblem-blue-underlay" fill="#38b6ff"');
+  expect(svg).toContain("M732,748 C760,728");
+  expect(svg).toContain("animation: risa-natural-surface 6.4s");
+  expect(svg).not.toContain("risa-natural-slosh");
+  expect(svg).not.toContain('fill="#fff"');
+  expect(svg).not.toContain('stroke="#fff"');
   expect(svg).toContain("risa-orb-3d");
   expect(svg).toContain("risa-green-orb-size");
   expect(svg).toContain('class="risa-glass-blue-backfill" fill="#38b6ff"');
