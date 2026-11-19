@@ -131,6 +131,47 @@ export async function getCourseMaterials(
  * Every materials lookup is done with the learner's JWT. PostgREST and
  * Storage independently enforce the enrolled-course RLS rules.
  */
+type MaterialFile = { title: string; storagePath: string };
+
+function parseMaterialFile(value: unknown): MaterialFile | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const row = value as Record<string, unknown>;
+  if (
+    typeof row.title !== "string" ||
+    typeof row.storage_path !== "string" ||
+    !/^[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,180}$/i.test(row.storage_path)
+  ) {
+    return null;
+  }
+  return { title: row.title, storagePath: row.storage_path };
+}
+
+async function getAuthorizedMaterialFile(
+  token: string,
+  id: string,
+): Promise<MaterialFile | null> {
+  const path =
+    "/rest/v1/risa_course_materials?select=title,storage_path&id=eq." +
+    id +
+    "&limit=1";
+  const response = await requestStudentBackend(token, path);
+  if (!response?.ok) {
+    return null;
+  }
+  try {
+    const rows: unknown = await response.json();
+    return Array.isArray(rows) && rows.length === 1 ? parseMaterialFile(rows[0]) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Every file lookup is performed with the student's access token. Storage RLS
+ * independently confirms enrollment before returning private bytes.
+ */
 export async function downloadCourseMaterial(
   token: string,
   materialId: string,
@@ -138,50 +179,32 @@ export async function downloadCourseMaterial(
   if (!uuidPattern.test(materialId)) {
     return null;
   }
-  const path =
-    "/rest/v1/risa_course_materials?select=title,storage_path&id=eq." +
-    materialId +
-    "&limit=1";
-  const metadata = await requestStudentBackend(token, path);
-  if (!metadata?.ok) {
+
+  const metadata = await getAuthorizedMaterialFile(token, materialId);
+  if (!metadata) {
     return null;
   }
 
-  try {
-    const rows: unknown = await metadata.json();
-    if (!Array.isArray(rows) || rows.length !== 1) {
-      return null;
-    }
-    const row = rows[0] as Record<string, unknown>;
-    if (
-      typeof row.title !== "string" ||
-      typeof row.storage_path !== "string" ||
-      !/^[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,180}$/i.test(row.storage_path)
-    ) {
-      return null;
-    }
-    const result = await requestStudentBackend(
-      token,
-      "/storage/v1/object/risa-course-content/" + row.storage_path,
-    );
-    if (!result?.ok || !result.body) {
-      return null;
-    }
-    const extension = row.storage_path.split(".").at(-1)?.toLowerCase() ?? "bin";
-    const safeTitle = row.title
-      .replace(/[^a-z0-9 _.-]/gi, "")
-      .trim()
-      .slice(0, 70);
-    return {
-      response: result,
-      title: safeTitle || "RISA-course-material",
-      extension: ["pdf", "png", "jpg", "jpeg", "webp", "txt"].includes(extension)
-        ? extension
-        : "bin",
-    };
-  } catch {
+  const file = await requestStudentBackend(
+    token,
+    "/storage/v1/object/risa-course-content/" + metadata.storagePath,
+  );
+  if (!file?.ok || !file.body) {
     return null;
   }
+
+  const extension = metadata.storagePath.split(".").at(-1)?.toLowerCase() ?? "bin";
+  const safeTitle = metadata.title
+    .replace(/[^a-z0-9 _.-]/gi, "")
+    .trim()
+    .slice(0, 70);
+  return {
+    response: file,
+    title: safeTitle || "RISA-course-material",
+    extension: ["pdf", "png", "jpg", "jpeg", "webp", "txt"].includes(extension)
+      ? extension
+      : "bin",
+  };
 }
 
 export async function uploadStudentAvatar(
