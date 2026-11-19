@@ -215,6 +215,10 @@ function validatedAvatarPath(userId: string, path: unknown): string | null {
   return accepted ? path : null;
 }
 
+function optionalProfileUpdateDate(value: unknown): { updatedAt?: string } {
+  return typeof value === "string" ? { updatedAt: value } : {};
+}
+
 function parseStudentIdentity(data: unknown): StudentIdentity | null {
   if (!data || typeof data !== "object") {
     return null;
@@ -249,7 +253,7 @@ function parseStudentIdentity(data: unknown): StudentIdentity | null {
     email: user.email,
     fullName: name.slice(0, 80) || "Student",
     avatarPath,
-    ...(typeof user.updated_at === "string" ? { updatedAt: user.updated_at } : {}),
+    ...optionalProfileUpdateDate(user.updated_at),
   };
 }
 
