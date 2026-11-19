@@ -132,9 +132,9 @@ export default async function RisaAdminPage() {
             Course administration
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Create courses with unique institutional codes, prepare draft curricula
-            and publish approved courses. Learner enrolment and content uploads
-            remain available to authorized project maintainers through Supabase.
+            Create courses with unique institutional codes, prepare draft curricula and
+            publish approved courses. Learner enrolment and content uploads remain
+            available to authorized project maintainers through Supabase.
           </p>
           <Link
             href="/admin/courses"

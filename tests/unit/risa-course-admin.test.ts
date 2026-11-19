@@ -125,9 +125,9 @@ describe("RISA institutional course codes", () => {
     expect(await createRisaCourse("learner-token", example)).toBe("unavailable");
     fetchMock.mockRejectedValueOnce(new Error("network unavailable"));
     expect(await createRisaCourse("admin-token", example)).toBe("unavailable");
-    expect(
-      await createRisaCourse("admin-token", { ...example, code: "!BAD!" }),
-    ).toBe("unavailable");
+    expect(await createRisaCourse("admin-token", { ...example, code: "!BAD!" })).toBe(
+      "unavailable",
+    );
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
@@ -154,7 +154,10 @@ describe("RISA administrator course listing", () => {
     fetchMock.mockResolvedValueOnce(Response.json([]));
     expect(await getRisaAdminCourses("admin-token")).toEqual([]);
     fetchMock.mockResolvedValueOnce(
-      Response.json([{ ...example, id: null }, { ...example, id: "u", created_at: "" }]),
+      Response.json([
+        { ...example, id: null },
+        { ...example, id: "u", created_at: "" },
+      ]),
     );
     expect(await getRisaAdminCourses("admin-token")).toHaveLength(1);
   });

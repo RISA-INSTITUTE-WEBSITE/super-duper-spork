@@ -82,8 +82,8 @@ export function AdminCreateCourseForm() {
             className={fieldClass + " font-mono font-semibold uppercase tracking-wider"}
           />
           <p id="risa-code-hint" className="mt-2 text-xs leading-5 text-slate-600">
-            Examples: DVE101, 4CPS232, PHY-101. Letters, digits, and one
-            optional hyphen. Codes cannot be reused.
+            Examples: DVE101, 4CPS232, PHY-101. Letters, digits, and one optional hyphen.
+            Codes cannot be reused.
           </p>
         </div>
         <div>
@@ -131,8 +131,8 @@ export function AdminCreateCourseForm() {
         />
         <span className="text-sm leading-6 text-slate-700">
           <strong className="block text-slate-950">Publish this course now</strong>
-          Leave unchecked to save as a draft. Published courses become
-          available only to learners enrolled by RISA.
+          Leave unchecked to save as a draft. Published courses become available only to
+          learners enrolled by RISA.
         </span>
       </label>
 
@@ -140,7 +140,8 @@ export function AdminCreateCourseForm() {
         <p className="text-sm text-slate-600">
           {code ? (
             <>
-              Course identifier: <strong className="font-mono text-[#286518]">{code}</strong>
+              Course identifier:{" "}
+              <strong className="font-mono text-[#286518]">{code}</strong>
             </>
           ) : (
             "The course will start as a draft unless you select Publish."

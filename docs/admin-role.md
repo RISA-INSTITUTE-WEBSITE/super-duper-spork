@@ -83,6 +83,7 @@ live counts for courses, enrolments, and materials.
 
 Select **Manage courses** from the Administration Centre or open `/admin/courses`.
 The admin-only tool provides:
+
 - **Unique course code**, such as `DVE101`, `4CPS232`, or `PHY-101`.
 - **Course title** (required, 2–120 characters).
 - **Course overview** (optional, up to 1,200 characters).

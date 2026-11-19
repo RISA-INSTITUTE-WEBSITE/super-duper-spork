@@ -20,7 +20,10 @@ export const metadata: Metadata = {
 function CourseList({ courses }: { courses: RisaCourse[] | null }) {
   if (!courses) {
     return (
-      <p role="status" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+      <p
+        role="status"
+        className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"
+      >
         Courses are currently unavailable. Please check the database connection.
       </p>
     );
@@ -119,8 +122,8 @@ export default async function ManageRisaCoursesPage() {
           Course management
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          Create courses with unique identifiers such as DVE101 and PHY-101.
-          Keep drafts private while preparing content for learners.
+          Create courses with unique identifiers such as DVE101 and PHY-101. Keep drafts
+          private while preparing content for learners.
         </p>
       </div>
 

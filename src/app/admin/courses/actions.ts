@@ -5,10 +5,7 @@ import { cookies } from "next/headers";
 
 import { getStudentIdentity } from "@/lib/student-auth-api";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
-import {
-  createRisaCourse,
-  validateNewRisaCourse,
-} from "@/lib/risa-course-admin";
+import { createRisaCourse, validateNewRisaCourse } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
 export type CourseCreationState = {
