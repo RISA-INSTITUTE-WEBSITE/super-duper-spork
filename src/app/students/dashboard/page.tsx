@@ -66,6 +66,12 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
                 {course.description}
               </p>
               <Link
+                href={"/students/courses/" + course.id}
+                className="mt-6 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
+              >
+                Open lessons and quizzes <span aria-hidden="true"> →</span>
+              </Link>
+              <Link
                 href="#course-materials"
                 className="mt-6 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
               >

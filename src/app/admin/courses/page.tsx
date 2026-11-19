@@ -71,6 +71,12 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
           <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">
             {course.description || "Course overview not added yet."}
           </p>
+          <Link
+            href={"/admin/courses/" + course.id + "/content"}
+            className="mt-6 inline-flex min-h-11 w-fit items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1d4f11]"
+          >
+            Manage topics, videos &amp; quizzes →
+          </Link>
           <p className="mt-5 border-t border-white pt-4 text-xs text-slate-500">
             {course.is_published
               ? "Visible to enrolled learners"
