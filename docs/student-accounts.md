@@ -1,151 +1,123 @@
-# RISA student accounts — Supabase activation checklist
+# RISA student accounts — Supabase activation guide
 
-## Current backend (verified 19 November 2026)
+## Current configuration
 
-RISA has its **own dedicated Supabase organization** and an existing project
-chosen for student authentication. Do **not** create or connect resources under
-Beacon Innovation Hub.
+RISA student registration is implemented on the Next.js website. RISA has a
+dedicated Supabase project outside Beacon Innovation Hub. **The requested
+temporary mode allows email-and-password registration without sending an
+email confirmation.** It is not passwordless login or admission to a
+programme.
 
-- Organization: **RISA Institute of Applied Sciences**
-- Organization ID: `vvhpskswrwuexeuatqoq`
-- Project name in Supabase: `learnxul-lang's Project` (can be renamed in Supabase settings)
-- Project ID: `zaruopeqlndkxltqlpeh`
-- Region: `eu-west-1` (Ireland)
-- Project URL: `https://zaruopeqlndkxltqlpeh.supabase.co`
-- Plan: Free
-- RISA website origin (owner-provided): `https://super-duper-spork-iota.vercel.app`
-- Database: active; no public user-profile tables required for initial email/password Auth
+| Setting | Value |
+| --- | --- |
+| Supabase organization | RISA Institute of Applied Sciences |
+| Organization ID | `vvhpskswrwuexeuatqoq` |
+| Project ID | `zaruopeqlndkxltqlpeh` |
+| Project URL | `https://zaruopeqlndkxltqlpeh.supabase.co` |
+| Website | `https://super-duper-spork-iota.vercel.app` |
+| Database region | `eu-west-1` (Ireland) |
+| Hosting plan | Supabase Free |
+| Student data | Supabase Auth identities; no additional public profile tables |
 
-The current RISA website already includes responsive registration, sign-in,
-email confirmation, private student dashboard and logout routes. The website
-is deployed, **but these forms must remain disabled** until email verification,
-privacy readiness, security controls and end-to-end tests have been confirmed.
-Account creation does not mean programme admission or enrolment.
+## Enable immediate registration without confirmation emails
 
-## Configure the existing Supabase project
+**Supabase requires an explicit dashboard setting.** The GitHub code cannot
+override a project with confirmation emails enabled. The current connected
+Supabase tools cannot modify Auth provider configuration, so a project
+administrator must do the following in the Supabase Dashboard.
 
-1. Open the [RISA Supabase Authentication settings](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/providers)
-   and enable **Email** sign-in. Require email confirmation.
-2. In [Authentication URL configuration](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/url-configuration),
-   set **Site URL** to the RISA deployment origin provided by the project owner:
-   `https://super-duper-spork-iota.vercel.app`
-   Add `https://super-duper-spork-iota.vercel.app/auth/confirm` to the
-   allowed redirect URLs. If preview testing is intended, explicitly add
-   only those approved HTTPS preview redirects. This website domain was
-   supplied by the owner and has not been independently HTTP-verified.
-3. In [Email Templates](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/templates),
-   configure the confirmation email using a one-time token hash to the
-   existing server-side endpoint:
+1. Open [Authentication → Providers → Email](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/providers).
+   Keep **Email** authentication and email/password signups enabled.
+   Turn **Confirm email** **OFF** and save. This auto-confirms new addresses
+   for Supabase Auth; it **does not prove ownership of the email inbox**.
+   Leave Custom SMTP disabled for this temporary mode.
+2. Verify [Authentication → URL Configuration](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/url-configuration)
+   has Site URL `https://super-duper-spork-iota.vercel.app`.
+   No confirmation email template is used for signups while **Confirm email**
+   is off. The existing `/auth/confirm` endpoint remains available for a
+   future verified-email rollout.
+3. In Vercel, open the **RISA** hosting project → **Settings → Environment
+   Variables**. Keep these **server-side-only** variables:
 
-       <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
-         Confirm your RISA email address
-       </a>
+       RISA_SUPABASE_URL=https://zaruopeqlndkxltqlpeh.supabase.co
+       RISA_SUPABASE_PUBLISHABLE_KEY=<RISA project's sb_publishable key>
+       RISA_STUDENT_AUTH_ENABLED=true
 
-   Ensure `SiteURL` is the same approved website origin. Test delivery to
-   a controlled account before enabling broad registration.
-4. Before public use, configure and validate a production SMTP sender,
-   anti-abuse/rate-limiting protection and an appropriate email confirmation
-   expiry policy. The built-in email service can have restrictive limits.
-5. Review the student privacy notice, POPIA compliance, hosting region,
-   cross-border transfers, retention/deletion processes and minors/guardian
-   consent as applicable.
+   The flag controls whether sign-up and sign-in are enabled on a deployment.
+   The user previously set it to `false`; a Vercel administrator must
+   explicitly switch it to `true` for the chosen environment and redeploy.
+   If the variable is not exactly `true`, both actions remain disabled.
+   **Do not use service-role or sb_secret keys.** Do not commit credentials.
+4. Before enabling the **Production** environment, complete the checks below
+   and ensure the draft [privacy notice](/students/privacy) is approved for
+   POPIA and any relevant guardian/minor consent requirements.
 
-## Connect the Next.js site to RISA Supabase on Vercel
+The connected tools can check GitHub, Supabase database security and project
+health, but **cannot read or change Vercel environment variables, or the
+Supabase Auth Email provider toggles**. Do not claim the production switch is
+complete until it is checked by an administrator.
 
-In the **Vercel project currently hosting the RISA website**, open
-**Settings → Environment Variables** and add:
+## What students will experience
 
-    RISA_SUPABASE_URL=https://zaruopeqlndkxltqlpeh.supabase.co
-    RISA_SUPABASE_PUBLISHABLE_KEY=<copy the sb_publishable key from the RISA project>
-    RISA_STUDENT_AUTH_ENABLED=false
+1. Navigate to `/students/register`.
+2. Enter name, email and a password with 10 or more characters, at least one
+   letter, one number and one special character. Accept the privacy notice.
+3. Supabase creates an Auth identity. When its **Confirm email** toggle is
+   OFF, Auth returns an access/refresh session immediately. RISA verifies the
+   session against `/auth/v1/user`, saves HttpOnly SameSite=Lax cookies
+   (Secure in production) and redirects to `/students/dashboard`.
+4. Students can sign out and sign in again at `/students/login`.
+   Their account is **not** an application, programme enrolment, academic
+   identity verification or admin privilege.
+5. If confirmations are later enabled, the same code falls back to the
+   `?status=check-email` flow and the existing token-hash verification route.
 
-The publishable key is available at
-[Supabase API Keys](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/settings/api-keys).
-It is safe to use the publishable key **as an API identifier**, but keep the
-value in Vercel configuration rather than committing it to the repository.
-Never use a secret key, service-role key or database password. **These are
-server-side-only variables**; no `NEXT_PUBLIC_` prefix is needed.
+## Security trade-offs and tests
 
-Add the variables to the right Vercel environments (preview and/or production),
-then redeploy so the server receives them. Keep the flag set to `false`
-until all operational and security checks have passed. Flipping it to
-`true` intentionally opens registration and sign-in on that deployment.
+**An unverified address can be mistyped, invented or belong to another
+person.** Do not grant enrolment, sensitive data access or financial
+capabilities solely because an Auth identity exists. A user might register
+someone else's address first. Password recovery still needs working email
+delivery, so without SMTP or the default email service, recovery may not be
+available to ordinary learners.
 
-There is no Vercel connection available to this assistant at the moment,
-so environment values are **not yet verified or installed**.
-
-## Controlled testing with Supabase's built-in email provider
-
-The RISA project can use Supabase's default SMTP service **for development
-only**, with no Custom SMTP credentials. As documented by Supabase, the default
-sender is restricted to email addresses belonging to organization team
-members, has strict rate limits, and is not suitable for public rollout.
-
-1. In [RISA Authentication Providers](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/providers),
-   enable email/password sign-in, keep **Confirm email** enabled and leave
-   Custom SMTP disabled. These settings must be verified in the dashboard;
-   the available connector does not expose Auth configuration controls.
-2. In [URL Configuration](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/url-configuration),
-   verify Site URL equals `https://super-duper-spork-iota.vercel.app`.
-3. The unmodified **default** Supabase confirmation template normally sends
-   a link through Supabase's own verification endpoint and then redirects to
-   the configured Site URL. That is valid for confirming email, but it
-   **does not** call the website's custom `/auth/confirm` handler or
-   automatically create its HttpOnly login session. After clicking the
-   default link, return to `/students/login` and sign in normally.
-   If a custom email template is permitted, the token-hash link specified
-   above instead invokes the RISA handler and establishes a session.
-4. Choose a **single approved test address** belonging to a member of
-   the RISA Supabase organization's team; do not email random learners.
-5. Keep the **Production** Vercel variable `RISA_STUDENT_AUTH_ENABLED=false`.
-   For a website smoke test, use either a **protected preview** deployment
-   with `RISA_STUDENT_AUTH_ENABLED=true` set for Preview only, or a local
-   development server with the three RISA variables configured. Verify
-   Preview access control before enabling it; an unprotected preview is
-   publicly accessible to anyone with its link, and even an email-only
-   restriction on delivery does not prevent unwanted signup attempts.
-6. On the test deployment, register using the approved address and a fresh
-   password (10+ characters with a letter, number, special character).
-   Check for the confirmation email, open the link once, sign in at
-   `/students/login`, verify dashboard protection and sign out.
-   Check [Auth Users](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/users)
-   for one test user whose email is confirmed. Do not use an admin key
-   or insert records directly into `auth.users`.
-7. Disable test-only Preview access or reset the flag to `false` after
-   testing. Do not enable production signup without approved privacy
-   procedures, an appropriate email service and the full release review.
-
-**Verification baseline (19 November 2026):** Supabase project healthy,
-`auth.users` count = 0, security advisor has no findings. An earlier RISA
-website CI run failed at the OWASP ZAP DAST step, so release approval
-is still outstanding. The assistant cannot read Vercel environment-variable
-values or modify Supabase Auth's provider settings through the connected
-tools, and therefore has **not** enabled registration or sent a test email.
-
-## Verification before activation
-
+- Enable CAPTCHA or equivalent anti-bot controls and review Supabase Auth
+  rate limits before opening unrestricted public signups.
+- Confirm that the account privacy notice, data retention/deletion procedures,
+  POPIA responsibilities and rules for minors are approved.
+- Test registration with a controlled test identity using the chosen
+  deployment; verify immediate dashboard redirect, logout, login,
+  password-strength validation, session expiry and inaccessible dashboard
+  without a session.
+- Check [Authentication → Users](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/users)
+  for the new test account. Do not insert users directly into `auth.users`.
 - Run `npm ci`, `npm run check` and `npm run test:e2e`.
-- Confirm email provider, site URL and confirmation template are correct.
-- Test with a controlled student email: register, receive confirmation,
-  verify once, sign in, access private dashboard, refresh session and log out.
-- Test invalid credentials, expired confirmation, duplicate registrations,
-  password strength, throttling and mobile accessibility.
-- Ensure unauthenticated requests to `/students/dashboard` redirect to login.
-- Review current GitHub required checks, including the OWASP ZAP DAST scan.
-  Earlier runs had failed the ZAP gate, so do not assume final CI approval.
-- Review pending dependency and licence audit exceptions before public release.
+- Ensure required GitHub CI checks, including OWASP ZAP dynamic scans, pass.
+  Previous baseline runs had a failed DAST step; do not bypass security checks.
+- Confirm Vercel's deployment was created from the intended GitHub main
+  commit and that the production environment really has the enabled flag.
+
+## Restoring email verification
+
+Before public student data or enrolment capabilities are introduced, configure
+a production SMTP service, turn Supabase **Confirm email** back ON and verify
+the email-confirmation and password-reset flows.
+
+If custom email templates are available, the server-side RISA callback is:
+
+    <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">
+      Confirm your RISA email address
+    </a>
+
+A Supabase default confirmation template can verify addresses via Supabase's
+own endpoint, but may return to the Site URL without creating RISA's
+server-side session; in that case students sign in manually.
 
 ## Database security
 
-A Supabase security advisor warning identified `public.rls_auto_enable()`
-(an event-trigger maintenance function) as executable by `anon` and
-`authenticated` roles. The migration
-`restrict_public_rls_event_trigger_execution` revoked those direct
-execution grants while retaining the internal service-role privilege.
-A subsequent advisor scan returned no findings. Recheck after future
-schema changes.
-
-No new public student tables or role authorization policies have been
-created. RISA uses Supabase Auth for identity. User-editable Auth metadata
-contains a display name only and must never be used to determine privileged
-access.
+The `restrict_public_rls_event_trigger_execution` migration revoked
+public/anonymous/authenticated direct execution of the privileged
+`public.rls_auto_enable()` maintenance function. The Supabase security
+advisor subsequently returned no findings. No public student tables or
+role-authorization policies were introduced. User-editable Auth metadata
+contains only display information and must not be trusted for authorization.
