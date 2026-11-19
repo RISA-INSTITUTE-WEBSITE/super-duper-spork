@@ -15,7 +15,9 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
   await expect(page.getByRole("heading", { name: "Our Vision" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Our Mission" })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Learn it. Understand it. Apply it. Test it. Improve it." }),
+    page.getByRole("heading", {
+      name: "Learn it. Understand it. Apply it. Test it. Improve it.",
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
@@ -192,7 +194,9 @@ test("homepage progress content sits on the white section without a boxed banner
   const section = page.locator('section[aria-labelledby="next-heading"]');
   await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(
-    section.getByRole("heading", { name: "Theory into practice. Knowledge into impact." }),
+    section.getByRole("heading", {
+      name: "Theory into practice. Knowledge into impact.",
+    }),
   ).toBeVisible();
   await expect(section.getByRole("link", { name: /About the institute/ })).toBeVisible();
   await expect(section.getByRole("link", { name: /Contact RISA/ })).toBeVisible();
