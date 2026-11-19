@@ -76,12 +76,34 @@ is tracked under `supabase/migrations`.
 
 ## Administrator interface scope
 
-The initial `/admin` page provides protected sign-in, role verification and
-read-only counts for courses, enrolments, and materials. Database permissions
-support content management; **course creation, student assignment, and file
-upload forms have not yet been built into the RISA admin website**. Until
-then, authorized project maintainers can use the Supabase dashboard to perform
-those operations.
+The `/admin` page provides protected sign-in, role verification and
+live counts for courses, enrolments, and materials.
+
+### Create a course with its code
+
+Select **Manage courses** from the Administration Centre or open `/admin/courses`.
+The admin-only tool provides:
+- **Unique course code**, such as `DVE101`, `4CPS232`, or `PHY-101`.
+- **Course title** (required, 2–120 characters).
+- **Course overview** (optional, up to 1,200 characters).
+- **Publish now** checkbox (unchecked by default so a new course starts as draft).
+- **Created courses** directory showing codes and publication status.
+
+Codes are normalized to uppercase and checked for uniqueness at both the
+application and the database levels. The generated URL slug is the lowercase
+version of the course code, not the potentially changeable course title.
+Only a live, verified administrator can submit the form. Supabase's role-based
+row-level security separately verifies every INSERT using the student's access
+token, so changing the browser form or submitting directly to the API never
+grants extra access.
+
+The `add_unique_risa_course_codes` migration has been applied to Supabase and
+is represented by `supabase/migrations/20261120011500_add_unique_risa_course_codes.sql`.
+No courses were automatically created or published.
+
+**Student assignment, file upload, and exercise editing forms are still not
+available inside the website**. Trusted staff can manage those via the existing
+Supabase administration process until RISA adds separate admin interfaces.
 
 For a production rollout, enable Supabase leaked-password protection,
 require MFA for staff accounts, review least-privilege audit logging and
