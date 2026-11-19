@@ -1,0 +1,29 @@
+name: Student auth formatting diagnostic
+
+on:
+  push:
+    branches:
+      - feature/student-account-registration
+
+permissions:
+  contents: read
+
+jobs:
+  formatted-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Produce format-only source snapshots
+        run: |
+          npx prettier --write docs/student-accounts.md src/app/globals.css src/app/page.tsx src/app/students/actions.ts src/app/students/login/page.tsx src/app/students/privacy/page.tsx src/app/students/register/page.tsx src/components/student-registration-form.tsx src/lib/student-auth-api.ts src/lib/student-validation.ts tests/e2e/public-pages.spec.ts
+          for file in docs/student-accounts.md src/app/globals.css src/app/page.tsx src/app/students/actions.ts src/app/students/login/page.tsx src/app/students/privacy/page.tsx src/app/students/register/page.tsx src/components/student-registration-form.tsx src/lib/student-auth-api.ts src/lib/student-validation.ts tests/e2e/public-pages.spec.ts; do
+            echo "FORMATTED_START:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
