@@ -21,6 +21,7 @@ export type StudentIdentity = {
   id: string;
   email: string;
   fullName: string;
+  avatarPath: string | null;
 };
 
 function resolveAuthOrigin(rawUrl: string): string | null {
@@ -225,14 +226,23 @@ function parseStudentIdentity(data: unknown): StudentIdentity | null {
 
   const metadata =
     user.user_metadata && typeof user.user_metadata === "object"
-      ? (user.user_metadata as { full_name?: unknown })
+      ? (user.user_metadata as { full_name?: unknown; avatar_path?: unknown })
       : {};
   const name = typeof metadata.full_name === "string" ? metadata.full_name.trim() : "";
+  // User metadata is editable. Accept only an avatar in this verified user's folder.
+  const avatarPath =
+    typeof metadata.avatar_path === "string" &&
+    ["avatar.jpg", "avatar.png", "avatar.webp"].some(
+      (filename) => metadata.avatar_path === user.id + "/" + filename,
+    )
+      ? metadata.avatar_path
+      : null;
 
   return {
     id: user.id,
     email: user.email,
     fullName: name.slice(0, 80) || "Student",
+    avatarPath,
   };
 }
 
@@ -257,4 +267,34 @@ export async function getStudentIdentity(
 
 export async function revokeStudentSession(accessToken: string): Promise<void> {
   await requestAuth({ path: "/logout", method: "POST", bearer: accessToken });
+}
+
+/**
+ * Server-side Supabase Data API / Storage access. Forward the learner's real
+ * access token so RLS remains effective; never use an administrative secret.
+ */
+export async function requestStudentBackend(
+  accessToken: string,
+  path: string,
+  options: RequestInit = {},
+): Promise<Response | null> {
+  const config = getAuthConfig();
+  if (!config || !accessToken || !/^\/(rest|storage)\/v1\//.test(path)) {
+    return null;
+  }
+
+  try {
+    return await fetch(config.url + path, {
+      ...options,
+      headers: {
+        apikey: config.publishableKey,
+        Authorization: "Bearer " + accessToken,
+        ...(options.headers ?? {}),
+      },
+      cache: "no-store",
+      signal: AbortSignal.timeout(12000),
+    });
+  } catch {
+    return null;
+  }
 }
