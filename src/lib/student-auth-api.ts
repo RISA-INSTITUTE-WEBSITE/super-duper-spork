@@ -18,49 +18,53 @@ export type StudentIdentity = {
   fullName: string;
 };
 
+function resolveAuthOrigin(rawUrl: string): string | null {
+  try {
+    const url = new URL(rawUrl);
+    const validProtocol =
+      url.protocol === "https:" ||
+      (url.protocol === "http:" && ["localhost", "127.0.0.1"].includes(url.hostname));
+    const validLocation =
+      !url.username && !url.password && url.pathname === "/" && !url.search && !url.hash;
+    return validProtocol && validLocation ? url.origin : null;
+  } catch {
+    return null;
+  }
+}
+
 function getAuthConfig(): AuthConfig | null {
   const rawUrl = process.env.RISA_SUPABASE_URL;
   const publishableKey = process.env.RISA_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!rawUrl || !publishableKey || !publishableKey.trim()) {
+  if (!rawUrl || !publishableKey?.trim()) {
     return null;
   }
 
-  try {
-    const url = new URL(rawUrl);
-    if (
-      !["https:", "http:"].includes(url.protocol) ||
-      (url.protocol === "http:" && !["localhost", "127.0.0.1"].includes(url.hostname)) ||
-      url.username ||
-      url.password ||
-      url.pathname !== "/" ||
-      url.search ||
-      url.hash
-    ) {
-      return null;
-    }
-
-    // An Auth publishable key is not an admin key.
-    if (publishableKey.startsWith("sb_secret_")) {
-      return null;
-    }
-
-    return { url: url.origin, publishableKey };
-  } catch {
+  const origin = resolveAuthOrigin(rawUrl);
+  if (!origin || publishableKey.startsWith("sb_secret_")) {
     return null;
   }
+
+  return { url: origin, publishableKey };
 }
 
 export function isStudentAuthConfigured(): boolean {
   return process.env.RISA_STUDENT_AUTH_ENABLED === "true" && getAuthConfig() !== null;
 }
 
-async function requestAuth(
-  path: string,
-  method: "GET" | "POST",
-  body?: Record<string, unknown>,
-  bearer?: string,
-): Promise<Response | null> {
+type AuthRequestOptions = {
+  path: string;
+  method: "GET" | "POST";
+  body?: Record<string, unknown>;
+  bearer?: string;
+};
+
+async function requestAuth({
+  path,
+  method,
+  body,
+  bearer,
+}: AuthRequestOptions): Promise<Response | null> {
   const config = getAuthConfig();
   if (!config) {
     return null;
@@ -123,7 +127,7 @@ export async function registerStudentWithAuth(
   email: string,
   password: string,
 ): Promise<boolean> {
-  const response = await requestAuth("/signup", "POST", {
+  const response = await requestAuth({ path: "/signup", method: "POST", body: {
     email,
     password,
     data: { full_name: fullName, account_type: "student" },
@@ -135,7 +139,7 @@ export async function signInStudentWithAuth(
   email: string,
   password: string,
 ): Promise<StudentSession | null> {
-  const response = await requestAuth("/token?grant_type=password", "POST", {
+  const response = await requestAuth({ path: "/token?grant_type=password", method: "POST", body: {
     email,
     password,
   });
@@ -145,7 +149,7 @@ export async function signInStudentWithAuth(
 export async function refreshStudentSession(
   refreshToken: string,
 ): Promise<StudentSession | null> {
-  const response = await requestAuth("/token?grant_type=refresh_token", "POST", {
+  const response = await requestAuth({ path: "/token?grant_type=refresh_token", method: "POST", body: {
     refresh_token: refreshToken,
   });
   return parseSession(response);
@@ -154,56 +158,65 @@ export async function refreshStudentSession(
 export async function verifyStudentEmail(
   tokenHash: string,
 ): Promise<StudentSession | null> {
-  const response = await requestAuth("/verify", "POST", {
+  const response = await requestAuth({ path: "/verify", method: "POST", body: {
     token_hash: tokenHash,
     type: "email",
   });
   return parseSession(response);
 }
 
+function parseStudentIdentity(data: unknown): StudentIdentity | null {
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+
+  const user = data as {
+    id?: unknown;
+    email?: unknown;
+    email_confirmed_at?: unknown;
+    user_metadata?: unknown;
+  };
+
+  if (
+    typeof user.id !== "string" ||
+    typeof user.email !== "string" ||
+    typeof user.email_confirmed_at !== "string"
+  ) {
+    return null;
+  }
+
+  const metadata =
+    user.user_metadata && typeof user.user_metadata === "object"
+      ? (user.user_metadata as { full_name?: unknown })
+      : {};
+  const name = typeof metadata.full_name === "string" ? metadata.full_name.trim() : "";
+
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: name.slice(0, 80) || "Student",
+  };
+}
+
 export async function getStudentIdentity(
   accessToken: string,
 ): Promise<StudentIdentity | null> {
-  const response = await requestAuth("/user", "GET", undefined, accessToken);
+  const response = await requestAuth({
+    path: "/user",
+    method: "GET",
+    bearer: accessToken,
+  });
   if (!response?.ok) {
     return null;
   }
 
   try {
-    const data: unknown = await response.json();
-    if (!data || typeof data !== "object") {
-      return null;
-    }
-    const user = data as {
-      id?: unknown;
-      email?: unknown;
-      email_confirmed_at?: unknown;
-      user_metadata?: unknown;
-    };
-    if (
-      typeof user.id !== "string" ||
-      typeof user.email !== "string" ||
-      typeof user.email_confirmed_at !== "string"
-    ) {
-      return null;
-    }
-
-    const metadata =
-      user.user_metadata && typeof user.user_metadata === "object"
-        ? (user.user_metadata as { full_name?: unknown })
-        : {};
-    const name = typeof metadata.full_name === "string" ? metadata.full_name.trim() : "";
-
-    return {
-      id: user.id,
-      email: user.email,
-      fullName: name.slice(0, 80) || "Student",
-    };
+    return parseStudentIdentity(await response.json());
   } catch {
     return null;
   }
 }
 
 export async function revokeStudentSession(accessToken: string): Promise<void> {
-  await requestAuth("/logout", "POST", undefined, accessToken);
+  await requestAuth({ path: "/logout", method: "POST", bearer: accessToken });
 }
