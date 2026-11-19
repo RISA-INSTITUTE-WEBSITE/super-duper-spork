@@ -14,7 +14,8 @@ export const metadata: Metadata = {
 const errors: Record<string, string> = {
   name: "Enter your full name (2–80 characters).",
   email: "Enter a valid email address.",
-  password: "Choose a password with at least 10 characters, a letter, a number and a special character.",
+  password:
+    "Choose a password with at least 10 characters, a letter, a number and a special character.",
   confirmation: "The two passwords must match.",
   consent: "Please review and acknowledge the student account privacy notice.",
   service: "Registration is currently unavailable. Please try again later.",
@@ -53,20 +54,29 @@ export default async function StudentRegisterPage({
           </p>
 
           {!enabled && (
-            <p role="status" className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+            <p
+              role="status"
+              className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+            >
               Student registration is being prepared. The secure authentication service
               must be connected before accounts can be created.
             </p>
           )}
           {message && (
-            <p role="alert" className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+            <p
+              role="alert"
+              className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+            >
               {message}
             </p>
           )}
           {submitted ? (
-            <div role="status" className="mt-6 rounded-xl border border-[#78eb29]/50 bg-[#eefce5] p-5 text-sm leading-7 text-[#286518]">
-              If this email address is eligible for registration, a confirmation link
-              will arrive shortly. Check your inbox and spam folder, then sign in.
+            <div
+              role="status"
+              className="mt-6 rounded-xl border border-[#78eb29]/50 bg-[#eefce5] p-5 text-sm leading-7 text-[#286518]"
+            >
+              If this email address is eligible for registration, a confirmation link will
+              arrive shortly. Check your inbox and spam folder, then sign in.
               <p className="mt-3">
                 <Link href="/students/login" className="font-bold underline">
                   Go to student sign in
