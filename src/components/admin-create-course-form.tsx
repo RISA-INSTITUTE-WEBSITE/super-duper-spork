@@ -4,8 +4,13 @@ import { useActionState, useEffect, useRef, useState } from "react";
 
 import {
   createCourseAction,
-  initialCourseCreationState,
+  type CourseCreationState,
 } from "@/app/admin/courses/actions";
+
+const initialCourseCreationState: CourseCreationState = {
+  status: "idle",
+  message: "",
+};
 
 const fieldClass =
   "mt-2 min-h-12 w-full rounded-xl border border-white bg-white/85 px-4 py-3 text-base text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:border-[#286518] focus-visible:ring-2 focus-visible:ring-[#78eb29]/30";
