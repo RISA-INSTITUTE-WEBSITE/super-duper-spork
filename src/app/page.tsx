@@ -220,49 +220,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="next-heading" className="bg-white py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="relative isolate overflow-hidden rounded-[2rem] bg-[#0b2450] px-7 py-12 text-white sm:px-12 sm:py-16 lg:px-16">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 bg-[url('/risa-logo-transparent.svg')] bg-center bg-no-repeat opacity-[0.16] [background-size:auto_90%] sm:bg-right sm:opacity-[0.23] sm:[background-size:auto_112%]"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-cyan-300/10"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
-            />
-            <div className="relative max-w-2xl">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
-                A platform in progress
-              </p>
-              <h2
-                id="next-heading"
-                className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl"
+      <section
+        aria-labelledby="next-heading"
+        className="relative isolate overflow-hidden bg-white py-20 sm:py-24"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 w-full bg-[url('/risa-logo-transparent.svg')] bg-right bg-no-repeat opacity-[0.06] [background-size:auto_72%] sm:w-3/5 sm:opacity-[0.10] sm:[background-size:auto_115%]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-[#38b6ff]/15"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
+        />
+        <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
+              A platform in progress
+            </p>
+            <h2
+              id="next-heading"
+              className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
+            >
+              A place to question, discover and grow.
+            </h2>
+            <p className="mt-5 leading-8 text-slate-600">
+              We are building RISA one step at a time. Explore the institute&apos;s
+              vision, or contact the team to learn more about the project.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/about"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#286518] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
               >
-                A place to question, discover and grow.
-              </h2>
-              <p className="mt-5 leading-8 text-blue-100">
-                We are building RISA one step at a time. Explore the institute&apos;s
-                vision, or contact the team to learn more about the project.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  href="/about"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-blue-950 transition hover:bg-cyan-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  About the institute <ArrowIcon />
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                >
-                  Contact RISA <ArrowIcon diagonal />
-                </Link>
-              </div>
+                About the institute <ArrowIcon />
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 text-sm font-semibold text-[#286518] transition hover:border-[#286518] hover:bg-[#eefce5] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+              >
+                Contact RISA <ArrowIcon diagonal />
+              </Link>
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-500">
