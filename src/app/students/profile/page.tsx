@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { updateStudentProfile } from "@/app/students/actions";
+import {
+  ProfilePhotoField,
+  StudentProfileSubmitButton,
+} from "@/components/student-profile-controls";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -103,44 +106,14 @@ export default async function StudentProfilePage({
         )}
 
         <form action={updateStudentProfile} className="mt-8 space-y-7">
-          <div className="flex flex-wrap items-center gap-5 rounded-[1.5rem] border border-white/90 bg-white/60 p-5">
-            <div
-              aria-label="Current profile picture"
-              className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-[#38b6ff] via-[#155DFC] to-[#123e8a] text-3xl font-bold text-white shadow-md"
-            >
-              {user.avatarPath ? (
-                <Image
-                  src="/students/avatar"
-                  alt="Your current profile picture"
-                  width={96}
-                  height={96}
-                  unoptimized
-                  className="size-full object-cover"
-                />
-              ) : (
-                <span aria-hidden="true">{initials}</span>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <label
-                htmlFor="student-avatar"
-                className="block text-sm font-semibold text-slate-900"
-              >
-                Profile picture
-              </label>
-              <p className="mb-3 mt-1 text-xs leading-5 text-slate-600">
-                Optional. JPG, PNG or WebP, up to 2 MB. Only your account can access the
-                original photo.
-              </p>
-              <input
-                id="student-avatar"
-                type="file"
-                name="avatar"
-                accept="image/jpeg,image/png,image/webp"
-                className="block w-full min-w-0 max-w-md text-xs text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-[#eefce5] file:px-3 file:py-2 file:font-semibold file:text-[#286518]"
-              />
-            </div>
-          </div>
+          <ProfilePhotoField
+            initials={initials}
+            currentSrc={
+              user.avatarPath
+                ? "/students/avatar?updated=" + encodeURIComponent(user.updatedAt ?? "")
+                : null
+            }
+          />
 
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
@@ -187,12 +160,7 @@ export default async function StudentProfilePage({
               Your photo and display name are profile details, not proof of enrolment or
               permission to access other learners&apos; records.
             </p>
-            <button
-              type="submit"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#286518] px-7 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
-            >
-              Save profile changes
-            </button>
+            <StudentProfileSubmitButton />
           </div>
         </form>
       </section>
