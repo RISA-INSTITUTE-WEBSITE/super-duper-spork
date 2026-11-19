@@ -193,7 +193,7 @@ test("homepage progress content sits on the white section without a boxed banner
   await expect(section.getByRole("link", { name: /Contact RISA/ })).toBeVisible();
 });
 
-test("RISA progress section shows clear animated logo without changing navigation logo", async ({
+test("RISA section animates original black liquid and green sphere without changing navbar", async ({
   page,
   request,
 }) => {
@@ -207,8 +207,13 @@ test("RISA progress section shows clear animated logo without changing navigatio
   const asset = await request.get("/risa-logo-animated.svg");
   expect(asset.ok()).toBeTruthy();
   const svg = await asset.text();
-  expect(svg).toContain('class="risa-wave-front"');
-  expect(svg).toContain('class="risa-led-core"');
+  expect(svg).toContain('class="risa-original-black-liquid" fill="#383838"');
+  expect(svg).toContain('class="risa-green-orb" fill="#78eb29"');
+  expect(svg).toContain("risa-original-liquid-flow");
+  expect(svg).toContain("risa-green-orb-size");
+  expect(svg).not.toContain("risa-wave-front");
+  expect(svg).not.toContain("risa-led-halo");
+  expect(svg).not.toContain("risa-bubble");
   expect(svg).toContain("prefers-reduced-motion");
 
   await page.setViewportSize({ width: 390, height: 844 });
