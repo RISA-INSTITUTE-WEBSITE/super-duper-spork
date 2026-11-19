@@ -41,14 +41,23 @@ export async function registerStudent(formData: FormData): Promise<void> {
     redirect("/students/register?error=" + problem);
   }
 
-  const accepted = await registerStudentWithAuth(fullName, email, password);
-  if (!accepted) {
+  const registration = await registerStudentWithAuth(fullName, email, password);
+  if (registration.status === "failed") {
     redirect("/students/register?error=service");
   }
 
-  // Always use the same confirmation response; do not disclose whether an
-  // address is already associated with an existing student account.
-  redirect("/students/register?status=check-email");
+  if (registration.status === "confirmation_required") {
+    redirect("/students/register?status=check-email");
+  }
+
+  // Only persist a session after Supabase confirms the account identity.
+  const identity = await getStudentIdentity(registration.session.access_token);
+  if (!identity) {
+    redirect("/students/register?error=service");
+  }
+
+  await saveStudentSession(registration.session);
+  redirect("/students/dashboard");
 }
 
 export async function signInStudent(formData: FormData): Promise<void> {
