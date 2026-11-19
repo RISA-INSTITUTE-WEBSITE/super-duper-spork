@@ -73,8 +73,8 @@ export default async function StudentProfilePage({
           Edit your profile
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          Personalize your learner profile with your preferred display name and a
-          profile picture. Your account email cannot be changed here.
+          Personalize your learner profile with your preferred display name and a profile
+          picture. Your account email cannot be changed here.
         </p>
 
         {status === "saved" && (
@@ -121,8 +121,8 @@ export default async function StudentProfilePage({
                 Profile picture
               </label>
               <p className="mb-3 mt-1 text-xs leading-5 text-slate-600">
-                Optional. JPG, PNG or WebP, up to 2 MB. Only your account can access
-                the original photo.
+                Optional. JPG, PNG or WebP, up to 2 MB. Only your account can access the
+                original photo.
               </p>
               <input
                 id="student-avatar"
@@ -176,8 +176,8 @@ export default async function StudentProfilePage({
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white pt-6">
             <p className="max-w-sm text-xs leading-5 text-slate-500">
-              Your photo and display name are profile details, not proof of enrolment
-              or permission to access other learners&apos; records.
+              Your photo and display name are profile details, not proof of enrolment or
+              permission to access other learners&apos; records.
             </p>
             <button
               type="submit"
