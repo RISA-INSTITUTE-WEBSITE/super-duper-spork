@@ -12,7 +12,9 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
     "Where real learning starts",
   );
   await expect(page.getByRole("main")).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "Our Vision", exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Our Vision", exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Our Mission" })).toBeVisible();
   await expect(
     page.getByRole("heading", {
