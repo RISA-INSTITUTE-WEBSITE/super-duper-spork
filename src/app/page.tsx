@@ -236,33 +236,33 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,29rem)] lg:gap-14">
             <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
-              A platform in progress
-            </p>
-            <h2
-              id="next-heading"
-              className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
-            >
-              A place to question, discover and grow.
-            </h2>
-            <p className="mt-5 leading-8 text-slate-600">
-              We are building RISA one step at a time. Explore the institute&apos;s
-              vision, or contact the team to learn more about the project.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/about"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#286518] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
+                A platform in progress
+              </p>
+              <h2
+                id="next-heading"
+                className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
               >
-                About the institute <ArrowIcon />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 text-sm font-semibold text-[#286518] transition hover:border-[#286518] hover:bg-[#eefce5] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
-              >
-                Contact RISA <ArrowIcon diagonal />
-              </Link>
-            </div>
+                A place to question, discover and grow.
+              </h2>
+              <p className="mt-5 leading-8 text-slate-600">
+                We are building RISA one step at a time. Explore the institute&apos;s
+                vision, or contact the team to learn more about the project.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/about"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#286518] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+                >
+                  About the institute <ArrowIcon />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 text-sm font-semibold text-[#286518] transition hover:border-[#286518] hover:bg-[#eefce5] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+                >
+                  Contact RISA <ArrowIcon diagonal />
+                </Link>
+              </div>
             </div>
             <div aria-hidden="true" className="flex justify-center lg:justify-end">
               <Image
