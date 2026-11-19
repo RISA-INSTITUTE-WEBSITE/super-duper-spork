@@ -262,8 +262,8 @@ export default function HomePage() {
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-500">
-            Website in development. Student accounts and applications are not available
-            yet.
+            Website in development. Student account access is being prepared; programme
+            applications and enrolment are not available yet.
           </p>
         </div>
       </section>

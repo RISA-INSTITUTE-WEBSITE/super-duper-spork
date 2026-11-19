@@ -8,6 +8,7 @@ const navigation = [
   { href: "/programmes", label: "Programmes" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
+  { href: "/students/login", label: "Students" },
 ] as const;
 
 function SearchIcon() {
@@ -28,6 +29,35 @@ function SearchIcon() {
   );
 }
 
+function trapSidebarFocus(event: KeyboardEvent, sidebar: HTMLDivElement | null): void {
+  if (event.key !== "Tab") {
+    return;
+  }
+
+  const elements = sidebar?.querySelectorAll<HTMLElement>(
+    'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+  );
+  if (!elements?.length) {
+    return;
+  }
+
+  const first = elements[0];
+  const last = elements[elements.length - 1];
+
+  if (event.shiftKey) {
+    if (document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    }
+    return;
+  }
+
+  if (document.activeElement === last || !sidebar?.contains(document.activeElement)) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 export function MobileNavigation() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -43,7 +73,9 @@ export function MobileNavigation() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (!searchOpen) return;
+    if (!searchOpen) {
+      return;
+    }
 
     function handleSearchEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -56,7 +88,9 @@ export function MobileNavigation() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen) {
+      return;
+    }
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -70,26 +104,7 @@ export function MobileNavigation() {
         return;
       }
 
-      if (event.key !== "Tab") return;
-
-      const elements = sidebarRef.current?.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
-      if (!elements?.length) return;
-
-      const first = elements[0];
-      const last = elements[elements.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      } else if (!sidebarRef.current?.contains(document.activeElement)) {
-        event.preventDefault();
-        first.focus();
-      }
+      trapSidebarFocus(event, sidebarRef.current);
     }
 
     document.addEventListener("keydown", handleSidebarKeyboard);
