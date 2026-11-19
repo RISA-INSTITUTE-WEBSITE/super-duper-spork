@@ -127,11 +127,15 @@ export async function registerStudentWithAuth(
   email: string,
   password: string,
 ): Promise<boolean> {
-  const response = await requestAuth({ path: "/signup", method: "POST", body: {
-    email,
-    password,
-    data: { full_name: fullName, account_type: "student" },
-  }});
+  const response = await requestAuth({
+    path: "/signup",
+    method: "POST",
+    body: {
+      email,
+      password,
+      data: { full_name: fullName, account_type: "student" },
+    },
+  });
   return response?.ok ?? false;
 }
 
@@ -139,29 +143,41 @@ export async function signInStudentWithAuth(
   email: string,
   password: string,
 ): Promise<StudentSession | null> {
-  const response = await requestAuth({ path: "/token?grant_type=password", method: "POST", body: {
-    email,
-    password,
-  }});
+  const response = await requestAuth({
+    path: "/token?grant_type=password",
+    method: "POST",
+    body: {
+      email,
+      password,
+    },
+  });
   return parseSession(response);
 }
 
 export async function refreshStudentSession(
   refreshToken: string,
 ): Promise<StudentSession | null> {
-  const response = await requestAuth({ path: "/token?grant_type=refresh_token", method: "POST", body: {
-    refresh_token: refreshToken,
-  }});
+  const response = await requestAuth({
+    path: "/token?grant_type=refresh_token",
+    method: "POST",
+    body: {
+      refresh_token: refreshToken,
+    },
+  });
   return parseSession(response);
 }
 
 export async function verifyStudentEmail(
   tokenHash: string,
 ): Promise<StudentSession | null> {
-  const response = await requestAuth({ path: "/verify", method: "POST", body: {
-    token_hash: tokenHash,
-    type: "email",
-  }});
+  const response = await requestAuth({
+    path: "/verify",
+    method: "POST",
+    body: {
+      token_hash: tokenHash,
+      type: "email",
+    },
+  });
   return parseSession(response);
 }
 
