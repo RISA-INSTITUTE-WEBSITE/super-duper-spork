@@ -44,13 +44,16 @@ function trapSidebarFocus(event: KeyboardEvent, sidebar: HTMLDivElement | null):
   const first = elements[0];
   const last = elements[elements.length - 1];
 
-  if (event.shiftKey && document.activeElement === first) {
+  const wrapsBackward = event.shiftKey && document.activeElement === first;
+  const wrapsForward = !event.shiftKey && document.activeElement === last;
+
+  if (wrapsBackward) {
     event.preventDefault();
     last.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first.focus();
-  } else if (!sidebar?.contains(document.activeElement)) {
+    return;
+  }
+
+  if (wrapsForward || !sidebar?.contains(document.activeElement)) {
     event.preventDefault();
     first.focus();
   }
