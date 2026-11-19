@@ -9,7 +9,9 @@ import {
 } from "@/lib/student-session";
 
 function needsRefresh(accessToken: string | undefined, expiresAt: number): boolean {
-  return !accessToken || !Number.isFinite(expiresAt) || expiresAt <= Date.now() / 1000 + 90;
+  return (
+    !accessToken || !Number.isFinite(expiresAt) || expiresAt <= Date.now() / 1000 + 90
+  );
 }
 
 export async function proxy(request: NextRequest) {
