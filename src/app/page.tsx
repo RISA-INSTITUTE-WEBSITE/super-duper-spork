@@ -67,16 +67,15 @@ export default function HomePage() {
             </div>
             <div className="mt-12 grid gap-5 border-t border-white/75 pt-7 text-sm text-[#516b8b] sm:grid-cols-3 sm:gap-6">
               <div>
-                <span className="block font-bold text-[#143361]">Learn it.</span>Understand
-                it.
+                <span className="block font-bold text-[#143361]">Learn it.</span>
+                Understand it.
               </div>
               <div>
-                <span className="block font-bold text-[#143361]">Apply it.</span>Test
-                it.
+                <span className="block font-bold text-[#143361]">Apply it.</span>Test it.
               </div>
               <div>
-                <span className="block font-bold text-[#143361]">Improve it.</span>Make
-                an impact.
+                <span className="block font-bold text-[#143361]">Improve it.</span>Make an
+                impact.
               </div>
             </div>
           </div>
