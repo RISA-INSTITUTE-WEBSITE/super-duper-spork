@@ -55,7 +55,10 @@ function trapSidebarFocus(
     return;
   }
 
-  if (document.activeElement === last || !sidebar?.contains(document.activeElement)) {
+  if (
+    document.activeElement === last ||
+    !sidebar?.contains(document.activeElement)
+  ) {
     event.preventDefault();
     first.focus();
   }
