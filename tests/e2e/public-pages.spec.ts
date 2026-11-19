@@ -26,6 +26,21 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
   ).toBeVisible();
 });
 
+test("course areas come directly after the four-photo hero", async ({ page }) => {
+  await page.goto("/");
+  const sections = page.locator("main > section");
+
+  await expect(sections.nth(0)).toHaveClass(/risa-hero/);
+  await expect(sections.nth(0).locator(".risa-hero-photo")).toHaveCount(4);
+  await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "pathways-heading");
+  await expect(sections.nth(2)).toHaveAttribute(
+    "aria-labelledby",
+    "vision-mission-heading",
+  );
+  await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "philosophy-heading");
+  await expect(sections.nth(1).getByText("Proposed")).toHaveCount(3);
+});
+
 test("primary navigation works", async ({ page }) => {
   // QA-E2E-02: visitors can reach the learning-pathway listing.
   await page.goto("/");
