@@ -13,16 +13,26 @@ export type CourseCreationState = {
   message: string;
 };
 
+async function authorizedAdminToken(): Promise<string | null> {
+  const jar = await cookies();
+  const token = jar.get(studentCookieNames.access)?.value;
+  if (!token) {
+    return null;
+  }
+  const identity = await getStudentIdentity(token);
+  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
+    return null;
+  }
+  return token;
+}
+
 /** Called by the protected administrator form; checks role on each submission. */
 export async function createCourseAction(
   _previous: CourseCreationState,
   formData: FormData,
 ): Promise<CourseCreationState> {
-  const jar = await cookies();
-  const token = jar.get(studentCookieNames.access)?.value;
-  const identity = token ? await getStudentIdentity(token) : null;
-
-  if (!token || !identity || !(await isRisaAdministrator(token, identity.id))) {
+  const token = await authorizedAdminToken();
+  if (!token) {
     return { status: "error", message: "Administrator access is required." };
   }
 
