@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
@@ -226,10 +227,6 @@ export default function HomePage() {
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-full bg-[url('/risa-logo-transparent.svg')] bg-right bg-no-repeat opacity-[0.06] [background-size:auto_72%] sm:w-3/5 sm:opacity-[0.10] sm:[background-size:auto_115%]"
-        />
-        <div
-          aria-hidden="true"
           className="pointer-events-none absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-[#38b6ff]/15"
         />
         <div
@@ -237,7 +234,8 @@ export default function HomePage() {
           className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
         />
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="max-w-2xl">
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,29rem)] lg:gap-14">
+            <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
               A platform in progress
             </p>
@@ -264,6 +262,17 @@ export default function HomePage() {
               >
                 Contact RISA <ArrowIcon diagonal />
               </Link>
+            </div>
+            </div>
+            <div aria-hidden="true" className="flex justify-center lg:justify-end">
+              <Image
+                src="/risa-logo-animated.svg"
+                alt=""
+                width={600}
+                height={600}
+                unoptimized
+                className="h-auto w-full max-w-[20rem] opacity-100 sm:max-w-[26rem] lg:max-w-[29rem]"
+              />
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-500">
