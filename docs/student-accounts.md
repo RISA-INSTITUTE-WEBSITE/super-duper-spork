@@ -19,7 +19,7 @@ programme.
 | Hosting plan          | Supabase Free                                                 |
 | Student data          | Supabase Auth identities; no additional public profile tables |
 
-## Enable immediate registration without confirmation emails
+## Activate account creation (email verification optional)
 
 **Supabase requires an explicit dashboard setting.** The GitHub code cannot
 override a project with confirmation emails enabled. The current connected
@@ -41,12 +41,13 @@ administrator must do the following in the Supabase Dashboard.
 
        RISA_SUPABASE_URL=https://zaruopeqlndkxltqlpeh.supabase.co
        RISA_SUPABASE_PUBLISHABLE_KEY=<RISA project's sb_publishable key>
-       RISA_STUDENT_AUTH_ENABLED=true
 
-   The flag controls whether sign-up and sign-in are enabled on a deployment.
-   The user previously set it to `false`; a Vercel administrator must
-   explicitly switch it to `true` for the chosen environment and redeploy.
-   If the variable is not exactly `true`, both actions remain disabled.
+   After the activation update, the site enables student account creation
+   automatically when both RISA Supabase connection values are valid.
+   The legacy `RISA_STUDENT_AUTH_ENABLED` variable is no longer read;
+   changing it alone will not disable the portal. To suspend registration,
+   remove the publishable-key environment variable and redeploy (which
+   disables both signup and login), or deploy a reviewed maintenance change.
    **Do not use service-role or sb_secret keys.** Do not commit credentials.
 
 4. Before enabling the **Production** environment, complete the checks below
@@ -54,9 +55,10 @@ administrator must do the following in the Supabase Dashboard.
    POPIA and any relevant guardian/minor consent requirements.
 
 The connected tools can check GitHub, Supabase database security and project
-health, but **cannot read or change Vercel environment variables, or the
-Supabase Auth Email provider toggles**. Do not claim the production switch is
-complete until it is checked by an administrator.
+health, but **cannot read or change Vercel environment variables or the
+Supabase Auth Email provider toggles**. Production activation is not verified
+until the environment credentials and Auth Email configuration are checked
+by an administrator and a test account successfully registers.
 
 ## What students will experience
 
@@ -96,7 +98,8 @@ available to ordinary learners.
 - Ensure required GitHub CI checks, including OWASP ZAP dynamic scans, pass.
   Previous baseline runs had a failed DAST step; do not bypass security checks.
 - Confirm Vercel's deployment was created from the intended GitHub main
-  commit and that the production environment really has the enabled flag.
+  commit, the production environment has the two Supabase connection values,
+  and a controlled registration attempt creates an authenticated student.
 
 ## Restoring email verification
 
