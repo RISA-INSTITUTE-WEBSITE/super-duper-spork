@@ -83,7 +83,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="vision-mission-heading" className="bg-white py-20 sm:py-24">
+      <section
+        aria-labelledby="vision-mission-heading"
+        className="bg-white py-20 sm:py-24"
+      >
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
             RISA — Vision and Mission
@@ -117,8 +120,8 @@ export default function HomePage() {
                 Our Mission
               </h3>
               <p className="mt-4 leading-8 text-slate-600">
-                To make scientific and technical education accessible, practical, rigorous,
-                and relevant by integrating foundational knowledge with hands-on
+                To make scientific and technical education accessible, practical,
+                rigorous, and relevant by integrating foundational knowledge with hands-on
                 experimentation, engineering applications, research, and real-world
                 problem-solving.
               </p>
@@ -279,8 +282,8 @@ export default function HomePage() {
                 Theory into practice. Knowledge into impact.
               </h2>
               <p className="mt-5 leading-8 text-slate-600">
-                Discover RISA&apos;s approach to practical scientific education, or contact
-                the team to learn more as the platform develops.
+                Discover RISA&apos;s approach to practical scientific education, or
+                contact the team to learn more as the platform develops.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
