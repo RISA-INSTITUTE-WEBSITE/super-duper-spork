@@ -43,23 +43,37 @@ describe("RISA student authentication gateway", () => {
     expect(isStudentAuthConfigured()).toBe(false);
   });
 
-  it("registers accounts without creating a local password record", async () => {
+  it("returns a pending status when email confirmation is required", async () => {
     fetchMock.mockResolvedValue(reply({ user: { id: "user" } }));
     expect(
       await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
-    ).toBe(true);
+    ).toEqual({ status: "confirmation_required" });
     expect(fetchMock.mock.calls[0][0]).toContain("/auth/v1/signup");
+  });
+
+  it("provides a session for immediate login when confirmation is disabled", async () => {
+    fetchMock.mockResolvedValue(reply(session));
+    expect(
+      await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
+    ).toEqual({ status: "signed_in", session });
+  });
+
+  it("rejects malformed signup responses without opening a session", async () => {
+    fetchMock.mockResolvedValue(new Response("invalid-json"));
+    expect(
+      await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
+    ).toEqual({ status: "failed" });
   });
 
   it("fails closed on server errors and network failures", async () => {
     fetchMock.mockResolvedValueOnce(reply({}, 500));
     expect(
       await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
-    ).toBe(false);
+    ).toEqual({ status: "failed" });
     fetchMock.mockRejectedValueOnce(new Error("connection interrupted"));
     expect(
       await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
-    ).toBe(false);
+    ).toEqual({ status: "failed" });
   });
 
   it("signs in and refreshes sessions", async () => {
@@ -147,7 +161,7 @@ describe("auth configuration safety cases", () => {
     vi.stubEnv("RISA_SUPABASE_URL", "");
     expect(
       await registerStudentWithAuth("Example", "user@example.org", "Example#12345"),
-    ).toBe(false);
+    ).toEqual({ status: "failed" });
     expect(await signInStudentWithAuth("user@example.org", "Example#12345")).toBeNull();
     expect(await refreshStudentSession("unused")).toBeNull();
     expect(await verifyStudentEmail("unused")).toBeNull();
