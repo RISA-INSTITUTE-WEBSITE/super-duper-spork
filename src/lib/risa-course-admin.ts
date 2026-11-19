@@ -126,3 +126,28 @@ export async function getRisaAdminCourses(token: string): Promise<RisaCourse[] |
     return null;
   }
 }
+
+/** Single-course lookup also respects learner enrolment policies. */
+export async function getRisaCourseById(
+  token: string,
+  courseId: string,
+): Promise<RisaCourse | null> {
+  if (!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(courseId)) {
+    return null;
+  }
+  const response = await requestStudentBackend(
+    token,
+    "/rest/v1/risa_courses?select=id,code,slug,title,description,is_published,created_at&id=eq." +
+      courseId +
+      "&limit=1",
+  );
+  if (!response?.ok) {
+    return null;
+  }
+  try {
+    const rows: unknown = await response.json();
+    return Array.isArray(rows) && rows.length === 1 ? parseRisaCourse(rows[0]) : null;
+  } catch {
+    return null;
+  }
+}
