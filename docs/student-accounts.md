@@ -74,6 +74,54 @@ until all operational and security checks have passed. Flipping it to
 There is no Vercel connection available to this assistant at the moment,
 so environment values are **not yet verified or installed**.
 
+## Controlled testing with Supabase's built-in email provider
+
+The RISA project can use Supabase's default SMTP service **for development
+only**, with no Custom SMTP credentials. As documented by Supabase, the default
+sender is restricted to email addresses belonging to organization team
+members, has strict rate limits, and is not suitable for public rollout.
+
+1. In [RISA Authentication Providers](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/providers),
+   enable email/password sign-in, keep **Confirm email** enabled and leave
+   Custom SMTP disabled. These settings must be verified in the dashboard;
+   the available connector does not expose Auth configuration controls.
+2. In [URL Configuration](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/url-configuration),
+   verify Site URL equals `https://super-duper-spork-iota.vercel.app`.
+3. The unmodified **default** Supabase confirmation template normally sends
+   a link through Supabase's own verification endpoint and then redirects to
+   the configured Site URL. That is valid for confirming email, but it
+   **does not** call the website's custom `/auth/confirm` handler or
+   automatically create its HttpOnly login session. After clicking the
+   default link, return to `/students/login` and sign in normally.
+   If a custom email template is permitted, the token-hash link specified
+   above instead invokes the RISA handler and establishes a session.
+4. Choose a **single approved test address** belonging to a member of
+   the RISA Supabase organization's team; do not email random learners.
+5. Keep the **Production** Vercel variable `RISA_STUDENT_AUTH_ENABLED=false`.
+   For a website smoke test, use either a **protected preview** deployment
+   with `RISA_STUDENT_AUTH_ENABLED=true` set for Preview only, or a local
+   development server with the three RISA variables configured. Verify
+   Preview access control before enabling it; an unprotected preview is
+   publicly accessible to anyone with its link, and even an email-only
+   restriction on delivery does not prevent unwanted signup attempts.
+6. On the test deployment, register using the approved address and a fresh
+   password (10+ characters with a letter, number, special character).
+   Check for the confirmation email, open the link once, sign in at
+   `/students/login`, verify dashboard protection and sign out.
+   Check [Auth Users](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/users)
+   for one test user whose email is confirmed. Do not use an admin key
+   or insert records directly into `auth.users`.
+7. Disable test-only Preview access or reset the flag to `false` after
+   testing. Do not enable production signup without approved privacy
+   procedures, an appropriate email service and the full release review.
+
+**Verification baseline (19 November 2026):** Supabase project healthy,
+`auth.users` count = 0, security advisor has no findings. An earlier RISA
+website CI run failed at the OWASP ZAP DAST step, so release approval
+is still outstanding. The assistant cannot read Vercel environment-variable
+values or modify Supabase Auth's provider settings through the connected
+tools, and therefore has **not** enabled registration or sent a test email.
+
 ## Verification before activation
 
 - Run `npm ci`, `npm run check` and `npm run test:e2e`.
