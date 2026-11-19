@@ -26,7 +26,8 @@ export async function GET(
     status: 200,
     headers: {
       "Content-Type": "application/octet-stream",
-      "Content-Disposition": 'attachment; filename="' + file.title + "." + file.extension + '"',
+      "Content-Disposition":
+        'attachment; filename="' + file.title + "." + file.extension + '"',
       "Cache-Control": "private, no-store",
       "X-Content-Type-Options": "nosniff",
       Vary: "Cookie",
