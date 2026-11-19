@@ -1,0 +1,27 @@
+name: Temporary Course Content Formatting
+on:
+  push:
+    branches:
+      - feature/risa-topic-video-quiz-authoring-2026-11-20
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Apply RISA Prettier formatting
+        run: |
+          npx prettier --write src/lib/risa-course-curriculum.ts src/lib/risa-course-admin.ts src/app/admin/courses/'[id]'/content/page.tsx src/app/admin/courses/'[id]'/content/actions.ts src/app/admin/courses/page.tsx src/app/students/courses/'[id]'/page.tsx src/app/students/dashboard/page.tsx src/components/student-practice-quiz.tsx src/proxy.ts next.config.ts tests/unit/risa-course-curriculum.test.ts tests/e2e/public-pages.spec.ts docs/course-content-authoring.md
+          git add src/lib/risa-course-curriculum.ts src/lib/risa-course-admin.ts src/app/admin/courses/'[id]'/content/page.tsx src/app/admin/courses/'[id]'/content/actions.ts src/app/admin/courses/page.tsx src/app/students/courses/'[id]'/page.tsx src/app/students/dashboard/page.tsx src/components/student-practice-quiz.tsx src/proxy.ts next.config.ts tests/unit/risa-course-curriculum.test.ts tests/e2e/public-pages.spec.ts docs/course-content-authoring.md
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "style(courses): apply repository formatter"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
