@@ -1,4 +1,4 @@
-import { requestStudentBackend } from "@/lib/student-auth-api";
+import { requestStudentBackend } from "./student-auth-api";
 
 export type EnrolledCourse = {
   id: string;
