@@ -193,6 +193,14 @@ test("private student dashboard redirects visitors without a session", async ({
   await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
 
+test("course content authoring and enrolled lessons require login", async ({ page }) => {
+  const id = "11111111-1111-4111-8111-111111111111";
+  await page.goto("/admin/courses/" + id + "/content");
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+  await page.goto("/students/courses/" + id);
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+});
+
 test("course creation is unavailable to unauthenticated visitors", async ({ page }) => {
   await page.goto("/admin/courses");
   await expect(page).toHaveURL(/\/students\/login\/?$/);
