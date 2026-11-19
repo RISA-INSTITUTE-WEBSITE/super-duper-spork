@@ -319,13 +319,18 @@ export async function createCourseContent(
   return response?.ok === true;
 }
 
+export type QuizQuestionDraft = {
+  quizId: string;
+  prompt: string;
+  choices: string[];
+  correctIndex: number;
+};
+
 export async function addQuizQuestion(
   token: string,
-  quizId: string,
-  prompt: string,
-  choices: string[],
-  correctIndex: number,
+  draft: QuizQuestionDraft,
 ): Promise<boolean> {
+  const { quizId, prompt, choices, correctIndex } = draft;
   if (
     !uuidPattern.test(quizId) ||
     prompt.length < 5 ||
