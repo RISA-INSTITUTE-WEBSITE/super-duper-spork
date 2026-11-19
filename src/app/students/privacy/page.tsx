@@ -37,7 +37,9 @@ export default function StudentPrivacyNoticePage() {
         <p className="mt-3 leading-7 text-slate-700">
           The authentication provider stores and checks password credentials. The website
           uses secure, HTTP-only session cookies for sign-in. Account access is restricted
-          to the person authenticated with the verified email address.
+          to someone who signs in with the registered email and password. While
+          email verification is disabled, the registered address may not belong to
+          the account holder.
         </p>
         <h2 className="mt-8 font-heading text-xl font-semibold">
           Why we use this information
