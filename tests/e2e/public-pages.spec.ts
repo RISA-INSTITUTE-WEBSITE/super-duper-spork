@@ -208,21 +208,18 @@ test("RISA section animates original black liquid and green sphere without chang
   expect(asset.ok()).toBeTruthy();
   const svg = await asset.text();
   expect(svg).toContain('class="risa-original-black-liquid" fill="#383838"');
-  expect(svg).toContain('class="risa-green-orb" fill="#78eb29"');
+  expect(svg).toContain('class="risa-green-orb" cx="974" cy="442" r="84"');
   expect(svg).toContain("risa-natural-surface");
   expect(svg).toContain("risa-natural-slosh");
   expect(svg).toContain("risa-liquid-3d");
   expect(svg).toContain("risa-orb-3d");
   expect(svg).toContain("risa-green-orb-size");
   expect(svg).toContain('class="risa-glass-blue-backfill" fill="#38b6ff"');
-  const blueSphere = svg.match(
-    /class="risa-orb-blue-backfill" fill="#38b6ff" d="([^"]+)"/,
-  );
-  const greenSphere = svg.match(
-    /class="risa-green-orb" fill="#78eb29" fill-rule="evenodd" d="([^"]+)"/,
-  );
-  expect(blueSphere?.[1]).toBeTruthy();
-  expect(blueSphere?.[1]).toBe(greenSphere?.[1]);
+  expect(svg).toContain('class="risa-orb-blue-backfill" cx="974" cy="442" r="86"');
+  expect(svg).toContain('r="86" fill="#38b6ff" stroke="none"');
+  expect(svg).toContain('r="84" fill="#78eb29" stroke="none"');
+  expect(svg).toContain('shape-rendering="geometricPrecision"');
+  expect(svg).not.toContain('<path class="risa-green-orb"');
   expect(svg).not.toContain("risa-wave-front");
   expect(svg).not.toContain("risa-led-halo");
   expect(svg).not.toContain("risa-bubble");
