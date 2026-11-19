@@ -8,16 +8,16 @@ temporary mode allows email-and-password registration without sending an
 email confirmation.** It is not passwordless login or admission to a
 programme.
 
-| Setting | Value |
-| --- | --- |
-| Supabase organization | RISA Institute of Applied Sciences |
-| Organization ID | `vvhpskswrwuexeuatqoq` |
-| Project ID | `zaruopeqlndkxltqlpeh` |
-| Project URL | `https://zaruopeqlndkxltqlpeh.supabase.co` |
-| Website | `https://super-duper-spork-iota.vercel.app` |
-| Database region | `eu-west-1` (Ireland) |
-| Hosting plan | Supabase Free |
-| Student data | Supabase Auth identities; no additional public profile tables |
+| Setting               | Value                                                         |
+| --------------------- | ------------------------------------------------------------- |
+| Supabase organization | RISA Institute of Applied Sciences                            |
+| Organization ID       | `vvhpskswrwuexeuatqoq`                                        |
+| Project ID            | `zaruopeqlndkxltqlpeh`                                        |
+| Project URL           | `https://zaruopeqlndkxltqlpeh.supabase.co`                    |
+| Website               | `https://super-duper-spork-iota.vercel.app`                   |
+| Database region       | `eu-west-1` (Ireland)                                         |
+| Hosting plan          | Supabase Free                                                 |
+| Student data          | Supabase Auth identities; no additional public profile tables |
 
 ## Enable immediate registration without confirmation emails
 
@@ -48,6 +48,7 @@ administrator must do the following in the Supabase Dashboard.
    explicitly switch it to `true` for the chosen environment and redeploy.
    If the variable is not exactly `true`, both actions remain disabled.
    **Do not use service-role or sb_secret keys.** Do not commit credentials.
+
 4. Before enabling the **Production** environment, complete the checks below
    and ensure the draft [privacy notice](/students/privacy) is approved for
    POPIA and any relevant guardian/minor consent requirements.
