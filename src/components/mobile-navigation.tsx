@@ -8,6 +8,7 @@ const navigation = [
   { href: "/programmes", label: "Programmes" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
+  { href: "/students/login", label: "Students" },
 ] as const;
 
 function SearchIcon() {
