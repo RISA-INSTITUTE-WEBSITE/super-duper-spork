@@ -1,6 +1,6 @@
 /**
  * Server-only gateway for Supabase Auth's documented REST endpoints.
- * No service-role key or password is ever sent to the browser.
+ * No service-role key is used, and credentials are sent to Auth only server-side.
  * Student records are managed by Supabase Auth (no public profile tables).
  */
 
@@ -48,7 +48,9 @@ function getAuthConfig(): AuthConfig | null {
 }
 
 export function isStudentAuthConfigured(): boolean {
-  return getAuthConfig() !== null;
+  return (
+    process.env.RISA_STUDENT_AUTH_ENABLED === "true" && getAuthConfig() !== null
+  );
 }
 
 async function requestAuth(
