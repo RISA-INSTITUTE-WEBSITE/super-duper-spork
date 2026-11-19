@@ -20,7 +20,11 @@ export async function GET() {
 
   const image = await getStudentAvatar(token, student.avatarPath);
   const mime = image?.headers.get("content-type")?.split(";")[0];
-  if (!image?.body || !mime || !["image/jpeg", "image/png", "image/webp"].includes(mime)) {
+  if (
+    !image?.body ||
+    !mime ||
+    !["image/jpeg", "image/png", "image/webp"].includes(mime)
+  ) {
     return new Response(null, { status: 404 });
   }
 
