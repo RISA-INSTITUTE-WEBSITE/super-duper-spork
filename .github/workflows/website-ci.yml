@@ -43,11 +43,13 @@ jobs:
 
       - name: Diagnostic formatted mobile nav snapshot
         run: |
-          npx prettier --write src/components/mobile-navigation.tsx
-          echo "AUTH_FORMAT_START"
-          base64 -w0 src/components/mobile-navigation.tsx
-          echo
-          echo "AUTH_FORMAT_END"
+          npx prettier --write src/components/mobile-navigation.tsx tests/unit/student-auth-api.test.ts tests/unit/student-session.test.ts
+          for file in tests/unit/student-auth-api.test.ts tests/unit/student-session.test.ts; do
+            echo "AUTH_FORMAT_START:$file"
+            base64 -w0 "$file"
+            echo
+            echo "AUTH_FORMAT_END:$file"
+          done
 
       # Phase 1 - fastest, read-only static checks.
       # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
