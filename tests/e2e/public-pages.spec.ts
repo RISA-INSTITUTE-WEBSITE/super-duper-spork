@@ -215,8 +215,12 @@ test("RISA section animates original black liquid and green sphere without chang
   expect(svg).toContain("risa-orb-3d");
   expect(svg).toContain("risa-green-orb-size");
   expect(svg).toContain('class="risa-glass-blue-backfill" fill="#38b6ff"');
-  const blueSphere = svg.match(/class="risa-orb-blue-backfill" fill="#38b6ff" d="([^"]+)"/);
-  const greenSphere = svg.match(/class="risa-green-orb" fill="#78eb29" fill-rule="evenodd" d="([^"]+)"/);
+  const blueSphere = svg.match(
+    /class="risa-orb-blue-backfill" fill="#38b6ff" d="([^"]+)"/,
+  );
+  const greenSphere = svg.match(
+    /class="risa-green-orb" fill="#78eb29" fill-rule="evenodd" d="([^"]+)"/,
+  );
   expect(blueSphere?.[1]).toBeTruthy();
   expect(blueSphere?.[1]).toBe(greenSphere?.[1]);
   expect(svg).not.toContain("risa-wave-front");
