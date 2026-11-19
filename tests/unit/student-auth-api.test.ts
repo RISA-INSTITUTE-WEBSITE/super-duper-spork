@@ -145,9 +145,9 @@ describe("auth configuration safety cases", () => {
 
   it("does not call a network service with missing configuration", async () => {
     vi.stubEnv("RISA_SUPABASE_URL", "");
-    expect(await registerStudentWithAuth("Example", "user@example.org", "Example#12345")).toBe(
-      false,
-    );
+    expect(
+      await registerStudentWithAuth("Example", "user@example.org", "Example#12345"),
+    ).toBe(false);
     expect(await signInStudentWithAuth("user@example.org", "Example#12345")).toBeNull();
     expect(await refreshStudentSession("unused")).toBeNull();
     expect(await verifyStudentEmail("unused")).toBeNull();
@@ -220,25 +220,31 @@ describe("auth transport and data validation cases", () => {
     };
     fetchMock.mockResolvedValueOnce(reply(verified));
     expect((await getStudentIdentity("access"))?.fullName).toBe("Student");
-    fetchMock.mockResolvedValueOnce(reply({
-      ...verified,
-      user_metadata: { full_name: 1234 },
-    }));
+    fetchMock.mockResolvedValueOnce(
+      reply({
+        ...verified,
+        user_metadata: { full_name: 1234 },
+      }),
+    );
     expect((await getStudentIdentity("access"))?.fullName).toBe("Student");
-    fetchMock.mockResolvedValueOnce(reply({
-      ...verified,
-      user_metadata: { full_name: "   " },
-    }));
+    fetchMock.mockResolvedValueOnce(
+      reply({
+        ...verified,
+        user_metadata: { full_name: "   " },
+      }),
+    );
     expect((await getStudentIdentity("access"))?.fullName).toBe("Student");
   });
 
   it("truncates display names to 80 characters", async () => {
-    fetchMock.mockResolvedValue(reply({
-      id: "student",
-      email: "user@example.org",
-      email_confirmed_at: "confirmed",
-      user_metadata: { full_name: "S".repeat(120) },
-    }));
+    fetchMock.mockResolvedValue(
+      reply({
+        id: "student",
+        email: "user@example.org",
+        email_confirmed_at: "confirmed",
+        user_metadata: { full_name: "S".repeat(120) },
+      }),
+    );
     expect((await getStudentIdentity("access"))?.fullName).toHaveLength(80);
   });
 
