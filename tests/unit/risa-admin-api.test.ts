@@ -1,9 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import {
-  getRisaAdminOverview,
-  isRisaAdministrator,
-} from "../../src/lib/risa-admin-api";
+import { getRisaAdminOverview, isRisaAdministrator } from "../../src/lib/risa-admin-api";
 
 const userId = "11111111-1111-4111-8111-111111111111";
 const fetchMock = vi.fn();

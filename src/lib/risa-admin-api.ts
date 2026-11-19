@@ -62,9 +62,7 @@ async function countAdminRecords(
   return match ? Number(match[1]) : null;
 }
 
-export async function getRisaAdminOverview(
-  token: string,
-): Promise<RisaAdminOverview> {
+export async function getRisaAdminOverview(token: string): Promise<RisaAdminOverview> {
   const [courses, enrolments, materials] = await Promise.all([
     countAdminRecords(token, "risa_courses", "id"),
     countAdminRecords(token, "risa_enrollments", "student_id"),

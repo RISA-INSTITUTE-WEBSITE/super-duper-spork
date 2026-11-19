@@ -4,10 +4,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { signOutStudent } from "@/app/students/actions";
-import {
-  getStudentIdentity,
-  isStudentAuthConfigured,
-} from "@/lib/student-auth-api";
+import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { getRisaAdminOverview, isRisaAdministrator } from "@/lib/risa-admin-api";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -80,8 +77,8 @@ export default async function RisaAdminPage() {
               Administration Centre
             </h1>
             <p className="mt-3 max-w-xl text-base leading-7 text-slate-600">
-              Welcome, {identity.fullName}. Your administrator role has been
-              verified against RISA&apos;s protected role registry.
+              Welcome, {identity.fullName}. Your administrator role has been verified
+              against RISA&apos;s protected role registry.
             </p>
             <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#eefce5] px-4 py-2 text-xs font-bold text-[#286518]">
               <span aria-hidden="true" className="size-2 rounded-full bg-[#286518]" />
@@ -107,8 +104,8 @@ export default async function RisaAdminPage() {
           Learning platform overview
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          Live records from RISA&apos;s course system. A dash indicates that the
-          backend count is unavailable, not that there are zero records.
+          Live records from RISA&apos;s course system. A dash indicates that the backend
+          count is unavailable, not that there are zero records.
         </p>
         <div className="mt-6 grid gap-5 md:grid-cols-3">
           <AdminMetric
@@ -137,8 +134,8 @@ export default async function RisaAdminPage() {
           <p className="mt-4 text-sm leading-7 text-slate-600">
             Your role is authorized for course records, enrolments, and learning
             materials. In-browser course editing and uploading tools are not yet
-            available; authorized institution staff can manage these records
-            through the project&apos;s existing Supabase management process.
+            available; authorized institution staff can manage these records through the
+            project&apos;s existing Supabase management process.
           </p>
         </article>
         <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
@@ -146,9 +143,9 @@ export default async function RisaAdminPage() {
             Account and permissions
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Administrator access is assigned by trusted RISA maintainers.
-            Students cannot promote themselves, and profile changes never
-            modify administrator permissions.
+            Administrator access is assigned by trusted RISA maintainers. Students cannot
+            promote themselves, and profile changes never modify administrator
+            permissions.
           </p>
           <Link
             href="/students/profile"
