@@ -31,13 +31,17 @@ export default function StudentPrivacyNoticePage() {
           verification message. RISA does not ask for identity documents, payment
           information or academic records during account registration.
         </p>
-        <h2 className="mt-8 font-heading text-xl font-semibold">How accounts are protected</h2>
+        <h2 className="mt-8 font-heading text-xl font-semibold">
+          How accounts are protected
+        </h2>
         <p className="mt-3 leading-7 text-slate-700">
-          The authentication provider stores and checks password credentials. The
-          website uses secure, HTTP-only session cookies for sign-in. Account access
-          is restricted to the person authenticated with the verified email address.
+          The authentication provider stores and checks password credentials. The website
+          uses secure, HTTP-only session cookies for sign-in. Account access is restricted
+          to the person authenticated with the verified email address.
         </p>
-        <h2 className="mt-8 font-heading text-xl font-semibold">Why we use this information</h2>
+        <h2 className="mt-8 font-heading text-xl font-semibold">
+          Why we use this information
+        </h2>
         <p className="mt-3 leading-7 text-slate-700">
           We use your details to create and secure your account and communicate about
           sign-in. Registration does not mean admission into a course, and it is not a
