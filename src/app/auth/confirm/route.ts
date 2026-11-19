@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
   }
 
   const session = await verifyStudentEmail(tokenHash);
-  if (!session) return NextResponse.redirect(destination);
+  if (!session) {
+    return NextResponse.redirect(destination);
+  }
 
   await saveStudentSession(session);
   return NextResponse.redirect(new URL("/students/dashboard", request.url));
