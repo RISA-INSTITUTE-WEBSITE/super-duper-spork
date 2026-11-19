@@ -1,0 +1,27 @@
+name: Temporary Curriculum Refactor Formatting
+on:
+  push:
+    branches:
+      - feature/risa-topic-video-quiz-authoring-2026-11-20
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Prettier
+        run: |
+          npx prettier --write src/lib/risa-course-curriculum.ts src/app/admin/courses/'[id]'/content/actions.ts src/app/students/courses/'[id]'/page.tsx tests/unit/risa-course-curriculum.test.ts
+          git add src/lib/risa-course-curriculum.ts src/app/admin/courses/'[id]'/content/actions.ts src/app/students/courses/'[id]'/page.tsx tests/unit/risa-course-curriculum.test.ts
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "style(courses): format curriculum refactor"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
