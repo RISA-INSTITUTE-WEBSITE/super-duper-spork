@@ -179,3 +179,16 @@ test("mobile students entry opens the student portal", async ({ page }) => {
     .click();
   await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
+
+test("homepage progress content sits on the white section without a boxed banner", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const section = page.locator('section[aria-labelledby="next-heading"]');
+  await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(
+    section.getByRole("heading", { name: "A place to question, discover and grow." }),
+  ).toBeVisible();
+  await expect(section.getByRole("link", { name: /About the institute/ })).toBeVisible();
+  await expect(section.getByRole("link", { name: /Contact RISA/ })).toBeVisible();
+});
