@@ -1,0 +1,29 @@
+name: Temporary Admin Feature Formatting
+on:
+  push:
+    branches:
+      - feature/risa-admin-role-and-portal-2026-11-20
+permissions:
+  contents: write
+jobs:
+  prettify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Apply Prettier on admin feature
+        run: |
+          npx prettier --write src/app/admin/page.tsx src/lib/risa-admin-api.ts src/app/students/actions.ts src/app/students/login/page.tsx src/proxy.ts tests/unit/risa-admin-api.test.ts tests/e2e/public-pages.spec.ts docs/admin-role.md
+          git add src/app/admin/page.tsx src/lib/risa-admin-api.ts src/app/students/actions.ts src/app/students/login/page.tsx src/proxy.ts tests/unit/risa-admin-api.test.ts tests/e2e/public-pages.spec.ts docs/admin-role.md
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "style(admin): apply RISA formatting"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
