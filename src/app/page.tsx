@@ -222,7 +222,11 @@ export default function HomePage() {
 
       <section aria-labelledby="next-heading" className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="relative overflow-hidden rounded-[2rem] bg-[#0b2450] px-7 py-12 text-white sm:px-12 sm:py-16 lg:px-16">
+          <div className="relative isolate overflow-hidden rounded-[2rem] bg-[#0b2450] px-7 py-12 text-white sm:px-12 sm:py-16 lg:px-16">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 bg-[url('/risa-logo-transparent.svg')] bg-center bg-no-repeat opacity-[0.16] [background-size:auto_90%] sm:bg-right sm:opacity-[0.23] sm:[background-size:auto_112%]"
+            />
             <div
               aria-hidden="true"
               className="absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-cyan-300/10"
