@@ -55,7 +55,7 @@ test("landing page labels pathways as proposed and links to project information"
     page.getByRole("heading", { name: "Explore proposed learning pathways." }),
   ).toBeVisible();
   await expect(
-    page.getByText("Student accounts and applications are not available yet."),
+    page.getByText("Student account access is being prepared;"),
   ).toBeVisible();
   await page.getByRole("link", { name: "Discover RISA" }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
@@ -148,4 +148,42 @@ test("navigation links use larger Outfit SemiBold text on desktop and mobile", a
   await expect(mobileLink).toHaveCSS("font-family", /Outfit/);
   await expect(mobileLink).toHaveCSS("font-size", "18px");
   await expect(mobileLink).toHaveCSS("font-weight", "600");
+});
+
+test("students can locate registration but signup is safely gated until configured", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Students" })
+    .click();
+
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+  await page.getByRole("link", { name: "Create an account" }).click();
+
+  await expect(page).toHaveURL(/\/students\/register\/?$/);
+  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Create student account" })).toBeDisabled();
+  await expect(page.getByRole("status")).toContainText(
+    "Student registration is being prepared",
+  );
+});
+
+test("private student dashboard redirects visitors without a session", async ({ page }) => {
+  await page.goto("/students/dashboard");
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+});
+
+test("mobile students entry opens the student portal", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  await page
+    .getByRole("navigation", { name: "Mobile navigation" })
+    .getByRole("link", { name: "Students" })
+    .click();
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
