@@ -237,8 +237,9 @@ describe("auth transport and data validation cases", () => {
       email_confirmed_at: "confirmed",
     };
     fetchMock.mockResolvedValueOnce(reply(verified));
-    expect((await getStudentIdentity("access"))?.fullName).toBe("Student");
-    expect((await getStudentIdentity("access"))?.avatarPath).toBeNull();
+    const identity = await getStudentIdentity("access");
+    expect(identity?.fullName).toBe("Student");
+    expect(identity?.avatarPath).toBeNull();
     fetchMock.mockResolvedValueOnce(
       reply({
         ...verified,
