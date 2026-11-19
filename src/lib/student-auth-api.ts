@@ -22,7 +22,9 @@ function getAuthConfig(): AuthConfig | null {
   const rawUrl = process.env.RISA_SUPABASE_URL;
   const publishableKey = process.env.RISA_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!rawUrl || !publishableKey || !publishableKey.trim()) return null;
+  if (!rawUrl || !publishableKey || !publishableKey.trim()) {
+    return null;
+  }
 
   try {
     const url = new URL(rawUrl);
@@ -39,7 +41,9 @@ function getAuthConfig(): AuthConfig | null {
     }
 
     // An Auth publishable key is not an admin key.
-    if (publishableKey.startsWith("sb_secret_")) return null;
+    if (publishableKey.startsWith("sb_secret_")) {
+      return null;
+    }
 
     return { url: url.origin, publishableKey };
   } catch {
@@ -48,9 +52,7 @@ function getAuthConfig(): AuthConfig | null {
 }
 
 export function isStudentAuthConfigured(): boolean {
-  return (
-    process.env.RISA_STUDENT_AUTH_ENABLED === "true" && getAuthConfig() !== null
-  );
+  return process.env.RISA_STUDENT_AUTH_ENABLED === "true" && getAuthConfig() !== null;
 }
 
 async function requestAuth(
@@ -60,7 +62,9 @@ async function requestAuth(
   bearer?: string,
 ): Promise<Response | null> {
   const config = getAuthConfig();
-  if (!config) return null;
+  if (!config) {
+    return null;
+  }
 
   try {
     return await fetch(config.url + "/auth/v1" + path, {
@@ -80,7 +84,9 @@ async function requestAuth(
 }
 
 function readSession(value: unknown): StudentSession | null {
-  if (!value || typeof value !== "object") return null;
+  if (!value || typeof value !== "object") {
+    return null;
+  }
   const session = value as Partial<StudentSession>;
   if (
     typeof session.access_token !== "string" ||
@@ -102,7 +108,9 @@ function readSession(value: unknown): StudentSession | null {
 }
 
 async function parseSession(response: Response | null): Promise<StudentSession | null> {
-  if (!response?.ok) return null;
+  if (!response?.ok) {
+    return null;
+  }
   try {
     return readSession(await response.json());
   } catch {
@@ -157,11 +165,15 @@ export async function getStudentIdentity(
   accessToken: string,
 ): Promise<StudentIdentity | null> {
   const response = await requestAuth("/user", "GET", undefined, accessToken);
-  if (!response?.ok) return null;
+  if (!response?.ok) {
+    return null;
+  }
 
   try {
     const data: unknown = await response.json();
-    if (!data || typeof data !== "object") return null;
+    if (!data || typeof data !== "object") {
+      return null;
+    }
     const user = data as {
       id?: unknown;
       email?: unknown;
