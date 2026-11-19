@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
@@ -226,10 +227,6 @@ export default function HomePage() {
       >
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 w-full bg-[url('/risa-logo-transparent.svg')] bg-right bg-no-repeat opacity-[0.06] [background-size:auto_72%] sm:w-3/5 sm:opacity-[0.10] sm:[background-size:auto_115%]"
-        />
-        <div
-          aria-hidden="true"
           className="pointer-events-none absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-[#38b6ff]/15"
         />
         <div
@@ -237,33 +234,45 @@ export default function HomePage() {
           className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
         />
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
-              A platform in progress
-            </p>
-            <h2
-              id="next-heading"
-              className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
-            >
-              A place to question, discover and grow.
-            </h2>
-            <p className="mt-5 leading-8 text-slate-600">
-              We are building RISA one step at a time. Explore the institute&apos;s
-              vision, or contact the team to learn more about the project.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                href="/about"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#286518] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,29rem)] lg:gap-14">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
+                A platform in progress
+              </p>
+              <h2
+                id="next-heading"
+                className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
               >
-                About the institute <ArrowIcon />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 text-sm font-semibold text-[#286518] transition hover:border-[#286518] hover:bg-[#eefce5] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
-              >
-                Contact RISA <ArrowIcon diagonal />
-              </Link>
+                A place to question, discover and grow.
+              </h2>
+              <p className="mt-5 leading-8 text-slate-600">
+                We are building RISA one step at a time. Explore the institute&apos;s
+                vision, or contact the team to learn more about the project.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/about"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#286518] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+                >
+                  About the institute <ArrowIcon />
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 text-sm font-semibold text-[#286518] transition hover:border-[#286518] hover:bg-[#eefce5] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+                >
+                  Contact RISA <ArrowIcon diagonal />
+                </Link>
+              </div>
+            </div>
+            <div aria-hidden="true" className="flex justify-center lg:justify-end">
+              <Image
+                src="/risa-logo-animated.svg"
+                alt=""
+                width={600}
+                height={600}
+                unoptimized
+                className="h-auto w-full max-w-[20rem] opacity-100 sm:max-w-[26rem] lg:max-w-[29rem]"
+              />
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-500">
