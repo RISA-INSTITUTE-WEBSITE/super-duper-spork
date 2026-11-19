@@ -67,7 +67,12 @@ function StatusNotice({ status }: { status?: string }) {
 function VisibilityCheckbox() {
   return (
     <label className="flex items-center gap-2 text-xs font-medium text-slate-700">
-      <input type="checkbox" name="published" defaultChecked className="accent-[#286518]" />
+      <input
+        type="checkbox"
+        name="published"
+        defaultChecked
+        className="accent-[#286518]"
+      />
       Visible when the course is published and the learner is enrolled
     </label>
   );
@@ -75,7 +80,10 @@ function VisibilityCheckbox() {
 
 function AddTopicForm({ courseId }: { courseId: string }) {
   return (
-    <form action={createTopicAction} className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8">
+    <form
+      action={createTopicAction}
+      className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8"
+    >
       <input type="hidden" name="courseId" value={courseId} />
       <h2 className="font-heading text-xl font-bold text-slate-950">Add a topic</h2>
       <p className="mt-2 text-sm text-slate-600">
@@ -84,60 +92,115 @@ function AddTopicForm({ courseId }: { courseId: string }) {
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <label className="block text-sm font-semibold text-slate-800">
           Topic title
-          <input name="title" className={field} minLength={2} maxLength={140} required placeholder="e.g. Introduction to Linux" />
+          <input
+            name="title"
+            className={field}
+            minLength={2}
+            maxLength={140}
+            required
+            placeholder="e.g. Introduction to Linux"
+          />
         </label>
         <label className="block text-sm font-semibold text-slate-800">
           Summary (optional)
-          <textarea name="description" className={field} rows={2} maxLength={1500} placeholder="Learning outcomes and key ideas" />
+          <textarea
+            name="description"
+            className={field}
+            rows={2}
+            maxLength={1500}
+            placeholder="Learning outcomes and key ideas"
+          />
         </label>
       </div>
       <div className="mt-4">
         <VisibilityCheckbox />
       </div>
-      <button type="submit" className={button}>Create topic</button>
+      <button type="submit" className={button}>
+        Create topic
+      </button>
     </form>
   );
 }
 
 function AddVideoForm({ courseId, topicId }: { courseId: string; topicId: string }) {
   return (
-    <form action={createVideoAction} className="rounded-xl border border-white bg-white/70 p-4">
+    <form
+      action={createVideoAction}
+      className="rounded-xl border border-white bg-white/70 p-4"
+    >
       <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="topicId" value={topicId} />
       <h4 className="text-sm font-bold text-slate-950">Embed YouTube lesson</h4>
       <label className="mt-3 block text-xs font-semibold text-slate-700">
         Video title
-        <input name="title" className={field} maxLength={160} minLength={2} required placeholder="e.g. Linux command line basics" />
+        <input
+          name="title"
+          className={field}
+          maxLength={160}
+          minLength={2}
+          required
+          placeholder="e.g. Linux command line basics"
+        />
       </label>
       <label className="mt-3 block text-xs font-semibold text-slate-700">
         YouTube link
-        <input name="youtubeUrl" type="text" className={field} required placeholder="https://www.youtube.com/watch?v=..." />
+        <input
+          name="youtubeUrl"
+          type="text"
+          className={field}
+          required
+          placeholder="https://www.youtube.com/watch?v=..."
+        />
       </label>
       <p className="mt-2 text-xs text-slate-500">
         Supports YouTube watch, shorts, live, embed and youtu.be links.
       </p>
-      <div className="mt-3"><VisibilityCheckbox /></div>
-      <button type="submit" className={button}>Add video</button>
+      <div className="mt-3">
+        <VisibilityCheckbox />
+      </div>
+      <button type="submit" className={button}>
+        Add video
+      </button>
     </form>
   );
 }
 
 function AddQuizForm({ courseId, topicId }: { courseId: string; topicId: string }) {
   return (
-    <form action={createQuizAction} className="rounded-xl border border-white bg-white/70 p-4">
+    <form
+      action={createQuizAction}
+      className="rounded-xl border border-white bg-white/70 p-4"
+    >
       <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="topicId" value={topicId} />
       <h4 className="text-sm font-bold text-slate-950">Create a quiz</h4>
       <label className="mt-3 block text-xs font-semibold text-slate-700">
         Quiz title
-        <input name="title" className={field} minLength={2} maxLength={160} required placeholder="e.g. Linux knowledge checkpoint 1" />
+        <input
+          name="title"
+          className={field}
+          minLength={2}
+          maxLength={160}
+          required
+          placeholder="e.g. Linux knowledge checkpoint 1"
+        />
       </label>
       <label className="mt-3 block text-xs font-semibold text-slate-700">
         Instructions (optional)
-        <textarea name="description" className={field} rows={2} maxLength={800} placeholder="Answer the four-option questions." />
+        <textarea
+          name="description"
+          className={field}
+          rows={2}
+          maxLength={800}
+          placeholder="Answer the four-option questions."
+        />
       </label>
-      <div className="mt-3"><VisibilityCheckbox /></div>
-      <button type="submit" className={button}>Create quiz</button>
+      <div className="mt-3">
+        <VisibilityCheckbox />
+      </div>
+      <button type="submit" className={button}>
+        Create quiz
+      </button>
     </form>
   );
 }
@@ -152,20 +215,37 @@ function AddQuestionForm({
   quizId: string;
 }) {
   return (
-    <form action={createQuestionAction} className="mt-4 rounded-xl border border-[#78eb29]/40 bg-white/80 p-4">
+    <form
+      action={createQuestionAction}
+      className="mt-4 rounded-xl border border-[#78eb29]/40 bg-white/80 p-4"
+    >
       <input type="hidden" name="courseId" value={courseId} />
       <input type="hidden" name="topicId" value={topicId} />
       <input type="hidden" name="quizId" value={quizId} />
       <h5 className="text-sm font-bold text-slate-900">Add multiple-choice question</h5>
       <label className="mt-3 block text-xs font-semibold text-slate-700">
         Question
-        <textarea name="prompt" className={field} rows={2} minLength={5} maxLength={500} required placeholder="What is the purpose of the Linux pwd command?" />
+        <textarea
+          name="prompt"
+          className={field}
+          rows={2}
+          minLength={5}
+          maxLength={500}
+          required
+          placeholder="What is the purpose of the Linux pwd command?"
+        />
       </label>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {["A", "B", "C", "D"].map((label, index) => (
           <label key={label} className="block text-xs font-semibold text-slate-700">
             Option {label}
-            <input name={"choice" + index} className={field} maxLength={250} required placeholder={"Answer " + label} />
+            <input
+              name={"choice" + index}
+              className={field}
+              maxLength={250}
+              required
+              placeholder={"Answer " + label}
+            />
           </label>
         ))}
       </div>
@@ -181,7 +261,9 @@ function AddQuestionForm({
       <p className="mt-2 text-xs text-slate-500">
         Correct answers are kept in an administrator-only database table.
       </p>
-      <button type="submit" className={button}>Save question</button>
+      <button type="submit" className={button}>
+        Save question
+      </button>
     </form>
   );
 }
@@ -206,15 +288,15 @@ function QuizCard({
           {quiz.is_published ? "Visible" : "Draft"} · {questions.length} questions
         </span>
       </div>
-      {quiz.description && <p className="mt-2 text-sm text-slate-600">{quiz.description}</p>}
+      {quiz.description && (
+        <p className="mt-2 text-sm text-slate-600">{quiz.description}</p>
+      )}
       {questions.map((question, index) => (
         <div key={question.id} className="mt-3 rounded-lg bg-white/85 p-4">
           <p className="text-sm font-semibold text-slate-900">
             {index + 1}. {question.prompt}
           </p>
-          <p className="mt-2 text-xs text-slate-600">
-            {question.choices.join(" · ")}
-          </p>
+          <p className="mt-2 text-xs text-slate-600">{question.choices.join(" · ")}</p>
         </div>
       ))}
       <AddQuestionForm courseId={courseId} topicId={topicId} quizId={quiz.id} />
@@ -241,16 +323,28 @@ function TopicCard({
           {topic.is_published ? "Visible" : "Draft"}
         </span>
       </div>
-      {topic.description && <p className="mt-3 text-sm text-slate-600">{topic.description}</p>}
+      {topic.description && (
+        <p className="mt-3 text-sm text-slate-600">{topic.description}</p>
+      )}
       {videos.length > 0 && (
         <div className="my-5 space-y-2">
           <h4 className="text-sm font-bold text-slate-900">YouTube lessons</h4>
           {videos.map((video) => (
-            <p key={video.id} className="rounded-lg bg-white/80 px-4 py-3 text-sm text-slate-700">
-              <a href={"https://www.youtube.com/watch?v=" + video.youtube_id} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#155DFC] underline-offset-4 hover:underline">
+            <p
+              key={video.id}
+              className="rounded-lg bg-white/80 px-4 py-3 text-sm text-slate-700"
+            >
+              <a
+                href={"https://www.youtube.com/watch?v=" + video.youtube_id}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-[#155DFC] underline-offset-4 hover:underline"
+              >
                 {video.title}
               </a>
-              <span className="ml-2 text-xs text-slate-500">{video.is_published ? "Visible" : "Draft"}</span>
+              <span className="ml-2 text-xs text-slate-500">
+                {video.is_published ? "Visible" : "Draft"}
+              </span>
             </p>
           ))}
         </div>
@@ -263,7 +357,13 @@ function TopicCard({
         <div className="mt-6 grid gap-4">
           <h4 className="text-sm font-bold text-slate-900">Quizzes and questions</h4>
           {quizzes.map((quiz) => (
-            <QuizCard key={quiz.id} quiz={quiz} courseId={courseId} topicId={topic.id} curriculum={curriculum} />
+            <QuizCard
+              key={quiz.id}
+              quiz={quiz}
+              courseId={courseId}
+              topicId={topic.id}
+              curriculum={curriculum}
+            />
           ))}
         </div>
       )}
@@ -303,8 +403,14 @@ export default async function AdminCourseContentPage({
   const { result } = await searchParams;
 
   return (
-    <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-5 py-10 sm:px-8 lg:py-16">
-      <Link href="/admin/courses" className="text-sm font-semibold text-[#286518] hover:underline">
+    <main
+      id="main-content"
+      className="mx-auto w-full max-w-7xl flex-1 px-5 py-10 sm:px-8 lg:py-16"
+    >
+      <Link
+        href="/admin/courses"
+        className="text-sm font-semibold text-[#286518] hover:underline"
+      >
         ← Back to course management
       </Link>
       <div className="mt-6 mb-8">
@@ -315,24 +421,32 @@ export default async function AdminCourseContentPage({
           {course.title}
         </h1>
         <div className="mt-3 flex flex-wrap gap-3 text-sm">
-          <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono font-bold text-[#286518]">{course.code}</span>
+          <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono font-bold text-[#286518]">
+            {course.code}
+          </span>
           <span className="rounded-lg bg-white px-3 py-1 font-semibold text-slate-700">
             {course.is_published ? "Course published" : "Course draft"}
           </span>
         </div>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
-          Build topics, embed YouTube lessons and write multiple-choice quizzes. Only enrolled
-          learners can see published content within a published course.
+          Build topics, embed YouTube lessons and write multiple-choice quizzes. Only
+          enrolled learners can see published content within a published course.
         </p>
       </div>
       <StatusNotice status={result} />
       <AddTopicForm courseId={course.id} />
       <section aria-labelledby="topics-heading" className="mt-12">
-        <h2 id="topics-heading" className="font-heading text-2xl font-bold text-slate-950">
+        <h2
+          id="topics-heading"
+          className="font-heading text-2xl font-bold text-slate-950"
+        >
           Course topics
         </h2>
         {!curriculum ? (
-          <p role="alert" className="mt-5 rounded-xl bg-amber-50 p-5 text-sm text-amber-900">
+          <p
+            role="alert"
+            className="mt-5 rounded-xl bg-amber-50 p-5 text-sm text-amber-900"
+          >
             Course content could not be loaded. Please try again.
           </p>
         ) : curriculum.topics.length === 0 ? (
@@ -342,7 +456,12 @@ export default async function AdminCourseContentPage({
         ) : (
           <div className="mt-6 space-y-6">
             {curriculum.topics.map((topic) => (
-              <TopicCard key={topic.id} topic={topic} courseId={course.id} curriculum={curriculum} />
+              <TopicCard
+                key={topic.id}
+                topic={topic}
+                courseId={course.id}
+                curriculum={curriculum}
+              />
             ))}
           </div>
         )}

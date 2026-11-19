@@ -17,12 +17,16 @@ export function StudentPracticeQuiz({
 }) {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [reviewed, setReviewed] = useState(false);
-  const answered = questions.filter((question) => answers[question.id] !== undefined).length;
+  const answered = questions.filter(
+    (question) => answers[question.id] !== undefined,
+  ).length;
 
   return (
     <section className="rounded-[1.5rem] border border-[#78eb29]/40 bg-[#eefce5]/60 p-5 sm:p-7">
       <h4 className="font-heading text-xl font-bold text-slate-950">{quiz.title}</h4>
-      {quiz.description && <p className="mt-2 text-sm leading-6 text-slate-600">{quiz.description}</p>}
+      {quiz.description && (
+        <p className="mt-2 text-sm leading-6 text-slate-600">{quiz.description}</p>
+      )}
       <p className="mt-2 text-xs text-slate-600">
         Practice quiz · Multiple choice · No grades recorded yet
       </p>
@@ -33,7 +37,10 @@ export function StudentPracticeQuiz({
       ) : (
         <div className="mt-6 space-y-6">
           {questions.map((question, index) => (
-            <fieldset key={question.id} className="rounded-xl border border-white bg-white/80 p-5">
+            <fieldset
+              key={question.id}
+              className="rounded-xl border border-white bg-white/80 p-5"
+            >
               <legend className="px-1 text-sm font-bold text-slate-950">
                 {index + 1}. {question.prompt}
               </legend>
@@ -49,12 +56,17 @@ export function StudentPracticeQuiz({
                       value={option}
                       checked={answers[question.id] === option}
                       onChange={() => {
-                        setAnswers((previous) => ({ ...previous, [question.id]: option }));
+                        setAnswers((previous) => ({
+                          ...previous,
+                          [question.id]: option,
+                        }));
                         setReviewed(false);
                       }}
                       className="size-4 accent-[#286518]"
                     />
-                    <span>{String.fromCharCode(65 + option)}. {choice}</span>
+                    <span>
+                      {String.fromCharCode(65 + option)}. {choice}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -80,9 +92,12 @@ export function StudentPracticeQuiz({
             </button>
           </div>
           {reviewed && (
-            <p role="status" className="rounded-xl border border-white bg-white/80 p-4 text-sm text-slate-700">
-              You selected answers for {answered} of {questions.length} questions.
-              Your selections stay on this page only; they are not submitted or graded.
+            <p
+              role="status"
+              className="rounded-xl border border-white bg-white/80 p-4 text-sm text-slate-700"
+            >
+              You selected answers for {answered} of {questions.length} questions. Your
+              selections stay on this page only; they are not submitted or graded.
             </p>
           )}
         </div>

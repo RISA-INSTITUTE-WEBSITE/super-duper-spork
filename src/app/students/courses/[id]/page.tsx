@@ -35,13 +35,18 @@ function StudentTopic({
     <section className="risa-glass-card rounded-[1.75rem] p-6 sm:p-8">
       <h2 className="font-heading text-2xl font-bold text-slate-950">{topic.title}</h2>
       {topic.description && (
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{topic.description}</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          {topic.description}
+        </p>
       )}
       {videos.length > 0 && (
         <div className="mt-7 space-y-6">
           <h3 className="font-heading text-lg font-bold text-slate-950">Video lessons</h3>
           {videos.map((video) => (
-            <article key={video.id} className="overflow-hidden rounded-[1.3rem] border border-white bg-white/90">
+            <article
+              key={video.id}
+              className="overflow-hidden rounded-[1.3rem] border border-white bg-white/90"
+            >
               <div className="aspect-video w-full bg-slate-950">
                 <iframe
                   src={"https://www.youtube-nocookie.com/embed/" + video.youtube_id}
@@ -53,14 +58,18 @@ function StudentTopic({
                   className="size-full border-0"
                 />
               </div>
-              <h4 className="p-4 text-sm font-bold text-slate-900 sm:px-6">{video.title}</h4>
+              <h4 className="p-4 text-sm font-bold text-slate-900 sm:px-6">
+                {video.title}
+              </h4>
             </article>
           ))}
         </div>
       )}
       {quizzes.length > 0 && (
         <div className="mt-8 space-y-6">
-          <h3 className="font-heading text-lg font-bold text-slate-950">Practice quizzes</h3>
+          <h3 className="font-heading text-lg font-bold text-slate-950">
+            Practice quizzes
+          </h3>
           {quizzes.map((quiz) => (
             <StudentPracticeQuiz
               key={quiz.id}

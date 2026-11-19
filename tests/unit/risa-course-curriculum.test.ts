@@ -105,9 +105,7 @@ describe("RISA course content authorization", () => {
     expect(urls).toHaveLength(4);
     expect(urls.some((url) => url.includes("risa_quiz_answer_keys"))).toBe(false);
     expect(urls.some((url) => url.includes("is_published=eq.true"))).toBe(true);
-    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe(
-      "Bearer student-token",
-    );
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer student-token");
   });
 
   it("handles empty courses and backend failures correctly", async () => {
@@ -153,11 +151,15 @@ describe("RISA course content authorization", () => {
   it("creates quiz questions with answer keys only through the invoker RPC", async () => {
     fetchMock.mockResolvedValueOnce(Response.json("new-question-id"));
     expect(
-      await addQuizQuestion("admin-jwt", quiz, "A sample question?", ["A", "B", "C", "D"], 1),
+      await addQuizQuestion(
+        "admin-jwt",
+        quiz,
+        "A sample question?",
+        ["A", "B", "C", "D"],
+        1,
+      ),
     ).toBe(true);
-    expect(fetchMock.mock.calls[0][0]).toContain(
-      "/rest/v1/rpc/risa_add_quiz_question",
-    );
+    expect(fetchMock.mock.calls[0][0]).toContain("/rest/v1/rpc/risa_add_quiz_question");
     const request = fetchMock.mock.calls[0][1] as RequestInit;
     expect(JSON.parse(String(request.body))).toMatchObject({
       p_quiz_id: quiz,
@@ -167,7 +169,9 @@ describe("RISA course content authorization", () => {
   });
 
   it("rejects malformed quizzes before making database requests", async () => {
-    expect(await addQuizQuestion("admin-jwt", quiz, "Hi?", ["A", "B", "C", "D"], 0)).toBe(false);
+    expect(await addQuizQuestion("admin-jwt", quiz, "Hi?", ["A", "B", "C", "D"], 0)).toBe(
+      false,
+    );
     expect(
       await addQuizQuestion("admin-jwt", quiz, "Question?", ["A", "B", "C"], 1),
     ).toBe(false);
