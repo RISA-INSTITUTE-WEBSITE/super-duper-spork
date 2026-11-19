@@ -44,7 +44,9 @@ export function MobileNavigation() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (!searchOpen) return;
+    if (!searchOpen) {
+      return;
+    }
 
     function handleSearchEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -57,7 +59,9 @@ export function MobileNavigation() {
   }, [searchOpen]);
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen) {
+      return;
+    }
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -71,12 +75,16 @@ export function MobileNavigation() {
         return;
       }
 
-      if (event.key !== "Tab") return;
+      if (event.key !== "Tab") {
+        return;
+      }
 
       const elements = sidebarRef.current?.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
-      if (!elements?.length) return;
+      if (!elements?.length) {
+        return;
+      }
 
       const first = elements[0];
       const last = elements[elements.length - 1];
