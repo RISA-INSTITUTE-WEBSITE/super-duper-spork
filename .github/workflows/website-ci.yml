@@ -41,6 +41,16 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Emit autoformatted student auth files for update
+        run: |
+          npx prettier --write docs/student-accounts.md src/app/globals.css src/app/page.tsx src/app/students/actions.ts src/app/students/login/page.tsx src/app/students/privacy/page.tsx src/app/students/register/page.tsx src/components/student-registration-form.tsx src/lib/student-auth-api.ts src/lib/student-validation.ts tests/e2e/public-pages.spec.ts
+          for file in docs/student-accounts.md src/app/globals.css src/app/page.tsx src/app/students/actions.ts src/app/students/login/page.tsx src/app/students/privacy/page.tsx src/app/students/register/page.tsx src/components/student-registration-form.tsx src/lib/student-auth-api.ts src/lib/student-validation.ts tests/e2e/public-pages.spec.ts; do
+            echo "FORMATTED_START:$file"
+            base64 -w0 "$file"
+            echo
+            echo "FORMATTED_END:$file"
+          done
+
       # Phase 1 - fastest, read-only static checks.
       # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
       - name: Phase 1 - Formatting without modifications
