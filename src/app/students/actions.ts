@@ -9,7 +9,9 @@ import {
   registerStudentWithAuth,
   revokeStudentSession,
   signInStudentWithAuth,
+  updateStudentAuthMetadata,
 } from "@/lib/student-auth-api";
+import { uploadStudentAvatar } from "@/lib/student-learning-api";
 import {
   clearStudentSession,
   saveStudentSession,
@@ -97,4 +99,84 @@ export async function signOutStudent(): Promise<void> {
   }
   await clearStudentSession();
   redirect("/students/login?status=signed-out");
+}
+
+function isValidStudentName(name: string): boolean {
+  return name.length >= 2 && name.length <= 80 && !/[\u0000-\u001f\u007f]/.test(name);
+}
+
+function isPhotoSignatureValid(bytes: Uint8Array, mime: string): boolean {
+  switch (mime) {
+    case "image/jpeg":
+      return [0xff, 0xd8, 0xff].every((byte, index) => bytes[index] === byte);
+    case "image/png":
+      return [137, 80, 78, 71, 13, 10, 26, 10].every(
+        (byte, index) => bytes[index] === byte,
+      );
+    case "image/webp":
+      return (
+        String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" &&
+        String.fromCharCode(...bytes.slice(8, 12)) === "WEBP"
+      );
+    default:
+      return false;
+  }
+}
+
+async function getProfileEditor() {
+  if (!isStudentAuthConfigured()) {
+    redirect("/students/login");
+  }
+  const jar = await cookies();
+  const token = jar.get(studentCookieNames.access)?.value;
+  if (!token) {
+    redirect("/students/login");
+  }
+  const student = await getStudentIdentity(token);
+  if (!student) {
+    redirect("/students/login");
+  }
+  return { token, student };
+}
+
+async function processProfilePhoto(
+  entry: FormDataEntryValue | null,
+  token: string,
+  studentId: string,
+): Promise<{ path?: string; error?: "photo" | "service" }> {
+  if (!(entry instanceof File) || entry.size === 0) {
+    return {};
+  }
+  if (
+    entry.size > 2 * 1024 * 1024 ||
+    !["image/jpeg", "image/png", "image/webp"].includes(entry.type)
+  ) {
+    return { error: "photo" };
+  }
+  const bytes = new Uint8Array(await entry.slice(0, 12).arrayBuffer());
+  if (!isPhotoSignatureValid(bytes, entry.type)) {
+    return { error: "photo" };
+  }
+  const path = await uploadStudentAvatar(token, studentId, entry);
+  return path ? { path } : { error: "service" };
+}
+
+/** Profile edits are limited to the currently authenticated learner. */
+export async function updateStudentProfile(formData: FormData): Promise<void> {
+  const { token, student } = await getProfileEditor();
+  const fullName = String(formData.get("fullName") ?? "").trim();
+  if (!isValidStudentName(fullName)) {
+    redirect("/students/profile?error=name");
+  }
+
+  const photo = await processProfilePhoto(formData.get("avatar"), token, student.id);
+  if (photo.error) {
+    redirect("/students/profile?error=" + photo.error);
+  }
+
+  const updated = await updateStudentAuthMetadata(token, fullName, photo.path);
+  if (!updated) {
+    redirect("/students/profile?error=service");
+  }
+  redirect("/students/profile?status=saved");
 }
