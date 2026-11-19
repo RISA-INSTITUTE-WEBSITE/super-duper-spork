@@ -4,27 +4,6 @@ import Link from "next/link";
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
 import { pathways } from "@/lib/pathways";
 
-const principles = [
-  {
-    number: "01",
-    title: "Understand the fundamentals",
-    description:
-      "Build confidence in the essential ideas behind science, technology and engineering.",
-  },
-  {
-    number: "02",
-    title: "Connect theory to practice",
-    description:
-      "Explore how scientific principles can help us approach real-world questions.",
-  },
-  {
-    number: "03",
-    title: "Learn with purpose",
-    description:
-      "Our vision is to make structured, application-oriented learning more accessible.",
-  },
-] as const;
-
 const pathwayAccents = [
   "from-sky-400 to-cyan-300",
   "from-indigo-400 to-sky-300",
@@ -57,19 +36,18 @@ export default function HomePage() {
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/95 bg-white/65 px-4 py-2 text-xs font-semibold tracking-wide text-[#34569E] shadow-sm backdrop-blur-md">
               <span className="size-2 rounded-full bg-[#155DFC]" aria-hidden="true" />
-              Building the future of applied learning
+              Our Slogan
             </span>
             <p className="mt-8 text-xs font-bold uppercase tracking-[0.22em] text-[#5274C3]">
               RISA Institute of Applied Sciences
             </p>
             <h1 className="risa-display mt-5 max-w-3xl text-[3rem] font-bold leading-[1.05] tracking-[-0.035em] sm:text-[4rem] lg:text-[4.8rem]">
-              Learn the science.
-              <span className="mt-2 block text-[#155DFC]">Shape what comes next.</span>
+              Where real learning starts
+              <span className="mt-2 block text-[#155DFC]">with hands-on work.</span>
             </h1>
             <p className="mt-7 max-w-xl text-base leading-8 text-[#465d7b] sm:text-lg">
-              Science makes more sense when you can put it to work. RISA is developing an
-              accessible learning experience that connects strong foundations with
-              practical thinking.
+              Theory provides the foundation. Practical experience develops competence.
+              Innovation transforms knowledge into impact.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link
@@ -89,60 +67,115 @@ export default function HomePage() {
             </div>
             <div className="mt-12 grid gap-5 border-t border-white/75 pt-7 text-sm text-[#516b8b] sm:grid-cols-3 sm:gap-6">
               <div>
-                <span className="block font-bold text-[#143361]">Explore</span>Scientific
-                ideas
+                <span className="block font-bold text-[#143361]">Learn it.</span>Understand
+                it.
               </div>
               <div>
-                <span className="block font-bold text-[#143361]">Connect</span>Theory and
-                practice
+                <span className="block font-bold text-[#143361]">Apply it.</span>Test
+                it.
               </div>
               <div>
-                <span className="block font-bold text-[#143361]">Create</span>New
-                possibilities
+                <span className="block font-bold text-[#143361]">Improve it.</span>Make
+                an impact.
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section aria-labelledby="approach-heading" className="bg-white py-20 sm:py-24">
+      <section aria-labelledby="vision-mission-heading" className="bg-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
-              The RISA approach
-            </p>
-            <h2
-              id="approach-heading"
-              className="risa-display mt-3 text-[2.6rem] font-bold tracking-tight text-[#0A0F1D] sm:text-[3.5rem]"
-            >
-              Knowledge that goes beyond the classroom.
-            </h2>
-            <p className="mt-5 text-base leading-7 text-slate-600">
-              We are shaping a learning experience around understanding, exploration and
-              meaningful application.
-            </p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+            RISA — Vision and Mission
+          </p>
+          <h2
+            id="vision-mission-heading"
+            className="risa-display mt-3 text-[2.6rem] font-bold tracking-tight text-[#0A0F1D] sm:text-[3.5rem]"
+          >
+            Our Vision and Mission
+          </h2>
+          <div className="mt-10 grid gap-5 lg:grid-cols-2">
+            <article className="risa-glass-card relative isolate overflow-hidden rounded-[1.6rem] p-7 sm:p-8">
+              <span className="inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
+                01
+              </span>
+              <h3 className="mt-7 text-2xl font-bold tracking-tight text-slate-950">
+                Our Vision
+              </h3>
+              <p className="mt-4 leading-8 text-slate-600">
+                To become a globally recognized centre of excellence in applied sciences
+                education, where theoretical knowledge meets practical experience,
+                empowering individuals to think critically, innovate confidently, and
+                develop sustainable solutions to real-world challenges.
+              </p>
+            </article>
+            <article className="risa-glass-card relative isolate overflow-hidden rounded-[1.6rem] p-7 sm:p-8">
+              <span className="inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
+                02
+              </span>
+              <h3 className="mt-7 text-2xl font-bold tracking-tight text-slate-950">
+                Our Mission
+              </h3>
+              <p className="mt-4 leading-8 text-slate-600">
+                To make scientific and technical education accessible, practical, rigorous,
+                and relevant by integrating foundational knowledge with hands-on
+                experimentation, engineering applications, research, and real-world
+                problem-solving.
+              </p>
+              <p className="mt-4 leading-8 text-slate-600">
+                RISA is committed to developing competent, creative, and independent
+                learners who can understand scientific principles, apply their knowledge,
+                design and test solutions, and contribute meaningfully to technological
+                advancement and societal development.
+              </p>
+            </article>
           </div>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="philosophy-heading"
+        className="risa-pathways-section py-20 sm:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
+            Our Educational Philosophy
+          </p>
+          <h2
+            id="philosophy-heading"
+            className="risa-display mt-3 max-w-4xl text-[2.6rem] font-bold tracking-tight text-[#0A0F1D] sm:text-[3.5rem]"
+          >
+            Learn it. Understand it. Apply it. Test it. Improve it.
+          </h2>
+          <p className="mt-6 max-w-4xl text-base leading-8 text-slate-600 sm:text-lg">
+            At RISA, education goes beyond memorizing theories and passing examinations.
+            We believe that meaningful learning emerges when students actively engage with
+            concepts, investigate problems, experiment with solutions, and demonstrate
+            what they have learned through practical work.
+          </p>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {principles.map(({ number, title, description }) => (
-              <article
-                key={number}
-                className="risa-glass-card group relative isolate overflow-hidden rounded-[1.6rem] p-7 transition duration-200 hover:-translate-y-1 sm:p-8"
-              >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-2 top-0 select-none text-[110px] font-black leading-none tracking-tight text-[#155DFC]/[0.07]"
-                >
-                  {number}
-                </span>
-                <span className="relative inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
-                  {number}
-                </span>
-                <h3 className="relative mt-7 text-xl font-bold tracking-tight text-slate-950">
-                  {title}
-                </h3>
-                <p className="relative mt-3 leading-7 text-slate-600">{description}</p>
-              </article>
-            ))}
+            <article className="risa-glass-card rounded-[1.6rem] p-7 sm:p-8">
+              <h3 className="text-xl font-bold tracking-tight text-slate-950">Theory</h3>
+              <p className="mt-3 leading-7 text-slate-600">
+                Theory provides the foundation.
+              </p>
+            </article>
+            <article className="risa-glass-card rounded-[1.6rem] p-7 sm:p-8">
+              <h3 className="text-xl font-bold tracking-tight text-slate-950">
+                Practical Experience
+              </h3>
+              <p className="mt-3 leading-7 text-slate-600">
+                Practical experience develops competence.
+              </p>
+            </article>
+            <article className="risa-glass-card rounded-[1.6rem] p-7 sm:p-8">
+              <h3 className="text-xl font-bold tracking-tight text-slate-950">
+                Innovation
+              </h3>
+              <p className="mt-3 leading-7 text-slate-600">
+                Innovation transforms knowledge into impact.
+              </p>
+            </article>
           </div>
         </div>
       </section>
@@ -237,17 +270,17 @@ export default function HomePage() {
           <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,29rem)] lg:gap-14">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
-                A platform in progress
+                The RISA commitment
               </p>
               <h2
                 id="next-heading"
                 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
               >
-                A place to question, discover and grow.
+                Theory into practice. Knowledge into impact.
               </h2>
               <p className="mt-5 leading-8 text-slate-600">
-                We are building RISA one step at a time. Explore the institute&apos;s
-                vision, or contact the team to learn more about the project.
+                Discover RISA&apos;s approach to practical scientific education, or contact
+                the team to learn more as the platform develops.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
