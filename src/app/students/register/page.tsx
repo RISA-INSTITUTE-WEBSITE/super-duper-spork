@@ -49,10 +49,10 @@ export default async function StudentRegisterPage({
             Create your account
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-600">
-            Create a student sign-in using your email address and password. When
-            instant registration is enabled, you can access your account without an
-            email confirmation step. An account does not constitute admission or
-            enrolment in any programme.
+            Create a student sign-in using your email address and password. When instant
+            registration is enabled, you can access your account without an email
+            confirmation step. An account does not constitute admission or enrolment in
+            any programme.
           </p>
 
           {!enabled && (
