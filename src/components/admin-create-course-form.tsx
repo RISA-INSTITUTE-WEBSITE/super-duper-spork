@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState } from "react";
 
 import {
   createCourseAction,
@@ -20,19 +20,8 @@ export function AdminCreateCourseForm() {
     createCourseAction,
     initialCourseCreationState,
   );
-  const [code, setCode] = useState("");
-  const formRef = useRef<HTMLFormElement>(null);
-
-  useEffect(() => {
-    if (state.status === "success") {
-      formRef.current?.reset();
-      setCode("");
-    }
-  }, [state]);
-
   return (
     <form
-      ref={formRef}
       action={formAction}
       className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8"
     >
@@ -76,8 +65,9 @@ export function AdminCreateCourseForm() {
             id="risa-course-code"
             name="code"
             type="text"
-            value={code}
-            onChange={(event) => setCode(event.target.value.toUpperCase())}
+            onInput={(event) => {
+              event.currentTarget.value = event.currentTarget.value.toUpperCase();
+            }}
             maxLength={25}
             pattern="[A-Z0-9]{3,16}(-[A-Z0-9]{2,8})?"
             placeholder="e.g. DVE101"
@@ -143,14 +133,7 @@ export function AdminCreateCourseForm() {
 
       <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white pt-6">
         <p className="text-sm text-slate-600">
-          {code ? (
-            <>
-              Course identifier:{" "}
-              <strong className="font-mono text-[#286518]">{code}</strong>
-            </>
-          ) : (
-            "The course will start as a draft unless you select Publish."
-          )}
+          Codes are unique. A new course starts as a draft unless you publish it.
         </p>
         <button
           type="submit"
