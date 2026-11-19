@@ -194,7 +194,7 @@ export default async function StudentDashboardPage() {
             >
               {user.avatarPath ? (
                 <Image
-                  src="/students/avatar"
+                  src={"/students/avatar?updated=" + encodeURIComponent(user.updatedAt ?? "")}
                   alt="Your profile picture"
                   width={96}
                   height={96}
