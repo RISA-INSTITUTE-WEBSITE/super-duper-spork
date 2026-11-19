@@ -112,6 +112,7 @@ describe("RISA student authentication gateway", () => {
       id: "student",
       email: "user@example.com",
       fullName: "Student Example",
+      avatarPath: null,
     });
     fetchMock.mockResolvedValueOnce(
       reply({
@@ -237,6 +238,7 @@ describe("auth transport and data validation cases", () => {
     };
     fetchMock.mockResolvedValueOnce(reply(verified));
     expect((await getStudentIdentity("access"))?.fullName).toBe("Student");
+    expect((await getStudentIdentity("access"))?.avatarPath).toBeNull();
     fetchMock.mockResolvedValueOnce(
       reply({
         ...verified,
