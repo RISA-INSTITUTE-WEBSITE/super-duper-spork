@@ -54,7 +54,7 @@ test("landing page labels pathways as proposed and links to project information"
   await expect(
     page.getByRole("heading", { name: "Explore proposed learning pathways." }),
   ).toBeVisible();
-  await expect(page.getByText("Student account access is being prepared;")).toBeVisible();
+  await expect(page.getByText("Student accounts provide portal access only;")).toBeVisible();
   await page.getByRole("link", { name: "Discover RISA" }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
 });
