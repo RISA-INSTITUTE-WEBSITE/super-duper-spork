@@ -16,15 +16,21 @@ export const metadata: Metadata = {
 };
 
 export default async function StudentDashboardPage() {
-  if (!isStudentAuthConfigured()) redirect("/students/login");
+  if (!isStudentAuthConfigured()) {
+    redirect("/students/login");
+  }
 
   const jar = await cookies();
   const accessToken = jar.get(studentCookieNames.access)?.value;
-  if (!accessToken) redirect("/students/login");
+  if (!accessToken) {
+    redirect("/students/login");
+  }
 
   // Never authorize from an unverified cookie/JWT or user-editable metadata.
   const user = await getStudentIdentity(accessToken);
-  if (!user) redirect("/students/login");
+  if (!user) {
+    redirect("/students/login");
+  }
 
   return (
     <main
