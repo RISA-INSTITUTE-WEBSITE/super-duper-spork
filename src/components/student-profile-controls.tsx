@@ -19,14 +19,12 @@ export function ProfilePhotoField({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!photo) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(photo);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [photo]);
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
 
   return (
     <div className="flex flex-wrap items-center gap-5 rounded-[1.5rem] border border-white/90 bg-white/60 p-5">
@@ -64,10 +62,12 @@ export function ProfilePhotoField({
             const file = event.target.files?.[0] ?? null;
             if (file && (!acceptedPhotoTypes.includes(file.type) || file.size > maxPhotoBytes)) {
               setPhoto(null);
+              setPreview(null);
               setError("Please choose a JPG, PNG or WebP image no larger than 2 MB.");
               event.target.value = "";
             } else {
               setPhoto(file);
+              setPreview(file ? URL.createObjectURL(file) : null);
               setError(null);
             }
           }}
