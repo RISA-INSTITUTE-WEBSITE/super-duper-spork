@@ -45,31 +45,33 @@ describe("RISA student authentication gateway", () => {
 
   it("registers accounts without creating a local password record", async () => {
     fetchMock.mockResolvedValue(reply({ user: { id: "user" } }));
-    expect(await registerStudentWithAuth("Student", "user@example.com", "Example123!")).toBe(
-      true,
-    );
+    expect(
+      await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
+    ).toBe(true);
     expect(fetchMock.mock.calls[0][0]).toContain("/auth/v1/signup");
   });
 
   it("fails closed on server errors and network failures", async () => {
     fetchMock.mockResolvedValueOnce(reply({}, 500));
-    expect(await registerStudentWithAuth("Student", "user@example.com", "Example123!")).toBe(
-      false,
-    );
+    expect(
+      await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
+    ).toBe(false);
     fetchMock.mockRejectedValueOnce(new Error("connection interrupted"));
-    expect(await registerStudentWithAuth("Student", "user@example.com", "Example123!")).toBe(
-      false,
-    );
+    expect(
+      await registerStudentWithAuth("Student", "user@example.com", "Example123!"),
+    ).toBe(false);
   });
 
   it("signs in and refreshes sessions", async () => {
-    fetchMock.mockResolvedValue(reply(session));
-    expect(await signInStudentWithAuth("user@example.com", "Example123!")).toEqual(session);
+    fetchMock.mockImplementation(() => Promise.resolve(reply(session)));
+    expect(await signInStudentWithAuth("user@example.com", "Example123!")).toEqual(
+      session,
+    );
     expect(await refreshStudentSession("refresh")).toEqual(session);
   });
 
   it("checks email verification through the Auth provider", async () => {
-    fetchMock.mockResolvedValue(reply(session));
+    fetchMock.mockImplementation(() => Promise.resolve(reply(session)));
     expect(await verifyStudentEmail("hash")).toEqual(session);
   });
 
@@ -81,22 +83,26 @@ describe("RISA student authentication gateway", () => {
   });
 
   it("accepts only verified identities", async () => {
-    fetchMock.mockResolvedValueOnce(reply({
-      id: "student",
-      email: "user@example.com",
-      email_confirmed_at: "verified",
-      user_metadata: { full_name: "Student Example" },
-    }));
+    fetchMock.mockResolvedValueOnce(
+      reply({
+        id: "student",
+        email: "user@example.com",
+        email_confirmed_at: "verified",
+        user_metadata: { full_name: "Student Example" },
+      }),
+    );
     expect(await getStudentIdentity("access")).toEqual({
       id: "student",
       email: "user@example.com",
       fullName: "Student Example",
     });
-    fetchMock.mockResolvedValueOnce(reply({
-      id: "student",
-      email: "user@example.com",
-      email_confirmed_at: null,
-    }));
+    fetchMock.mockResolvedValueOnce(
+      reply({
+        id: "student",
+        email: "user@example.com",
+        email_confirmed_at: null,
+      }),
+    );
     expect(await getStudentIdentity("access")).toBeNull();
   });
 
