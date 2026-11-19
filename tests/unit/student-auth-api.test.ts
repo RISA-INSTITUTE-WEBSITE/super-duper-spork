@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   getStudentIdentity,
+  updateStudentAuthMetadata,
   isStudentAuthConfigured,
   refreshStudentSession,
   registerStudentWithAuth,
@@ -122,6 +123,49 @@ describe("RISA student authentication gateway", () => {
       }),
     );
     expect(await getStudentIdentity("access")).toBeNull();
+  });
+
+  it("updates learner-owned profile metadata using the signed-in token", async () => {
+    fetchMock.mockResolvedValueOnce(reply({ id: "student" }));
+    expect(
+      await updateStudentAuthMetadata(
+        "student-access",
+        "Updated Learner",
+        "student/avatar.webp",
+      ),
+    ).toBe(true);
+    expect(fetchMock.mock.calls[0][0]).toContain("/auth/v1/user");
+    const options = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(options.method).toBe("PUT");
+    expect(options.headers).toMatchObject({
+      Authorization: "Bearer student-access",
+    });
+    expect(JSON.parse(String(options.body))).toEqual({
+      data: {
+        full_name: "Updated Learner",
+        avatar_path: "student/avatar.webp",
+      },
+    });
+    fetchMock.mockResolvedValueOnce(reply({}, 401));
+    expect(await updateStudentAuthMetadata("expired", "Learner")).toBe(false);
+  });
+
+  it("provides an avatar refresh version after profile changes", async () => {
+    fetchMock.mockResolvedValue(
+      reply({
+        id: "student-01",
+        email: "student@example.org",
+        email_confirmed_at: "2026-11-19T01:00:00Z",
+        updated_at: "2026-11-20T01:00:00Z",
+        user_metadata: {
+          full_name: "Updated Learner",
+          avatar_path: "student-01/avatar.png",
+        },
+      }),
+    );
+    const user = await getStudentIdentity("access");
+    expect(user?.avatarPath).toBe("student-01/avatar.png");
+    expect(user?.updatedAt).toBe("2026-11-20T01:00:00Z");
   });
 
   it("requests sign out", async () => {
