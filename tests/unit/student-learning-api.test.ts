@@ -52,9 +52,7 @@ describe("authenticated RISA learning API", () => {
       },
     ]);
     expect(fetchMock.mock.calls[0][0]).toContain("risa_enrollments");
-    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe(
-      "Bearer student-token",
-    );
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer student-token");
   });
 
   it("distinguishes no enrolments from a failed backend", async () => {
@@ -96,10 +94,10 @@ describe("authenticated RISA learning API", () => {
     const result = await downloadCourseMaterial("student-token", materialId);
     expect(result?.title).toBe("Course handout");
     expect(result?.extension).toBe("pdf");
-    expect(fetchMock.mock.calls[1][0]).toContain("/storage/v1/object/risa-course-content/");
-    expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe(
-      "Bearer student-token",
+    expect(fetchMock.mock.calls[1][0]).toContain(
+      "/storage/v1/object/risa-course-content/",
     );
+    expect(fetchMock.mock.calls[1][1].headers.Authorization).toBe("Bearer student-token");
   });
 
   it("rejects material paths outside the course storage bucket contract", async () => {
