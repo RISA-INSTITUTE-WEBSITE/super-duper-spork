@@ -68,7 +68,10 @@ export function StudentRegistrationForm({ enabled }: { enabled: boolean }) {
           />
         </div>
         <div>
-          <label htmlFor="student-password" className="text-sm font-semibold text-slate-800">
+          <label
+            htmlFor="student-password"
+            className="text-sm font-semibold text-slate-800"
+          >
             Create a password
           </label>
           <input
@@ -105,7 +108,10 @@ export function StudentRegistrationForm({ enabled }: { enabled: boolean }) {
           )}
         </div>
         <div>
-          <label htmlFor="student-confirm" className="text-sm font-semibold text-slate-800">
+          <label
+            htmlFor="student-confirm"
+            className="text-sm font-semibold text-slate-800"
+          >
             Confirm password
           </label>
           <input
