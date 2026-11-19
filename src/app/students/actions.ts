@@ -9,7 +9,9 @@ import {
   registerStudentWithAuth,
   revokeStudentSession,
   signInStudentWithAuth,
+  updateStudentAuthMetadata,
 } from "@/lib/student-auth-api";
+import { uploadStudentAvatar } from "@/lib/student-learning-api";
 import {
   clearStudentSession,
   saveStudentSession,
@@ -97,4 +99,72 @@ export async function signOutStudent(): Promise<void> {
   }
   await clearStudentSession();
   redirect("/students/login?status=signed-out");
+}
+
+/** Profile edits are limited to the currently authenticated learner. */
+export async function updateStudentProfile(formData: FormData): Promise<void> {
+  if (!isStudentAuthConfigured()) {
+    redirect("/students/login");
+  }
+
+  const jar = await cookies();
+  const token = jar.get(studentCookieNames.access)?.value;
+  if (!token) {
+    redirect("/students/login");
+  }
+
+  const student = await getStudentIdentity(token);
+  if (!student) {
+    redirect("/students/login");
+  }
+
+  const fullName = String(formData.get("fullName") ?? "").trim();
+  if (
+    fullName.length < 2 ||
+    fullName.length > 80 ||
+    /[\u0000-\u001f\u007f]/.test(fullName)
+  ) {
+    redirect("/students/profile?error=name");
+  }
+
+  const photo = formData.get("avatar");
+  let avatarPath: string | undefined;
+
+  if (photo instanceof File && photo.size > 0) {
+    if (
+      photo.size > 2 * 1024 * 1024 ||
+      !["image/jpeg", "image/png", "image/webp"].includes(photo.type)
+    ) {
+      redirect("/students/profile?error=photo");
+    }
+
+    const bytes = new Uint8Array(await photo.slice(0, 12).arrayBuffer());
+    const validJpeg =
+      photo.type === "image/jpeg" &&
+      bytes[0] === 0xff &&
+      bytes[1] === 0xd8 &&
+      bytes[2] === 0xff;
+    const validPng =
+      photo.type === "image/png" &&
+      [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte);
+    const validWebp =
+      photo.type === "image/webp" &&
+      String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" &&
+      String.fromCharCode(...bytes.slice(8, 12)) === "WEBP";
+    if (!validJpeg && !validPng && !validWebp) {
+      redirect("/students/profile?error=photo");
+    }
+
+    avatarPath = (await uploadStudentAvatar(token, student.id, photo)) ?? undefined;
+    if (!avatarPath) {
+      redirect("/students/profile?error=service");
+    }
+  }
+
+  const updated = await updateStudentAuthMetadata(token, fullName, avatarPath);
+  if (!updated) {
+    redirect("/students/profile?error=service");
+  }
+
+  redirect("/students/profile?status=saved");
 }
