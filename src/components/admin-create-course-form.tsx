@@ -132,7 +132,7 @@ export function AdminCreateCourseForm() {
         <span className="text-sm leading-6 text-slate-700">
           <strong className="block text-slate-950">Publish this course now</strong>
           Leave unchecked to save as a draft. Published courses become
-          available to learners **only when RISA enrols them**.
+          available only to learners enrolled by RISA.
         </span>
       </label>
 
