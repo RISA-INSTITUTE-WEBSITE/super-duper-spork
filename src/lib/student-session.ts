@@ -64,9 +64,13 @@ export function saveStudentSessionOnResponse(
 
 export async function clearStudentSession(): Promise<void> {
   const jar = await cookies();
-  for (const name of Object.values(studentCookieNames)) jar.delete(name);
+  for (const name of Object.values(studentCookieNames)) {
+    jar.delete(name);
+  }
 }
 
 export function clearStudentSessionOnResponse(response: NextResponse): void {
-  for (const name of Object.values(studentCookieNames)) response.cookies.delete(name);
+  for (const name of Object.values(studentCookieNames)) {
+    response.cookies.delete(name);
+  }
 }
