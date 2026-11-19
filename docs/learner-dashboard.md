@@ -17,11 +17,9 @@ There are **no demo enrolments, fabricated completion percentages or example fil
 
 RISA project: `zaruopeqlndkxltqlpeh`.
 
-| Table | Purpose | Student access |
-| --- | --- | --- |
-| `public.risa_courses` | Published course catalogue | SELECT only for enrolled students |
-| `public.risa_enrollments` | Student-to-course membership and status | SELECT only own rows |
-| `public.risa_course_materials` | Staff-uploaded files and exercises | SELECT only enrolled courses |
+- `public.risa_courses`: published course catalogue, readable only by enrolled learners.
+- `public.risa_enrollments`: learner membership and status, readable only by that learner.
+- `public.risa_course_materials`: staff-uploaded files and exercises, readable only by learners enrolled in the relevant course.
 
 Supabase Storage has two **private** buckets:
 
