@@ -22,6 +22,21 @@ const messages: Record<string, string> = {
   service: "We couldn't save your changes. Please try again.",
 };
 
+function profileInitials(name: string): string {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase();
+  return initials || "R";
+}
+
+function profileErrorMessage(error?: string): string | null {
+  return error && Object.hasOwn(messages, error) ? messages[error] : null;
+}
+
 export default async function StudentProfilePage({
   searchParams,
 }: {
@@ -43,15 +58,8 @@ export default async function StudentProfilePage({
   }
 
   const { error, status } = await searchParams;
-  const message = error && Object.hasOwn(messages, error) ? messages[error] : null;
-  const initials =
-    user.fullName
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((part) => part.charAt(0))
-      .join("")
-      .toUpperCase() || "R";
+  const message = profileErrorMessage(error);
+  const initials = profileInitials(user.fullName);
 
   return (
     <main
