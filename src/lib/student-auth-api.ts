@@ -204,6 +204,16 @@ export async function verifyStudentEmail(
   return parseSession(response);
 }
 
+function validatedAvatarPath(userId: string, path: unknown): string | null {
+  if (typeof path !== "string") {
+    return null;
+  }
+  const accepted = ["avatar.jpg", "avatar.png", "avatar.webp"].some(
+    (file) => path === userId + "/" + file,
+  );
+  return accepted ? path : null;
+}
+
 function parseStudentIdentity(data: unknown): StudentIdentity | null {
   if (!data || typeof data !== "object") {
     return null;
@@ -229,14 +239,8 @@ function parseStudentIdentity(data: unknown): StudentIdentity | null {
       ? (user.user_metadata as { full_name?: unknown; avatar_path?: unknown })
       : {};
   const name = typeof metadata.full_name === "string" ? metadata.full_name.trim() : "";
-  // User metadata is editable. Accept only an avatar in this verified user's folder.
-  const avatarPath =
-    typeof metadata.avatar_path === "string" &&
-    ["avatar.jpg", "avatar.png", "avatar.webp"].some(
-      (filename) => metadata.avatar_path === user.id + "/" + filename,
-    )
-      ? metadata.avatar_path
-      : null;
+  // Profile metadata is user-editable, never an authorization credential.
+  const avatarPath = validatedAvatarPath(user.id, metadata.avatar_path);
 
   return {
     id: user.id,
