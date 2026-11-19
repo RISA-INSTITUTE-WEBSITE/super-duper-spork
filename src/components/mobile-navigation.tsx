@@ -29,10 +29,7 @@ function SearchIcon() {
   );
 }
 
-function trapSidebarFocus(
-  event: KeyboardEvent,
-  sidebar: HTMLDivElement | null,
-): void {
+function trapSidebarFocus(event: KeyboardEvent, sidebar: HTMLDivElement | null): void {
   if (event.key !== "Tab") {
     return;
   }
