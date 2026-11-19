@@ -1,4 +1,4 @@
-<!-- Original RISA logo with blue cutout backfills, shaded charcoal-liquid morph and green-sphere size animation. -->
+<!-- Original RISA logo with natural black-liquid motion and a smooth outline-free green sphere over solid RISA blue. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="2000" height="2000" viewBox="0 0 2000 2000" aria-hidden="true" focusable="false">
 
   <title>Animated RISA logo</title>
@@ -38,6 +38,8 @@
 
     .risa-green-orb {
       fill: url(#risa-orb-3d);
+      stroke: none;
+      shape-rendering: geometricPrecision;
       transform-box: view-box;
       transform-origin: 974px 442px;
       animation: risa-green-orb-size 2.9s ease-in-out infinite;
@@ -80,7 +82,7 @@
     <path class="risa-original-black-liquid" fill="#383838" d="M732,748 733,771 741,804 751,826 767,850 783,867 808,886 832,898 858,906 881,909 913,908 948,899 973,887 997,869 1016,849 1033,823 1041,804 991,806 962,800 927,787 843,746 803,734 764,734 738,742Z"/>
   </g>
 </g>
-<!-- The blue circle beneath the shrinking green sphere uses its exact outline. -->
-<path class="risa-orb-blue-backfill" fill="#38b6ff" d="M964,358 931,369 907,390 892,420 890,456 901,486 924,511 955,525 988,526 1019,514 1041,494 1055,467 1058,432 1049,403 1028,377 998,361Z"/>
-<path class="risa-green-orb" fill="#78eb29" fill-rule="evenodd" d="M964,358 931,369 907,390 892,420 890,456 901,486 924,511 955,525 988,526 1019,514 1041,494 1055,467 1058,432 1049,403 1028,377 998,361Z"/>
+<!-- Perfectly round, solid-blue backing eliminates white seams as the green sphere scales. -->
+<circle class="risa-orb-blue-backfill" cx="974" cy="442" r="86" fill="#38b6ff" stroke="none" shape-rendering="geometricPrecision"/>
+<circle class="risa-green-orb" cx="974" cy="442" r="84" fill="#78eb29" stroke="none" shape-rendering="geometricPrecision"/>
 </svg>
