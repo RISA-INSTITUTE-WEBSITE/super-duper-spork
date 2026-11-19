@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { signOutStudent } from "@/app/students/actions";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { getCourseMaterials, getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
 import { pathways } from "@/lib/pathways";
 
@@ -48,6 +50,15 @@ export default async function StudentDashboardPage() {
       .join("")
       .toUpperCase() || "R";
 
+  // Both lookups use this learner's JWT and Supabase row-level security.
+  const courses = await getEnrolledCourses(accessToken, user.id);
+  const materials = courses
+    ? await getCourseMaterials(
+        accessToken,
+        courses.map((course) => course.id),
+      )
+    : null;
+
   return (
     <main
       id="main-content"
@@ -67,12 +78,24 @@ export default async function StudentDashboardPage() {
         />
         <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div
-              aria-hidden="true"
-              className="flex size-20 shrink-0 items-center justify-center rounded-[1.5rem] border-2 border-white bg-gradient-to-br from-[#38b6ff] via-[#155DFC] to-[#123e8a] font-heading text-3xl font-bold text-white shadow-lg sm:size-24"
+            <Link
+              href="/students/profile"
+              aria-label="Edit your learner profile"
+              className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.5rem] border-2 border-white bg-gradient-to-br from-[#38b6ff] via-[#155DFC] to-[#123e8a] font-heading text-3xl font-bold text-white shadow-lg focus-visible:outline-2 focus-visible:outline-[#286518] sm:size-24"
             >
-              {initials}
-            </div>
+              {user.avatarPath ? (
+                <Image
+                  src="/students/avatar"
+                  alt="Your profile picture"
+                  width={96}
+                  height={96}
+                  unoptimized
+                  className="size-full object-cover"
+                />
+              ) : (
+                <span aria-hidden="true">{initials}</span>
+              )}
+            </Link>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#286518]">
                 RISA student portal / My Learning
@@ -104,9 +127,136 @@ export default async function StudentDashboardPage() {
             Student account active
           </span>
           <span className="text-sm text-slate-600">
-            Course registration and progress tracking are not yet available.
+            Enrolment is managed by RISA. Self-enrolment and progress tracking are not yet available.
           </span>
         </div>
+      </section>
+
+      <section aria-labelledby="enrolled-heading" className="mt-12">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
+              Your learning
+            </p>
+            <h2
+              id="enrolled-heading"
+              className="mt-2 font-heading text-2xl font-bold text-slate-950 sm:text-3xl"
+            >
+              Courses you&apos;re enrolled in
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+              View courses assigned to your account by RISA and access the learning materials
+              available to you.
+            </p>
+          </div>
+          <Link
+            href="/students/profile"
+            className="inline-flex min-h-11 items-center rounded-xl border border-[#78eb29]/50 bg-[#eefce5] px-5 py-2 text-sm font-bold text-[#286518] hover:bg-white"
+          >
+            Edit my profile
+          </Link>
+        </div>
+        {courses === null ? (
+          <div role="status" className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+            Your course list is temporarily unavailable. Please try again later.
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="risa-science-glass mt-7 rounded-[1.6rem] p-7 sm:p-9">
+            <h3 className="font-heading text-xl font-bold text-slate-950">
+              No enrolled courses yet
+            </h3>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+              When RISA enrols you in a published course, it will appear here.
+              You can explore the proposed learning areas below in the meantime.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {courses.map((course) => (
+              <article
+                key={course.id}
+                className="risa-glass-card flex flex-col rounded-[1.6rem] p-6 sm:p-8"
+              >
+                <span className="w-fit rounded-full bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
+                  {course.status === "completed" ? "Completed" : "Enrolled"}
+                </span>
+                <h3 className="mt-5 font-heading text-xl font-bold text-slate-950">
+                  {course.title}
+                </h3>
+                <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
+                  {course.description}
+                </p>
+                <Link
+                  href="#course-materials"
+                  className="mt-6 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
+                >
+                  View course materials <span aria-hidden="true"> →</span>
+                </Link>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section
+        id="course-materials"
+        aria-labelledby="materials-heading"
+        className="mt-12 scroll-mt-24"
+      >
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
+          Study resources
+        </p>
+        <h2
+          id="materials-heading"
+          className="mt-2 font-heading text-2xl font-bold text-slate-950 sm:text-3xl"
+        >
+          Course content &amp; exercises
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+          Download resources and exercises shared with your enrolled courses.
+          Content is accessible only to authorized learners.
+        </p>
+        {materials === null ? (
+          <p role="status" className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+            Course materials are temporarily unavailable.
+          </p>
+        ) : materials.length === 0 ? (
+          <div className="risa-science-glass mt-6 rounded-[1.6rem] p-6 text-sm leading-7 text-slate-600">
+            No course materials or exercises have been shared with your account yet.
+          </div>
+        ) : (
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {materials.map((material) => (
+              <article
+                key={material.id}
+                className="risa-glass-card rounded-[1.4rem] p-6"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#286518]">
+                    {material.kind === "exercise" ? "Exercise" : "Learning material"}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {courses?.find((course) => course.id === material.courseId)?.title}
+                  </span>
+                </div>
+                <h3 className="mt-4 font-heading text-lg font-bold text-slate-950">
+                  {material.title}
+                </h3>
+                {material.description && (
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    {material.description}
+                  </p>
+                )}
+                <a
+                  href={"/students/materials/" + material.id}
+                  className="mt-5 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
+                >
+                  Download file <span aria-hidden="true"> ↓</span>
+                </a>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section aria-labelledby="learning-heading" className="mt-12">
@@ -203,6 +353,12 @@ export default async function StudentDashboardPage() {
 
         <article className="risa-glass-card rounded-[1.6rem] p-6 sm:p-8">
           <h2 className="font-heading text-xl font-bold text-slate-950">Quick links</h2>
+          <Link
+            href="/students/profile"
+            className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1d4f11]"
+          >
+            Edit profile &amp; picture
+          </Link>
           <div className="mt-5 grid gap-2">
             <Link
               href="/about"
