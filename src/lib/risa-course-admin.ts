@@ -54,14 +54,13 @@ export async function createRisaCourse(
   course: NewRisaCourse,
 ): Promise<CreateCourseResult> {
   // A valid course must be revalidated server-side, even if called by a custom client.
-  if (
-    !validateNewRisaCourse({
-      code: course.code,
-      title: course.title,
-      description: course.description,
-      isPublished: course.is_published,
-    })
-  ) {
+  const validated = validateNewRisaCourse({
+    code: course.code,
+    title: course.title,
+    description: course.description,
+    isPublished: course.is_published,
+  });
+  if (!validated) {
     return "unavailable";
   }
 
@@ -71,7 +70,7 @@ export async function createRisaCourse(
       "Content-Type": "application/json",
       Prefer: "return=minimal",
     },
-    body: JSON.stringify(course),
+    body: JSON.stringify(validated),
   });
 
   if (response?.status === 409) {
