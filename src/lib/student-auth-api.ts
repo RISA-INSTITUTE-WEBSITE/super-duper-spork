@@ -12,6 +12,11 @@ export type StudentSession = {
   expires_in: number;
 };
 
+export type StudentRegistrationResult =
+  | { status: "failed" }
+  | { status: "confirmation_required" }
+  | { status: "signed_in"; session: StudentSession };
+
 export type StudentIdentity = {
   id: string;
   email: string;
@@ -126,7 +131,7 @@ export async function registerStudentWithAuth(
   fullName: string,
   email: string,
   password: string,
-): Promise<boolean> {
+): Promise<StudentRegistrationResult> {
   const response = await requestAuth({
     path: "/signup",
     method: "POST",
@@ -136,7 +141,21 @@ export async function registerStudentWithAuth(
       data: { full_name: fullName, account_type: "student" },
     },
   });
-  return response?.ok ?? false;
+
+  if (!response?.ok) {
+    return { status: "failed" };
+  }
+
+  try {
+    // Supabase returns a session immediately when email confirmation is disabled.
+    // With confirmations enabled it accepts signup without issuing a session.
+    const session = readSession(await response.json());
+    return session
+      ? { status: "signed_in", session }
+      : { status: "confirmation_required" };
+  } catch {
+    return { status: "failed" };
+  }
 }
 
 export async function signInStudentWithAuth(

@@ -72,9 +72,9 @@ export default async function StudentDashboardPage() {
           </div>
           <div>
             <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              Email verification
+              Account status
             </dt>
-            <dd className="mt-1 text-sm font-semibold text-[#286518]">Confirmed</dd>
+            <dd className="mt-1 text-sm font-semibold text-[#286518]">Active</dd>
           </div>
         </dl>
         <div className="mt-8 rounded-xl bg-white/80 p-5 text-sm leading-7 text-slate-600">
