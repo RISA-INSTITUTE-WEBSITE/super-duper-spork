@@ -29,7 +29,10 @@ function SearchIcon() {
   );
 }
 
-function trapSidebarFocus(event: KeyboardEvent, sidebar: HTMLDivElement | null): void {
+function trapSidebarFocus(
+  event: KeyboardEvent,
+  sidebar: HTMLDivElement | null,
+): void {
   if (event.key !== "Tab") {
     return;
   }
@@ -44,16 +47,15 @@ function trapSidebarFocus(event: KeyboardEvent, sidebar: HTMLDivElement | null):
   const first = elements[0];
   const last = elements[elements.length - 1];
 
-  const wrapsBackward = event.shiftKey && document.activeElement === first;
-  const wrapsForward = !event.shiftKey && document.activeElement === last;
-
-  if (wrapsBackward) {
-    event.preventDefault();
-    last.focus();
+  if (event.shiftKey) {
+    if (document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    }
     return;
   }
 
-  if (wrapsForward || !sidebar?.contains(document.activeElement)) {
+  if (document.activeElement === last || !sidebar?.contains(document.activeElement)) {
     event.preventDefault();
     first.focus();
   }
