@@ -8,8 +8,10 @@ Applied Sciences website.
 **Foundation scaffold — not production-ready.** The current website offers
 a public homepage, proposed learning pathways, About and Contact pages.
 The proposed pathways are examples only and are **not confirmed courses**.
-There are no working student accounts, enrollment, educator portals, or
-administration dashboards yet.
+The student registration and sign-in screens are implemented but disabled
+until a dedicated RISA authentication backend is connected and approved.
+There is no live enrollment, educator portal or administration dashboard yet.
+See [student account setup](docs/student-accounts.md) before activation.
 
 ## Technology
 
