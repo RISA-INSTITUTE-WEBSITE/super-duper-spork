@@ -54,7 +54,10 @@ function getAuthConfig(): AuthConfig | null {
 }
 
 export function isStudentAuthConfigured(): boolean {
-  return process.env.RISA_STUDENT_AUTH_ENABLED === "true" && getAuthConfig() !== null;
+  // Student registration is active whenever the RISA Supabase connection is
+  // configured. The legacy deployment feature flag is no longer required.
+  // Missing or unsafe credentials still disable all student auth actions.
+  return getAuthConfig() !== null;
 }
 
 type AuthRequestOptions = {

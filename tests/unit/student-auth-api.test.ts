@@ -34,11 +34,14 @@ afterEach(() => {
 });
 
 describe("RISA student authentication gateway", () => {
-  it("enables account access only with explicit configuration", () => {
+  it("activates account creation with valid Supabase credentials", () => {
     expect(isStudentAuthConfigured()).toBe(true);
+    // The obsolete deployment flag cannot block configured student signups.
     vi.stubEnv("RISA_STUDENT_AUTH_ENABLED", "false");
-    expect(isStudentAuthConfigured()).toBe(false);
-    vi.stubEnv("RISA_STUDENT_AUTH_ENABLED", "true");
+    expect(isStudentAuthConfigured()).toBe(true);
+    vi.stubEnv("RISA_STUDENT_AUTH_ENABLED", "");
+    expect(isStudentAuthConfigured()).toBe(true);
+    // Missing credentials still fail closed.
     vi.stubEnv("RISA_SUPABASE_URL", "");
     expect(isStudentAuthConfigured()).toBe(false);
   });
