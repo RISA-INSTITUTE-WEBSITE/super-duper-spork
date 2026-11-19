@@ -9,9 +9,18 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
   // QA-E2E-01: essential heading, single main landmark and labeled navigation.
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Learn the science",
+    "Where real learning starts",
   );
   await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(
+    page.getByRole("heading", { name: "Our Vision", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Our Mission" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Learn it. Understand it. Apply it. Test it. Improve it.",
+    }),
+  ).toBeVisible();
   await expect(
     page.getByRole("navigation", { name: "Primary navigation" }),
   ).toBeVisible();
@@ -187,7 +196,9 @@ test("homepage progress content sits on the white section without a boxed banner
   const section = page.locator('section[aria-labelledby="next-heading"]');
   await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
   await expect(
-    section.getByRole("heading", { name: "A place to question, discover and grow." }),
+    section.getByRole("heading", {
+      name: "Theory into practice. Knowledge into impact.",
+    }),
   ).toBeVisible();
   await expect(section.getByRole("link", { name: /About the institute/ })).toBeVisible();
   await expect(section.getByRole("link", { name: /Contact RISA/ })).toBeVisible();
