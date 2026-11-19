@@ -192,3 +192,25 @@ test("homepage progress content sits on the white section without a boxed banner
   await expect(section.getByRole("link", { name: /About the institute/ })).toBeVisible();
   await expect(section.getByRole("link", { name: /Contact RISA/ })).toBeVisible();
 });
+
+test("RISA progress section shows clear animated logo without changing navigation logo", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  const section = page.locator('section[aria-labelledby="next-heading"]');
+  const animatedLogo = section.locator('img[src="/risa-logo-animated.svg"]');
+  await expect(animatedLogo).toBeVisible();
+  await expect(animatedLogo).toHaveCSS("opacity", "1");
+  await expect(page.locator('header img[src="/risa-logo.svg"]')).toBeVisible();
+
+  const asset = await request.get("/risa-logo-animated.svg");
+  expect(asset.ok()).toBeTruthy();
+  const svg = await asset.text();
+  expect(svg).toContain('class="risa-wave-front"');
+  expect(svg).toContain('class="risa-led-core"');
+  expect(svg).toContain("prefers-reduced-motion");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(animatedLogo).toBeVisible();
+});
