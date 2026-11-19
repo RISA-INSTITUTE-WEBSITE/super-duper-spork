@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { isStudentAuthConfigured, verifyStudentEmail } from "@/lib/student-auth-api";
-import { saveStudentSession } from "@/lib/student-session";
+import { saveStudentSessionOnResponse } from "@/lib/student-session";
 
 export async function GET(request: NextRequest) {
   const tokenHash = request.nextUrl.searchParams.get("token_hash");
@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(destination);
   }
 
-  await saveStudentSession(session);
-  return NextResponse.redirect(new URL("/students/dashboard", request.url));
+  const response = NextResponse.redirect(new URL("/students/dashboard", request.url));
+  saveStudentSessionOnResponse(response, session);
+  return response;
 }
