@@ -196,7 +196,7 @@ test("private student dashboard redirects visitors without a session", async ({
 test("administrator portal requires a verified signed-in account", async ({ page }) => {
   await page.goto("/admin");
   await expect(page).toHaveURL(/\/students\/login\/?$/);
-  await expect(page.getByRole("heading", { name: "Student sign in" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
 
 test("unverified visitors cannot open private learner profile or files", async ({
