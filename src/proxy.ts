@@ -8,16 +8,18 @@ import {
   studentCookieNames,
 } from "@/lib/student-session";
 
+function needsRefresh(accessToken: string | undefined, expiresAt: number): boolean {
+  return !accessToken || !Number.isFinite(expiresAt) || expiresAt <= Date.now() / 1000 + 90;
+}
+
 export async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get(studentCookieNames.access)?.value;
   const refreshToken = request.cookies.get(studentCookieNames.refresh)?.value;
   const expiresAt = Number(request.cookies.get(studentCookieNames.expires)?.value ?? 0);
-  const currentTime = Math.floor(Date.now() / 1000);
-
   if (
     !isStudentAuthConfigured() ||
     !refreshToken ||
-    (accessToken && Number.isFinite(expiresAt) && expiresAt > currentTime + 90)
+    !needsRefresh(accessToken, expiresAt)
   ) {
     return NextResponse.next({ request });
   }
