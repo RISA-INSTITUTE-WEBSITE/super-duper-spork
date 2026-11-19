@@ -41,6 +41,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Diagnostic formatted mobile nav snapshot
+        run: |
+          npx prettier --write src/components/mobile-navigation.tsx
+          echo "AUTH_FORMAT_START"
+          base64 -w0 src/components/mobile-navigation.tsx
+          echo
+          echo "AUTH_FORMAT_END"
+
       # Phase 1 - fastest, read-only static checks.
       # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
       - name: Phase 1 - Formatting without modifications
