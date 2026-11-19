@@ -125,6 +125,6 @@ export async function createQuestionAction(form: FormData): Promise<void> {
   const prompt = inputText(form, "prompt");
   const choices = [0, 1, 2, 3].map((index) => inputText(form, "choice" + index));
   const correctIndex = Number(inputText(form, "correctIndex"));
-  const ok = await addQuizQuestion(token, quizId, prompt, choices, correctIndex);
+  const ok = await addQuizQuestion(token, { quizId, prompt, choices, correctIndex });
   finish(courseId, ok ? "question" : "failed");
 }
