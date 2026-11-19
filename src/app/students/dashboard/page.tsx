@@ -41,11 +41,12 @@ export default async function StudentDashboardPage() {
 
   const nameParts = user.fullName.trim().split(/\s+/);
   const firstName = nameParts[0] || "Learner";
-  const initials = nameParts
-    .slice(0, 2)
-    .map((part) => part.charAt(0))
-    .join("")
-    .toUpperCase() || "R";
+  const initials =
+    nameParts
+      .slice(0, 2)
+      .map((part) => part.charAt(0))
+      .join("")
+      .toUpperCase() || "R";
 
   return (
     <main
@@ -83,8 +84,8 @@ export default async function StudentDashboardPage() {
                 Hi, {firstName}!
               </h1>
               <p className="mt-2 max-w-lg text-sm leading-7 text-slate-600 sm:text-base">
-                Welcome to your learning space. Discover the science, skills and
-                practical experiences RISA is developing.
+                Welcome to your learning space. Discover the science, skills and practical
+                experiences RISA is developing.
               </p>
             </div>
           </div>
@@ -150,7 +151,10 @@ export default async function StudentDashboardPage() {
                 <span className="inline-flex rounded-full bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
                   Proposed
                 </span>
-                <span className="text-3xl font-black text-[#155DFC]/20" aria-hidden="true">
+                <span
+                  className="text-3xl font-black text-[#155DFC]/20"
+                  aria-hidden="true"
+                >
                   0{index + 1}
                 </span>
               </div>
@@ -177,9 +181,7 @@ export default async function StudentDashboardPage() {
         className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]"
       >
         <article className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8">
-          <h2 className="font-heading text-xl font-bold text-slate-950">
-            Your account
-          </h2>
+          <h2 className="font-heading text-xl font-bold text-slate-950">Your account</h2>
           <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -194,15 +196,13 @@ export default async function StudentDashboardPage() {
             </span>
           </div>
           <p className="mt-5 border-t border-white/90 pt-5 text-xs leading-6 text-slate-500">
-            A RISA account provides portal access only. It does not confirm
-            enrolment in any programme.
+            A RISA account provides portal access only. It does not confirm enrolment in
+            any programme.
           </p>
         </article>
 
         <article className="risa-glass-card rounded-[1.6rem] p-6 sm:p-8">
-          <h2 className="font-heading text-xl font-bold text-slate-950">
-            Quick links
-          </h2>
+          <h2 className="font-heading text-xl font-bold text-slate-950">Quick links</h2>
           <div className="mt-5 grid gap-2">
             <Link
               href="/about"
