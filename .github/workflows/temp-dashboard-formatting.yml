@@ -1,0 +1,21 @@
+name: Temporary Dashboard Prettier Diagnostic
+on:
+  push:
+    branches:
+      - design/learner-dashboard-my-learning-2026-11-19
+permissions:
+  contents: read
+jobs:
+  show-formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Show dashboard Prettier diff
+        run: |
+          npx prettier --write src/app/students/dashboard/page.tsx
+          git --no-pager diff -- src/app/students/dashboard/page.tsx
