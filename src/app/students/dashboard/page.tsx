@@ -127,7 +127,8 @@ export default async function StudentDashboardPage() {
             Student account active
           </span>
           <span className="text-sm text-slate-600">
-            Enrolment is managed by RISA. Self-enrolment and progress tracking are not yet available.
+            Enrolment is managed by RISA. Self-enrolment and progress tracking are not yet
+            available.
           </span>
         </div>
       </section>
@@ -145,8 +146,8 @@ export default async function StudentDashboardPage() {
               Courses you&apos;re enrolled in
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-              View courses assigned to your account by RISA and access the learning materials
-              available to you.
+              View courses assigned to your account by RISA and access the learning
+              materials available to you.
             </p>
           </div>
           <Link
@@ -157,7 +158,10 @@ export default async function StudentDashboardPage() {
           </Link>
         </div>
         {courses === null ? (
-          <div role="status" className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+          <div
+            role="status"
+            className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
+          >
             Your course list is temporarily unavailable. Please try again later.
           </div>
         ) : courses.length === 0 ? (
@@ -166,8 +170,8 @@ export default async function StudentDashboardPage() {
               No enrolled courses yet
             </h3>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-              When RISA enrols you in a published course, it will appear here.
-              You can explore the proposed learning areas below in the meantime.
+              When RISA enrols you in a published course, it will appear here. You can
+              explore the proposed learning areas below in the meantime.
             </p>
           </div>
         ) : (
@@ -213,11 +217,14 @@ export default async function StudentDashboardPage() {
           Course content &amp; exercises
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          Download resources and exercises shared with your enrolled courses.
-          Content is accessible only to authorized learners.
+          Download resources and exercises shared with your enrolled courses. Content is
+          accessible only to authorized learners.
         </p>
         {materials === null ? (
-          <p role="status" className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+          <p
+            role="status"
+            className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"
+          >
             Course materials are temporarily unavailable.
           </p>
         ) : materials.length === 0 ? (
@@ -227,10 +234,7 @@ export default async function StudentDashboardPage() {
         ) : (
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {materials.map((material) => (
-              <article
-                key={material.id}
-                className="risa-glass-card rounded-[1.4rem] p-6"
-              >
+              <article key={material.id} className="risa-glass-card rounded-[1.4rem] p-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#286518]">
                     {material.kind === "exercise" ? "Exercise" : "Learning material"}
