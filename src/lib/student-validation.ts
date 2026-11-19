@@ -11,9 +11,7 @@ export type RegistrationDetails = {
 
 function hasValidEmail(email: string): boolean {
   return (
-    email.length >= 6 &&
-    email.length <= 254 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    email.length >= 6 && email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
   );
 }
 
