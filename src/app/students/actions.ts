@@ -12,6 +12,7 @@ import {
   updateStudentAuthMetadata,
 } from "@/lib/student-auth-api";
 import { uploadStudentAvatar } from "@/lib/student-learning-api";
+import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
   clearStudentSession,
   saveStudentSession,
@@ -87,6 +88,9 @@ export async function signInStudent(formData: FormData): Promise<void> {
   }
 
   await saveStudentSession(session);
+  if (await isRisaAdministrator(session.access_token, identity.id)) {
+    redirect("/admin");
+  }
   redirect("/students/dashboard");
 }
 

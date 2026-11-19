@@ -39,8 +39,8 @@ export default async function StudentLoginPage({
             Welcome back
           </h1>
           <p className="mt-3 text-sm leading-7 text-slate-600">
-            Sign in with the email address and password used to create your student
-            account.
+            Sign in with your RISA account. Verified administrators are directed to the
+            administration centre; learners continue to My Learning.
           </p>
 
           {!enabled && (
