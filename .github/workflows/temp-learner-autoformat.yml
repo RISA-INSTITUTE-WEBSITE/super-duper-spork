@@ -1,0 +1,29 @@
+name: Temporary Learner Feature Autoformat
+on:
+  push:
+    branches:
+      - feature/learner-enrolments-content-profile-2026-11-19
+permissions:
+  contents: write
+jobs:
+  prettify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Apply repository Prettier rules on learner files
+        run: |
+          npx prettier --write src/app/students/actions.ts src/app/students/avatar/route.ts src/app/students/dashboard/page.tsx src/app/students/profile/page.tsx 'src/app/students/materials/[id]/route.ts' src/lib/student-auth-api.ts src/lib/student-learning-api.ts tests/unit/student-auth-api.test.ts tests/unit/student-learning-api.test.ts tests/e2e/public-pages.spec.ts docs/learner-dashboard.md
+          git add src/app/students/actions.ts src/app/students/avatar/route.ts src/app/students/dashboard/page.tsx src/app/students/profile/page.tsx 'src/app/students/materials/[id]/route.ts' src/lib/student-auth-api.ts src/lib/student-learning-api.ts tests/unit/student-auth-api.test.ts tests/unit/student-learning-api.test.ts tests/e2e/public-pages.spec.ts docs/learner-dashboard.md
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "style(students): apply repository formatting"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
