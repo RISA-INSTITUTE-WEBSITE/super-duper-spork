@@ -132,11 +132,16 @@ export default async function RisaAdminPage() {
             Course administration
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Your role is authorized for course records, enrolments, and learning
-            materials. In-browser course editing and uploading tools are not yet
-            available; authorized institution staff can manage these records through the
-            project&apos;s existing Supabase management process.
+            Create courses with unique institutional codes, prepare draft curricula and
+            publish approved courses. Learner enrolment and content uploads remain
+            available to authorized project maintainers through Supabase.
           </p>
+          <Link
+            href="/admin/courses"
+            className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
+          >
+            Manage courses →
+          </Link>
         </article>
         <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
           <h2 className="font-heading text-xl font-bold text-slate-950">
