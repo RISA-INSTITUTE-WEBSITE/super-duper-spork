@@ -13,6 +13,7 @@ Beacon Innovation Hub.
 - Region: `eu-west-1` (Ireland)
 - Project URL: `https://zaruopeqlndkxltqlpeh.supabase.co`
 - Plan: Free
+- RISA website origin (owner-provided): `https://super-duper-spork-iota.vercel.app`
 - Database: active; no public user-profile tables required for initial email/password Auth
 
 The current RISA website already includes responsive registration, sign-in,
@@ -26,9 +27,12 @@ Account creation does not mean programme admission or enrolment.
 1. Open the [RISA Supabase Authentication settings](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/providers)
    and enable **Email** sign-in. Require email confirmation.
 2. In [Authentication URL configuration](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/url-configuration),
-   set **Site URL** to the actual, approved RISA deployment origin (HTTPS).
-   Do not guess the domain. If preview testing is intended, explicitly list
-   the allowed HTTPS preview redirect origin(s).
+   set **Site URL** to the RISA deployment origin provided by the project owner:
+   `https://super-duper-spork-iota.vercel.app`
+   Add `https://super-duper-spork-iota.vercel.app/auth/confirm` to the
+   allowed redirect URLs. If preview testing is intended, explicitly add
+   only those approved HTTPS preview redirects. This website domain was
+   supplied by the owner and has not been independently HTTP-verified.
 3. In [Email Templates](https://supabase.com/dashboard/project/zaruopeqlndkxltqlpeh/auth/templates),
    configure the confirmation email using a one-time token hash to the
    existing server-side endpoint:
