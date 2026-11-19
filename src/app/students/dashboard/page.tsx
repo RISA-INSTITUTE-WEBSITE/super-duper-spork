@@ -29,57 +29,52 @@ const pathwayAccents = [
   "from-teal-400 to-emerald-600",
 ] as const;
 
-function EnrolledCoursesContent({
-  courses,
-}: {
-  courses: EnrolledCourse[] | null;
-}) {
+function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null }) {
   return (
     <>
-        {courses === null ? (
-          <div
-            role="status"
-            className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
-          >
-            Your course list is temporarily unavailable. Please try again later.
-          </div>
-        ) : courses.length === 0 ? (
-          <div className="risa-science-glass mt-7 rounded-[1.6rem] p-7 sm:p-9">
-            <h3 className="font-heading text-xl font-bold text-slate-950">
-              No enrolled courses yet
-            </h3>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-              When RISA enrols you in a published course, it will appear here. You can
-              explore the proposed learning areas below in the meantime.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course) => (
-              <article
-                key={course.id}
-                className="risa-glass-card flex flex-col rounded-[1.6rem] p-6 sm:p-8"
+      {courses === null ? (
+        <div
+          role="status"
+          className="mt-7 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
+        >
+          Your course list is temporarily unavailable. Please try again later.
+        </div>
+      ) : courses.length === 0 ? (
+        <div className="risa-science-glass mt-7 rounded-[1.6rem] p-7 sm:p-9">
+          <h3 className="font-heading text-xl font-bold text-slate-950">
+            No enrolled courses yet
+          </h3>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            When RISA enrols you in a published course, it will appear here. You can
+            explore the proposed learning areas below in the meantime.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {courses.map((course) => (
+            <article
+              key={course.id}
+              className="risa-glass-card flex flex-col rounded-[1.6rem] p-6 sm:p-8"
+            >
+              <span className="w-fit rounded-full bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
+                {course.status === "completed" ? "Completed" : "Enrolled"}
+              </span>
+              <h3 className="mt-5 font-heading text-xl font-bold text-slate-950">
+                {course.title}
+              </h3>
+              <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
+                {course.description}
+              </p>
+              <Link
+                href="#course-materials"
+                className="mt-6 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
               >
-                <span className="w-fit rounded-full bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
-                  {course.status === "completed" ? "Completed" : "Enrolled"}
-                </span>
-                <h3 className="mt-5 font-heading text-xl font-bold text-slate-950">
-                  {course.title}
-                </h3>
-                <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
-                  {course.description}
-                </p>
-                <Link
-                  href="#course-materials"
-                  className="mt-6 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
-                >
-                  View course materials <span aria-hidden="true"> →</span>
-                </Link>
-              </article>
-            ))}
-          </div>
-        )}
-
+                View course materials <span aria-hidden="true"> →</span>
+              </Link>
+            </article>
+          ))}
+        </div>
+      )}
     </>
   );
 }
@@ -93,48 +88,47 @@ function CourseMaterialsContent({
 }) {
   return (
     <>
-        {materials === null ? (
-          <p
-            role="status"
-            className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"
-          >
-            Course materials are temporarily unavailable.
-          </p>
-        ) : materials.length === 0 ? (
-          <div className="risa-science-glass mt-6 rounded-[1.6rem] p-6 text-sm leading-7 text-slate-600">
-            No course materials or exercises have been shared with your account yet.
-          </div>
-        ) : (
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            {materials.map((material) => (
-              <article key={material.id} className="risa-glass-card rounded-[1.4rem] p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#286518]">
-                    {material.kind === "exercise" ? "Exercise" : "Learning material"}
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    {courses?.find((course) => course.id === material.courseId)?.title}
-                  </span>
-                </div>
-                <h3 className="mt-4 font-heading text-lg font-bold text-slate-950">
-                  {material.title}
-                </h3>
-                {material.description && (
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {material.description}
-                  </p>
-                )}
-                <a
-                  href={"/students/materials/" + material.id}
-                  className="mt-5 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
-                >
-                  Download file <span aria-hidden="true"> ↓</span>
-                </a>
-              </article>
-            ))}
-          </div>
-        )}
-
+      {materials === null ? (
+        <p
+          role="status"
+          className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"
+        >
+          Course materials are temporarily unavailable.
+        </p>
+      ) : materials.length === 0 ? (
+        <div className="risa-science-glass mt-6 rounded-[1.6rem] p-6 text-sm leading-7 text-slate-600">
+          No course materials or exercises have been shared with your account yet.
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {materials.map((material) => (
+            <article key={material.id} className="risa-glass-card rounded-[1.4rem] p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#286518]">
+                  {material.kind === "exercise" ? "Exercise" : "Learning material"}
+                </span>
+                <span className="text-xs text-slate-500">
+                  {courses?.find((course) => course.id === material.courseId)?.title}
+                </span>
+              </div>
+              <h3 className="mt-4 font-heading text-lg font-bold text-slate-950">
+                {material.title}
+              </h3>
+              {material.description && (
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {material.description}
+                </p>
+              )}
+              <a
+                href={"/students/materials/" + material.id}
+                className="mt-5 inline-flex min-h-10 items-center text-sm font-bold text-[#155DFC] hover:underline"
+              >
+                Download file <span aria-hidden="true"> ↓</span>
+              </a>
+            </article>
+          ))}
+        </div>
+      )}
     </>
   );
 }

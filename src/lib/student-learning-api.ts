@@ -153,9 +153,7 @@ async function getAuthorizedMaterialFile(
   id: string,
 ): Promise<MaterialFile | null> {
   const path =
-    "/rest/v1/risa_course_materials?select=title,storage_path&id=eq." +
-    id +
-    "&limit=1";
+    "/rest/v1/risa_course_materials?select=title,storage_path&id=eq." + id + "&limit=1";
   const response = await requestStudentBackend(token, path);
   if (!response?.ok) {
     return null;
