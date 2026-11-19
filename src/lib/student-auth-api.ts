@@ -22,6 +22,7 @@ export type StudentIdentity = {
   email: string;
   fullName: string;
   avatarPath: string | null;
+  updatedAt?: string;
 };
 
 function resolveAuthOrigin(rawUrl: string): string | null {
@@ -214,6 +215,10 @@ function validatedAvatarPath(userId: string, path: unknown): string | null {
   return accepted ? path : null;
 }
 
+function optionalProfileUpdateDate(value: unknown): { updatedAt?: string } {
+  return typeof value === "string" ? { updatedAt: value } : {};
+}
+
 function parseStudentIdentity(data: unknown): StudentIdentity | null {
   if (!data || typeof data !== "object") {
     return null;
@@ -223,6 +228,7 @@ function parseStudentIdentity(data: unknown): StudentIdentity | null {
     id?: unknown;
     email?: unknown;
     email_confirmed_at?: unknown;
+    updated_at?: unknown;
     user_metadata?: unknown;
   };
 
@@ -247,6 +253,7 @@ function parseStudentIdentity(data: unknown): StudentIdentity | null {
     email: user.email,
     fullName: name.slice(0, 80) || "Student",
     avatarPath,
+    ...optionalProfileUpdateDate(user.updated_at),
   };
 }
 

@@ -26,6 +26,12 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Profile forms allow images up to 2 MB; Server Actions default to 1 MB.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "3mb",
+    },
+  },
   poweredByHeader: false,
   async headers() {
     return [
