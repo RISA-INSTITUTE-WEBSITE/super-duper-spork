@@ -60,7 +60,10 @@ export function ProfilePhotoField({
           aria-describedby={error ? "student-photo-error" : undefined}
           onChange={(event) => {
             const file = event.target.files?.[0] ?? null;
-            if (file && (!acceptedPhotoTypes.includes(file.type) || file.size > maxPhotoBytes)) {
+            if (
+              file &&
+              (!acceptedPhotoTypes.includes(file.type) || file.size > maxPhotoBytes)
+            ) {
               setPhoto(null);
               setPreview(null);
               setError("Please choose a JPG, PNG or WebP image no larger than 2 MB.");
@@ -74,7 +77,11 @@ export function ProfilePhotoField({
           className="block w-full min-w-0 max-w-md text-xs text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-[#eefce5] file:px-3 file:py-2 file:font-semibold file:text-[#286518]"
         />
         {error && (
-          <p id="student-photo-error" role="alert" className="mt-2 text-xs font-medium text-red-700">
+          <p
+            id="student-photo-error"
+            role="alert"
+            className="mt-2 text-xs font-medium text-red-700"
+          >
             {error}
           </p>
         )}
