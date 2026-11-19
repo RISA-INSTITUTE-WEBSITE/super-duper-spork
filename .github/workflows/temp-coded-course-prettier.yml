@@ -1,0 +1,29 @@
+name: Temporary RISA Course Formatting
+on:
+  push:
+    branches:
+      - feature/admin-create-coded-courses-2026-11-20
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Format and commit coded-course feature
+        run: |
+          npx prettier --write src/lib/risa-course-admin.ts src/app/admin/courses/actions.ts src/app/admin/courses/page.tsx src/components/admin-create-course-form.tsx src/app/admin/page.tsx tests/unit/risa-course-admin.test.ts tests/e2e/public-pages.spec.ts docs/admin-role.md
+          git add src/lib/risa-course-admin.ts src/app/admin/courses/actions.ts src/app/admin/courses/page.tsx src/components/admin-create-course-form.tsx src/app/admin/page.tsx tests/unit/risa-course-admin.test.ts tests/e2e/public-pages.spec.ts docs/admin-role.md
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "style(admin): apply RISA formatter to course creation"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
