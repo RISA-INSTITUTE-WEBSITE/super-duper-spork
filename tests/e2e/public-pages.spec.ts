@@ -193,6 +193,22 @@ test("private student dashboard redirects visitors without a session", async ({
   await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
 
+test("unverified visitors cannot open private learner profile or files", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/students/profile");
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+
+  const avatar = await request.get("/students/avatar");
+  expect(avatar.status()).toBe(404);
+
+  const privateMaterial = await request.get(
+    "/students/materials/33333333-3333-4333-8333-333333333333",
+  );
+  expect(privateMaterial.status()).toBe(404);
+});
+
 test("mobile students entry opens the student portal", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
