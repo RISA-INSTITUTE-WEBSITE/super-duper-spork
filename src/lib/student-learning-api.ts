@@ -28,7 +28,9 @@ export async function getEnrolledCourses(
 
   const path =
     "/rest/v1/risa_enrollments?select=course_id,status,course:risa_courses(id,slug,title,description)" +
-    "&student_id=eq." + studentId + "&status=in.(active,completed)&order=created_at.desc&limit=50";
+    "&student_id=eq." +
+    studentId +
+    "&status=in.(active,completed)&order=created_at.desc&limit=50";
   const response = await requestStudentBackend(token, path);
   if (!response?.ok) {
     return null;
@@ -82,7 +84,9 @@ export async function getCourseMaterials(
 
   const path =
     "/rest/v1/risa_course_materials?select=id,course_id,title,description,kind" +
-    "&course_id=in.(" + ids.join(",") + ")&order=created_at.desc&limit=60";
+    "&course_id=in.(" +
+    ids.join(",") +
+    ")&order=created_at.desc&limit=60";
   const response = await requestStudentBackend(token, path);
   if (!response?.ok) {
     return null;
@@ -136,7 +140,8 @@ export async function downloadCourseMaterial(
   }
   const path =
     "/rest/v1/risa_course_materials?select=title,storage_path&id=eq." +
-    materialId + "&limit=1";
+    materialId +
+    "&limit=1";
   const metadata = await requestStudentBackend(token, path);
   if (!metadata?.ok) {
     return null;
@@ -163,7 +168,10 @@ export async function downloadCourseMaterial(
       return null;
     }
     const extension = row.storage_path.split(".").at(-1)?.toLowerCase() ?? "bin";
-    const safeTitle = row.title.replace(/[^a-z0-9 _.-]/gi, "").trim().slice(0, 70);
+    const safeTitle = row.title
+      .replace(/[^a-z0-9 _.-]/gi, "")
+      .trim()
+      .slice(0, 70);
     return {
       response: result,
       title: safeTitle || "RISA-course-material",
