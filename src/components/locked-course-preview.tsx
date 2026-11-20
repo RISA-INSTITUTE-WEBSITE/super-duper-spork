@@ -53,7 +53,9 @@ function PreviewTopicTile({
           )}
         </div>
         <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/25 text-white">
-          <span aria-hidden="true" className="text-3xl">🔒</span>
+          <span aria-hidden="true" className="text-3xl">
+            🔒
+          </span>
           <span className="rounded-full border border-white/70 bg-black/40 px-4 py-1.5 text-xs font-bold backdrop-blur-sm">
             Enrol to unlock lessons
           </span>
@@ -88,10 +90,7 @@ function PreviewTopicTile({
               className="group relative overflow-hidden rounded-lg border border-white bg-white p-1 focus-visible:outline-2 focus-visible:outline-[#286518]"
             >
               <div className="pointer-events-none blur-[6px] brightness-75">
-                <YouTubeLessonThumbnail
-                  videoId={video.youtube_id}
-                  title={video.title}
-                />
+                <YouTubeLessonThumbnail videoId={video.youtube_id} title={video.title} />
               </div>
               <span
                 className="absolute inset-0 flex items-center justify-center text-lg text-white drop-shadow"
@@ -220,10 +219,13 @@ function EnrolmentPrompt({
         >
           Enrol to unlock this course
         </h2>
-        <p id="risa-enrolment-description" className="mt-3 text-sm leading-7 text-slate-700">
-          Your RISA account lets you preview <strong>{courseName}</strong>.
-          Request enrolment to access the complete lessons, quizzes and study resources
-          after RISA approves your registration.
+        <p
+          id="risa-enrolment-description"
+          className="mt-3 text-sm leading-7 text-slate-700"
+        >
+          Your RISA account lets you preview <strong>{courseName}</strong>. Request
+          enrolment to access the complete lessons, quizzes and study resources after RISA
+          approves your registration.
         </p>
         {selectedTitle && (
           <p className="mt-4 rounded-xl bg-white/70 px-4 py-3 text-sm text-slate-700">
@@ -282,9 +284,9 @@ export function LockedCoursePreview({
         Explore course topics
       </h2>
       <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-        Topic titles and descriptions are visible to registered learners.
-        Video previews are blurred until your enrolment is approved.
-        Select a topic or locked lesson to request access.
+        Topic titles and descriptions are visible to registered learners. Video previews
+        are blurred until your enrolment is approved. Select a topic or locked lesson to
+        request access.
       </p>
       {curriculum.topics.length === 0 ? (
         <p className="risa-glass-card mt-7 rounded-2xl p-7 text-sm text-slate-600">

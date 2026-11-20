@@ -49,7 +49,9 @@ function CourseAlert({ message }: { message: string }) {
 
 function EnrolledTopics({ curriculum }: { curriculum: CourseCurriculum | null }) {
   if (!curriculum) {
-    return <CourseAlert message="Course content is currently unavailable. Please try again." />;
+    return (
+      <CourseAlert message="Course content is currently unavailable. Please try again." />
+    );
   }
   if (curriculum.topics.length === 0) {
     return (

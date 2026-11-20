@@ -151,8 +151,14 @@ export default async function AdminEnrolmentRequestsPage({
   const { result } = await searchParams;
 
   return (
-    <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-5 py-12 sm:px-8">
-      <Link href="/admin" className="text-sm font-semibold text-[#286518] hover:underline">
+    <main
+      id="main-content"
+      className="mx-auto w-full max-w-6xl flex-1 px-5 py-12 sm:px-8"
+    >
+      <Link
+        href="/admin"
+        className="text-sm font-semibold text-[#286518] hover:underline"
+      >
         ← Administration Centre
       </Link>
       <p className="mt-8 text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
@@ -162,8 +168,8 @@ export default async function AdminEnrolmentRequestsPage({
         Course enrolment requests
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
-        Review requests submitted by registered learners. Approval adds the learner to
-        the selected course and unlocks its lessons, quizzes and authorised materials.
+        Review requests submitted by registered learners. Approval adds the learner to the
+        selected course and unlocks its lessons, quizzes and authorised materials.
       </p>
       <ReviewFeedback result={result} />
       <EnrolmentRequestQueue requests={requests} courses={courses} />

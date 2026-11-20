@@ -48,12 +48,16 @@ async function existingAccessState(
     return { status: "existing", message: "You are already enrolled in this course." };
   }
   if (existing?.status === "pending") {
-    return { status: "existing", message: "Your enrolment request is awaiting RISA approval." };
+    return {
+      status: "existing",
+      message: "Your enrolment request is awaiting RISA approval.",
+    };
   }
   if (existing) {
     return {
       status: "existing",
-      message: "Your previous request has been reviewed. Contact RISA if you need assistance.",
+      message:
+        "Your previous request has been reviewed. Contact RISA if you need assistance.",
     };
   }
   return null;
