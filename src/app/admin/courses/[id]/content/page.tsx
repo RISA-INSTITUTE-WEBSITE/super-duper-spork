@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+
+import { TopicVideoPlayer } from "@/components/topic-video-player";
 import { notFound, redirect } from "next/navigation";
 
 import {
@@ -327,26 +329,8 @@ function TopicCard({
         <p className="mt-3 text-sm text-slate-600">{topic.description}</p>
       )}
       {videos.length > 0 && (
-        <div className="my-5 space-y-2">
-          <h4 className="text-sm font-bold text-slate-900">YouTube lessons</h4>
-          {videos.map((video) => (
-            <p
-              key={video.id}
-              className="rounded-lg bg-white/80 px-4 py-3 text-sm text-slate-700"
-            >
-              <a
-                href={"https://www.youtube.com/watch?v=" + video.youtube_id}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-[#155DFC] underline-offset-4 hover:underline"
-              >
-                {video.title}
-              </a>
-              <span className="ml-2 text-xs text-slate-500">
-                {video.is_published ? "Visible" : "Draft"}
-              </span>
-            </p>
-          ))}
+        <div className="my-6">
+          <TopicVideoPlayer videos={videos} topicTitle={topic.title} />
         </div>
       )}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
