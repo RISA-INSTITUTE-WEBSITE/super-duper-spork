@@ -15,7 +15,7 @@ export const courseLevels = [
   "Professional Level",
 ] as const;
 const thumbnailPathPattern =
-  /^[0-9a-f-]{36}/[0-9a-f-]{36}\.(?:png|jpg|webp)$/;
+  /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:png|jpg|webp)$/;
 const thumbnailTypes: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
