@@ -142,6 +142,26 @@ function CourseMaterialsContent({
   );
 }
 
+function learnerGreeting(fullName: string) {
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    firstName: parts[0] || "Learner",
+    initials:
+      parts
+        .slice(0, 2)
+        .map((part) => part.charAt(0))
+        .join("")
+        .toUpperCase() || "R",
+  };
+}
+
+function countLabel(items: readonly unknown[] | null, singular: string): string {
+  if (!items) {
+    return "— " + singular + "s";
+  }
+  return items.length + " " + singular + (items.length === 1 ? "" : "s");
+}
+
 export default async function StudentDashboardPage() {
   if (!isStudentAuthConfigured()) {
     redirect("/students/login");
@@ -159,14 +179,7 @@ export default async function StudentDashboardPage() {
     redirect("/students/login");
   }
 
-  const nameParts = user.fullName.trim().split(/\s+/);
-  const firstName = nameParts[0] || "Learner";
-  const initials =
-    nameParts
-      .slice(0, 2)
-      .map((part) => part.charAt(0))
-      .join("")
-      .toUpperCase() || "R";
+  const { firstName, initials } = learnerGreeting(user.fullName);
 
   // Read enrolments and resources with the learner's JWT and row-level security.
   const courses = await getEnrolledCourses(accessToken, user.id);
@@ -176,14 +189,8 @@ export default async function StudentDashboardPage() {
         courses.map((course) => course.id),
       )
     : null;
-  const courseCount =
-    courses === null
-      ? "— courses"
-      : courses.length + (courses.length === 1 ? " course" : " courses");
-  const materialCount =
-    materials === null
-      ? "— files"
-      : materials.length + (materials.length === 1 ? " file" : " files");
+  const courseCount = countLabel(courses, "course");
+  const materialCount = countLabel(materials, "file");
 
   return (
     <main
