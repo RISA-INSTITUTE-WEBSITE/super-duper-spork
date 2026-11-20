@@ -32,7 +32,7 @@ describe("RISA account-aware site navigation", () => {
 
     expect(html).toContain('href="/students/login"');
     expect(html).toContain('href="/students/register"');
-    expect(html).not.toContain('href="/students/profile"');
+    expect(html).not.toContain('href="/students/dashboard"');
     expect(identityMock).not.toHaveBeenCalled();
   });
 
@@ -43,7 +43,7 @@ describe("RISA account-aware site navigation", () => {
 
     expect(identityMock).toHaveBeenCalledWith("expired-token");
     expect(html).toContain('href="/students/login"');
-    expect(html).not.toContain('href="/students/profile"');
+    expect(html).not.toContain('href="/students/dashboard"');
   });
 
   it("shows a small round uploaded avatar instead of authentication links", async () => {
@@ -57,8 +57,9 @@ describe("RISA account-aware site navigation", () => {
     });
     const html = await renderHeader();
 
-    expect(html).toContain('aria-label="Open profile for Ada Learner"');
-    expect(html).toContain('href="/students/profile"');
+    expect(html).toContain('aria-label="Open My Learning for Ada Learner"');
+    expect(html).toContain('href="/students/dashboard"');
+    expect(html).not.toContain('href="/students/profile"');
     expect(html).toContain("avatar?updated=2026-11-20");
     expect(html).toContain("rounded-full");
     expect(html).not.toContain('href="/students/login"');
@@ -75,7 +76,7 @@ describe("RISA account-aware site navigation", () => {
     });
     const html = await renderHeader();
 
-    expect(html).toContain('aria-label="Open profile for Ada Learner"');
+    expect(html).toContain('aria-label="Open My Learning for Ada Learner"');
     expect(html).toContain(">AL</span>");
     expect(html).not.toContain("/students/avatar?");
   });
