@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
 import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
 
@@ -23,8 +24,9 @@ export default async function ProgrammesPage() {
       </p>
       <h1 className="mt-3 text-4xl font-bold text-slate-950">Available courses</h1>
       <p className="mt-5 max-w-3xl leading-relaxed text-slate-600">
-        Explore the courses published by RISA administration. Course enrolment and
-        learning content are accessed through the learner portal.
+        Explore the courses published by RISA administration. Sign in to preview published
+        course topics and blurred video thumbnails. RISA enrolment approval unlocks the
+        full lessons, quizzes and study resources.
       </p>
 
       {courses === null ? (
@@ -78,6 +80,12 @@ export default async function ProgrammesPage() {
                   <p className="mt-4 text-sm leading-7 text-slate-600">
                     {course.description || "Course details will be added by RISA."}
                   </p>
+                  <Link
+                    href={"/students/courses/" + course.id}
+                    className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-[#286518]"
+                  >
+                    Preview course topics <span aria-hidden="true">→</span>
+                  </Link>
                 </div>
               </article>
             );

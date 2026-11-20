@@ -4,6 +4,7 @@ import {
   addQuizQuestion,
   createCourseContent,
   getCourseCurriculum,
+  getCoursePreviewCurriculum,
   parseYouTubeId,
 } from "../../src/lib/risa-course-curriculum";
 
@@ -184,5 +185,53 @@ describe("RISA course content authorization", () => {
       false,
     );
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("registered learner preview data", () => {
+  it("loads published topics and thumbnail metadata but never quizzes or answer keys", async () => {
+    fetchMock.mockResolvedValueOnce(
+      Response.json([
+        {
+          id: topic,
+          course_id: course,
+          title: "Measurements",
+          description: "Learn SI units and experiments",
+          is_published: true,
+        },
+      ]),
+    );
+    fetchMock.mockResolvedValueOnce(
+      Response.json([
+        {
+          id: "44444444-4444-4444-8444-444444444444",
+          topic_id: topic,
+          title: "Introduction",
+          youtube_id: "dQw4w9WgXcQ",
+          is_published: true,
+        },
+      ]),
+    );
+    const preview = await getCoursePreviewCurriculum("registered-token", course);
+    expect(preview?.topics[0]?.title).toBe("Measurements");
+    expect(preview?.videos).toHaveLength(1);
+    expect(preview).not.toHaveProperty("quizzes");
+    expect(preview).not.toHaveProperty("questions");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const endpoints = fetchMock.mock.calls.map((call) => String(call[0]));
+    expect(endpoints.every((url) => !url.includes("risa_quiz"))).toBe(true);
+    expect(endpoints.every((url) => url.includes("is_published=eq.true"))).toBe(true);
+  });
+
+  it("does not return a preview on invalid or denied course content", async () => {
+    expect(await getCoursePreviewCurriculum("jwt", "invalid")).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
+    expect(await getCoursePreviewCurriculum("jwt", course)).toBeNull();
+    fetchMock.mockResolvedValueOnce(Response.json([]));
+    expect(await getCoursePreviewCurriculum("jwt", course)).toEqual({
+      topics: [],
+      videos: [],
+    });
   });
 });

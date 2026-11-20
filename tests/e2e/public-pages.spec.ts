@@ -79,7 +79,7 @@ test("landing page displays published course section and links to project inform
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Explore our courses" })).toBeVisible();
   await expect(
-    page.getByText("Student accounts provide portal access only;"),
+    page.getByText("Registered learners can preview course topics and request"),
   ).toBeVisible();
   await page.getByRole("link", { name: "Discover RISA" }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
@@ -94,7 +94,9 @@ test("site search finds published course navigation", async ({ page }) => {
   await search.getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search\?q=courses$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Search RISA");
-  await expect(page.getByRole("link", { name: /Programmes/ })).toBeVisible();
+  await expect(
+    page.getByRole("main").getByRole("link", { name: /Page Programmes/ }),
+  ).toBeVisible();
 });
 
 test("site search handles unmatched keywords", async ({ page }) => {
@@ -113,10 +115,12 @@ test("mobile header opens search only when its icon is tapped", async ({ page })
   await page.getByRole("button", { name: "Open search" }).click();
   const search = page.getByRole("search");
   await expect(search).toBeVisible();
-  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("physics");
+  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("courses");
   await search.getByRole("button", { name: "Search" }).click();
-  await expect(page).toHaveURL(/\/search\?q=physics$/);
-  await expect(page.getByRole("link", { name: /Physics & Measurement/ })).toBeVisible();
+  await expect(page).toHaveURL(/\/search\?q=courses$/);
+  await expect(
+    page.getByRole("main").getByRole("link", { name: /Page Programmes/ }),
+  ).toBeVisible();
 });
 
 test("mobile menu opens a sidebar and closes after navigation", async ({ page }) => {
@@ -148,7 +152,7 @@ test("navigation links use larger Outfit SemiBold text on desktop and mobile", a
   const desktopLink = page
     .getByRole("navigation", { name: "Primary navigation" })
     .getByRole("link", { name: "Home" });
-  await expect(desktopLink).toHaveCSS("font-family", /Outfit/);
+  await expect(desktopLink).toHaveCSS("font-family", /Plus Jakarta Sans/);
   await expect(desktopLink).toHaveCSS("font-size", "16px");
   await expect(desktopLink).toHaveCSS("font-weight", "600");
 
@@ -157,7 +161,7 @@ test("navigation links use larger Outfit SemiBold text on desktop and mobile", a
   const mobileLink = page
     .getByRole("navigation", { name: "Mobile navigation" })
     .getByRole("link", { name: "Home" });
-  await expect(mobileLink).toHaveCSS("font-family", /Outfit/);
+  await expect(mobileLink).toHaveCSS("font-family", /Plus Jakarta Sans/);
   await expect(mobileLink).toHaveCSS("font-size", "18px");
   await expect(mobileLink).toHaveCSS("font-weight", "600");
 });
@@ -289,4 +293,15 @@ test("RISA section animates original black liquid and green sphere without chang
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(animatedLogo).toBeVisible();
+});
+
+test("course preview and enrolment review require verified accounts", async ({
+  page,
+}) => {
+  const courseId = "11111111-1111-4111-8111-111111111111";
+  await page.goto("/students/courses/" + courseId);
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+
+  await page.goto("/admin/enrolment-requests");
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
