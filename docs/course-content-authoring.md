@@ -28,11 +28,27 @@ Course creation, enrolment status and private file access remain unchanged.
 ## Learner experience
 
 Under **My Learning → Courses you're enrolled in**, learners can select
-**Open lessons and quizzes**. The course page displays the published topics,
-embedded YouTube video lessons and multiple-choice practice questions.
+**Open lessons and quizzes**. The first course screen now follows the
+Edu-ca-te topic-card pattern: a responsive **grid of topic cards**, each
+showing the official YouTube thumbnail of the **first published video**,
+real lesson count, optional quiz count, title and description. No fictitious
+progress data is displayed; topics without a video get a neutral illustration.
+
+Selecting a topic opens `/students/courses/<course-id>/topics/<topic-id>`.
+Its embedded YouTube player stays **on the RISA website** with a selectable
+video thumbnail playlist and next/previous controls, followed by the topic's
+practice quizzes. Video selection updates the embedded player without
+redirecting learners to YouTube.
+
+The same embedded preview replaces outbound YouTube links in the **admin
+topic editor**, so staff can review lessons without leaving RISA.
 
 For privacy, embeds use `https://www.youtube-nocookie.com/embed/` and the
-Content Security Policy allows only that iframe origin.
+Content Security Policy allows only that iframe origin. YouTube topic covers
+use `https://img.youtube.com/vi/<video-id>/hqdefault.jpg`, with a fallback
+when an image is missing. Playback still depends on the YouTube owner's embed
+permissions and third-party network availability; embedded playback cannot
+override restrictions set by the content owner.
 
 **Quiz scope in this release:** Learners can select and review their answers
 locally, but answers are **not submitted, graded, or stored**. The answer
