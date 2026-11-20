@@ -25,6 +25,22 @@ const securityHeaders = [
   },
 ] as const;
 
+// COEP is enforced only on pages without third-party media or remote public
+// course thumbnails. A global require-corp policy can block YouTube iframes and
+// Supabase images, so expand this list only after browser compatibility tests.
+const coepProtectedRoutes = [
+  "/about",
+  "/contact",
+  "/students/login",
+  "/students/register",
+  "/students/privacy",
+] as const;
+
+const coepHeader = {
+  key: "Cross-Origin-Embedder-Policy",
+  value: "require-corp",
+} as const;
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Profile forms allow images up to 2 MB; Server Actions default to 1 MB.
@@ -43,6 +59,10 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [...securityHeaders],
       },
+      ...coepProtectedRoutes.map((source) => ({
+        source,
+        headers: [coepHeader],
+      })),
     ];
   },
 };
