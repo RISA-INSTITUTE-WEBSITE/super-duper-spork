@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { HeaderProfileLink, type HeaderUser } from "@/components/header-profile-link";
 import { MobileNavigation } from "@/components/mobile-navigation";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import { studentCookieNames } from "@/lib/student-session";
 
 const navigation = [
@@ -42,6 +43,7 @@ async function getHeaderUser(): Promise<HeaderUser | null> {
   return {
     fullName: identity.fullName,
     initials,
+    isAdmin: await isRisaAdministrator(token, identity.id),
     avatarUrl: identity.avatarPath
       ? "/students/avatar?updated=" + encodeURIComponent(identity.updatedAt ?? "")
       : null,
@@ -126,9 +128,21 @@ export async function SiteHeader() {
               </li>
             ))}
             {user ? (
-              <li className="ml-2 flex items-center">
-                <HeaderProfileLink user={user} />
-              </li>
+              <>
+                {user.isAdmin && (
+                  <li>
+                    <Link
+                      href="/admin"
+                      className="inline-flex min-h-11 items-center rounded-xl bg-[#eefce5] px-3 py-2 text-sm font-bold text-[#286518] transition hover:bg-[#daf4c6] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
+                    >
+                      Admin
+                    </Link>
+                  </li>
+                )}
+                <li className="ml-2 flex items-center">
+                  <HeaderProfileLink user={user} />
+                </li>
+              </>
             ) : (
               <>
                 <li>

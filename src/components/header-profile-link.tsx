@@ -5,6 +5,7 @@ export type HeaderUser = {
   fullName: string;
   initials: string;
   avatarUrl: string | null;
+  isAdmin: boolean;
 };
 
 export function HeaderProfileLink({ user }: { user: HeaderUser }) {

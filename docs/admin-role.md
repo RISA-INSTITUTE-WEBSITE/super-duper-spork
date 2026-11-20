@@ -8,6 +8,25 @@ RISA now supports two levels of access:
   in `public.risa_user_roles` may access `/admin` and manage RISA course,
   enrolment, and exercise records.
 
+## Administrators who are also learners
+
+An administrator can enrol in courses and use the learner dashboard with the
+**same account**. There is no separate administrator login and no need to sign
+out or change roles:
+
+- After signing in, authorized administrators can open the Administration
+  Centre. On every page, a verified administrator also sees an **Admin** link
+  in the desktop header or **Administration Centre** in the mobile menu.
+- Selecting the round profile photo continues to open **My Learning**.
+- **My Learning** shows an administrator-only **Administration Centre** link,
+  while the Administration Centre includes a **My Learning** shortcut.
+- Learners without an explicit grant do not see administrator shortcuts and
+  are still blocked from `/admin` by server checks and database RLS.
+
+Navigation visibility is based on a live, server-side query for a verified
+Supabase user and the database role record. UI links are not a security boundary;
+course writes remain subject to authorization checks and RLS.
+
 The admin role is **not** granted by signup, learner profile metadata, email
 address, client-side code, or editable JWT claims. Server access is checked
 against the signed-in identity and current database role membership.

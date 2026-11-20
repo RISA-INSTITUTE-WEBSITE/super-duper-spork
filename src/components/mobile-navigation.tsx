@@ -268,6 +268,17 @@ export function MobileNavigation({ user }: { user: HeaderUser | null }) {
                         My Learning
                       </Link>
                     </li>
+                    {user.isAdmin && (
+                      <li>
+                        <Link
+                          href="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex min-h-12 items-center rounded-xl bg-[#eefce5] px-4 py-3 font-heading text-lg font-semibold text-[#286518] transition hover:bg-[#daf4c6]"
+                        >
+                          Administration Centre
+                        </Link>
+                      </li>
+                    )}
                     <li>
                       <Link
                         href="/students/profile"
