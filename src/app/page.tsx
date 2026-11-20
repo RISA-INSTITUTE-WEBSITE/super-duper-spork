@@ -97,10 +97,6 @@ export default async function HomePage() {
               >
                 Explore our courses
               </h2>
-              <p className="mt-4 leading-7 text-slate-600">
-                Browse the courses published by RISA administrators. Each course shows its
-                institutional code, academic level and course overview.
-              </p>
             </div>
             <Link
               href="/programmes"

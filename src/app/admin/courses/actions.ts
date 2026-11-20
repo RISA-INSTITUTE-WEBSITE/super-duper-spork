@@ -8,7 +8,6 @@ import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
   courseIdPattern,
   createRisaCourse,
-  getRisaCourseByCode,
   getRisaCourseById,
   isValidCourseThumbnail,
   removeRisaCourseThumbnail,
@@ -57,36 +56,6 @@ function refreshCoursePages(courseId?: string) {
   }
 }
 
-/** Thumbnail failure never makes an already-created course disappear. */
-async function saveInitialThumbnail({
-  token,
-  code,
-  level,
-  image,
-}: {
-  token: string;
-  code: string;
-  level: string;
-  image: File;
-}): Promise<boolean> {
-  const course = await getRisaCourseByCode(token, code);
-  if (!course) {
-    return false;
-  }
-  const path = await uploadRisaCourseThumbnail(token, course.id, image);
-  if (!path) {
-    return false;
-  }
-  const saved = await updateRisaCoursePresentation(token, course.id, {
-    level,
-    thumbnailPath: path,
-  });
-  if (!saved) {
-    await removeRisaCourseThumbnail(token, path);
-  }
-  return saved;
-}
-
 function newCourseFromForm(formData: FormData): ReturnType<typeof validateNewRisaCourse> {
   return validateNewRisaCourse({
     code: String(formData.get("code") ?? ""),
@@ -114,34 +83,34 @@ export async function createCourseAction(
   }
 
   const thumbnail = formThumbnail(formData);
-  if (thumbnail && !isValidCourseThumbnail(thumbnail)) {
+  if (!thumbnail) {
+    return error("Choose a course thumbnail before creating the course.");
+  }
+  if (!isValidCourseThumbnail(thumbnail)) {
     return error("Upload a JPG, PNG or WebP image no larger than 2 MB.");
   }
 
-  const outcome = await createRisaCourse(token, input);
-  if (outcome === "duplicate") {
-    return error("This course code is already in use. Choose a different unique code.");
-  }
-  if (outcome !== "created") {
-    return error("Course creation failed. Check your permissions and try again.");
+  // Upload first, so the course and its presentation metadata are saved
+  // together. A failed image upload never creates a thumbnail-less course.
+  const courseId = crypto.randomUUID();
+  const thumbnailPath = await uploadRisaCourseThumbnail(token, courseId, thumbnail);
+  if (!thumbnailPath) {
+    return error("Thumbnail upload failed. No course was created. Please retry.");
   }
 
-  const thumbnailSaved = thumbnail
-    ? await saveInitialThumbnail({
-        token,
-        code: input.code,
-        level: input.level,
-        image: thumbnail,
-      })
-    : true;
-  refreshCoursePages();
+  const outcome = await createRisaCourse(token, input, { courseId, thumbnailPath });
+  if (outcome !== "created") {
+    await removeRisaCourseThumbnail(token, thumbnailPath);
+    if (outcome === "duplicate") {
+      return error("This course code is already in use. Choose a different unique code.");
+    }
+    return error("Course creation failed. No course was created. Please retry.");
+  }
+
+  refreshCoursePages(courseId);
   return {
     status: "success",
-    message: thumbnailSaved
-      ? "Course " + input.code + " created successfully."
-      : "Course " +
-        input.code +
-        " created, but its thumbnail could not be saved. Retry from Edit course.",
+    message: "Course " + input.code + " created successfully.",
   };
 }
 
