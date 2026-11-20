@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
 import { AdminCreateCourseForm } from "@/components/admin-create-course-form";
+import { AdminEditCourseForm } from "@/components/admin-edit-course-form";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
-import { getRisaAdminCourses, type RisaCourse } from "@/lib/risa-course-admin";
+import { getRisaAdminCourses, risaThumbnailUrl, type RisaCourse } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
 export const dynamic = "force-dynamic";
@@ -65,8 +67,27 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
               {course.is_published ? "Published" : "Draft"}
             </span>
           </div>
-          <h3 className="mt-5 font-heading text-lg font-bold text-slate-950">
-            {course.title}
+          <div className="relative mt-5 aspect-video overflow-hidden rounded-xl bg-gradient-to-br from-[#dbeafe] via-white to-[#eefce5]">
+            {risaThumbnailUrl(course.thumbnail_path) ? (
+              <Image
+                src={risaThumbnailUrl(course.thumbnail_path)!}
+                alt={course.title + " course thumbnail"}
+                fill
+                unoptimized
+                sizes="(max-width: 768px) 100vw, 33vw"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex size-full items-center justify-center font-mono text-3xl font-black text-[#155DFC]/35">
+                {course.code}
+              </div>
+            )}
+          </div>
+          <p className="mt-4 w-fit rounded-full bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
+            {course.level}
+          </p>
+          <h3 className="mt-4 font-heading text-lg font-bold text-slate-950">
+            {course.code} — {course.title}
           </h3>
           <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">
             {course.description || "Course overview not added yet."}
@@ -77,6 +98,10 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
           >
             Manage topics, videos &amp; quizzes →
           </Link>
+          <AdminEditCourseForm
+            courseId={course.id}
+            initialLevel={course.level}
+          />
           <p className="mt-5 border-t border-white pt-4 text-xs text-slate-500">
             {course.is_published
               ? "Visible to enrolled learners"
