@@ -213,9 +213,19 @@ describe("public RISA catalogue and course presentation", () => {
   it("validates admin levels and image format before saving", () => {
     expect(validateCourseLevel(" 2nd   Year Level ")).toBe("2nd Year Level");
     expect(validateCourseLevel("<script>")).toBeNull();
-    expect(isValidCourseThumbnail(new File(["x"], "course.png", { type: "image/png" }))).toBe(true);
-    expect(isValidCourseThumbnail(new File(["x"], "course.svg", { type: "image/svg+xml" }))).toBe(false);
-    expect(isValidCourseThumbnail(new File([new Uint8Array(2 * 1024 * 1024 + 1)], "huge.jpg", { type: "image/jpeg" }))).toBe(false);
+    expect(
+      isValidCourseThumbnail(new File(["x"], "course.png", { type: "image/png" })),
+    ).toBe(true);
+    expect(
+      isValidCourseThumbnail(new File(["x"], "course.svg", { type: "image/svg+xml" })),
+    ).toBe(false);
+    expect(
+      isValidCourseThumbnail(
+        new File([new Uint8Array(2 * 1024 * 1024 + 1)], "huge.jpg", {
+          type: "image/jpeg",
+        }),
+      ),
+    ).toBe(false);
   });
 
   it("patches only the approved course presentation columns", async () => {
@@ -234,9 +244,16 @@ describe("public RISA catalogue and course presentation", () => {
   });
 
   it("rejects unsafe image paths and malformed course IDs before any API call", async () => {
-    expect(await updateRisaCoursePresentation("jwt", "bad", "1st Year Level")).toBe(false);
+    expect(await updateRisaCoursePresentation("jwt", "bad", "1st Year Level")).toBe(
+      false,
+    );
     expect(
-      await updateRisaCoursePresentation("jwt", courseId, "1st Year Level", "https://evil.example/test.png"),
+      await updateRisaCoursePresentation(
+        "jwt",
+        courseId,
+        "1st Year Level",
+        "https://evil.example/test.png",
+      ),
     ).toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -244,7 +261,8 @@ describe("public RISA catalogue and course presentation", () => {
   it("constructs thumbnail URLs only for the managed storage path", () => {
     const path = courseId + "/22222222-2222-4222-8222-222222222222.webp";
     expect(risaThumbnailUrl(path)).toBe(
-      "https://example.supabase.co/storage/v1/object/public/risa-course-thumbnails/" + path,
+      "https://example.supabase.co/storage/v1/object/public/risa-course-thumbnails/" +
+        path,
     );
     expect(risaThumbnailUrl("https://external.example/cat.png")).toBeNull();
   });

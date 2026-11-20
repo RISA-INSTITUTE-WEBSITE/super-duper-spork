@@ -8,7 +8,11 @@ import { AdminCreateCourseForm } from "@/components/admin-create-course-form";
 import { AdminEditCourseForm } from "@/components/admin-edit-course-form";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
-import { getRisaAdminCourses, risaThumbnailUrl, type RisaCourse } from "@/lib/risa-course-admin";
+import {
+  getRisaAdminCourses,
+  risaThumbnailUrl,
+  type RisaCourse,
+} from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
 export const dynamic = "force-dynamic";
@@ -98,10 +102,7 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
           >
             Manage topics, videos &amp; quizzes →
           </Link>
-          <AdminEditCourseForm
-            courseId={course.id}
-            initialLevel={course.level}
-          />
+          <AdminEditCourseForm courseId={course.id} initialLevel={course.level} />
           <p className="mt-5 border-t border-white pt-4 text-xs text-slate-500">
             {course.is_published
               ? "Visible to enrolled learners"

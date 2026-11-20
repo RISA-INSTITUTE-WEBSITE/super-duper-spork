@@ -71,8 +71,7 @@ export function AdminEditCourseForm({
           <p
             role={state.status === "error" ? "alert" : "status"}
             className={
-              "text-sm " +
-              (state.status === "error" ? "text-red-700" : "text-green-800")
+              "text-sm " + (state.status === "error" ? "text-red-700" : "text-green-800")
             }
           >
             {state.message}

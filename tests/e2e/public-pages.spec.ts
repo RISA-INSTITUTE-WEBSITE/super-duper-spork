@@ -38,7 +38,9 @@ test("course areas come directly after the four-photo hero", async ({ page }) =>
     "vision-mission-heading",
   );
   await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "philosophy-heading");
-  await expect(sections.nth(1).getByRole("heading", { name: "Explore our courses" })).toBeVisible();
+  await expect(
+    sections.nth(1).getByRole("heading", { name: "Explore our courses" }),
+  ).toBeVisible();
 });
 
 test("primary navigation works", async ({ page }) => {
@@ -75,9 +77,7 @@ test("landing page displays published course section and links to project inform
 }) => {
   // QA-E2E-05: avoid suggesting that enrollment and applications are live.
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: "Explore our courses" }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Explore our courses" })).toBeVisible();
   await expect(
     page.getByText("Student accounts provide portal access only;"),
   ).toBeVisible();

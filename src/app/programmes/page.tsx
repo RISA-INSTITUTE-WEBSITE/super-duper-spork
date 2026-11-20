@@ -14,7 +14,10 @@ export default async function ProgrammesPage() {
   const courses = await getPublicRisaCourses();
 
   return (
-    <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-5 py-14 sm:px-8">
+    <main
+      id="main-content"
+      className="mx-auto w-full max-w-7xl flex-1 px-5 py-14 sm:px-8"
+    >
       <p className="font-semibold uppercase tracking-widest text-blue-800">
         RISA / Course catalogue
       </p>
@@ -25,7 +28,10 @@ export default async function ProgrammesPage() {
       </p>
 
       {courses === null ? (
-        <p role="status" className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+        <p
+          role="status"
+          className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900"
+        >
           Course information is temporarily unavailable. Please try again later.
         </p>
       ) : courses.length === 0 ? (
@@ -66,7 +72,8 @@ export default async function ProgrammesPage() {
                   </span>
                   <h2 className="mt-5 text-xl font-bold text-slate-950">
                     <span className="font-mono text-[#286518]">{course.code}</span>
-                    {" — "}{course.title}
+                    {" — "}
+                    {course.title}
                   </h2>
                   <p className="mt-4 text-sm leading-7 text-slate-600">
                     {course.description || "Course details will be added by RISA."}

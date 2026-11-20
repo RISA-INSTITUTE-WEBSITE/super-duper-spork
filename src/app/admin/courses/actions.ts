@@ -67,7 +67,8 @@ export async function createCourseAction(
   if (!input) {
     return {
       status: "error",
-      message: "Enter a valid course code, title, academic level and overview (up to 1,200 characters).",
+      message:
+        "Enter a valid course code, title, academic level and overview (up to 1,200 characters).",
     };
   }
 

@@ -103,8 +103,8 @@ export default async function HomePage() {
                 Explore our courses
               </h2>
               <p className="mt-4 leading-7 text-slate-600">
-                Browse the courses published by RISA administrators. Each course shows
-                its institutional code, academic level and course overview.
+                Browse the courses published by RISA administrators. Each course shows its
+                institutional code, academic level and course overview.
               </p>
             </div>
             <Link
@@ -116,7 +116,10 @@ export default async function HomePage() {
           </div>
 
           {courses === null ? (
-            <p role="status" className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+            <p
+              role="status"
+              className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
+            >
               The course catalogue is temporarily unavailable. Please try again shortly.
             </p>
           ) : courses.length === 0 ? (

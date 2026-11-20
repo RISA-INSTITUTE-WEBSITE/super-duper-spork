@@ -41,7 +41,6 @@ const pages = [
   },
 ] as const;
 
-
 export default async function SearchPage({
   searchParams,
 }: {

@@ -1,7 +1,4 @@
-import {
-  requestPublicCourseCatalogue,
-  requestStudentBackend,
-} from "./student-auth-api";
+import { requestPublicCourseCatalogue, requestStudentBackend } from "./student-auth-api";
 
 export const courseCodePattern = /^[A-Z0-9]{3,16}(-[A-Z0-9]{2,8})?$/;
 export const courseIdPattern = /^[0-9a-f]{8}-[0-9a-f-]{27}$/i;
@@ -14,8 +11,7 @@ export const courseLevels = [
   "Postgraduate Level",
   "Professional Level",
 ] as const;
-const thumbnailPathPattern =
-  /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:png|jpg|webp)$/;
+const thumbnailPathPattern = /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(?:png|jpg|webp)$/;
 const thumbnailTypes: Record<string, string> = {
   "image/jpeg": "jpg",
   "image/png": "png",
@@ -41,9 +37,7 @@ export type CreateCourseResult = "created" | "duplicate" | "unavailable";
 
 export function validateCourseLevel(input: string): string | null {
   const level = input.trim().replace(/\s+/g, " ");
-  return /^[A-Za-z0-9][A-Za-z0-9 .&'()-]{2,49}$/.test(level)
-    ? level
-    : null;
+  return /^[A-Za-z0-9][A-Za-z0-9 .&'()-]{2,49}$/.test(level) ? level : null;
 }
 
 /** Institutional codes, titles and levels are revalidated before every write. */
@@ -180,9 +174,7 @@ export async function getRisaAdminCourses(token: string): Promise<RisaCourse[] |
   return readCourses(
     await requestStudentBackend(
       token,
-      "/rest/v1/risa_courses?select=" +
-        courseFields +
-        "&order=created_at.desc&limit=100",
+      "/rest/v1/risa_courses?select=" + courseFields + "&order=created_at.desc&limit=100",
     ),
   );
 }
@@ -197,11 +189,7 @@ export async function getRisaCourseById(
   const courses = await readCourses(
     await requestStudentBackend(
       token,
-      "/rest/v1/risa_courses?select=" +
-        courseFields +
-        "&id=eq." +
-        courseId +
-        "&limit=1",
+      "/rest/v1/risa_courses?select=" + courseFields + "&id=eq." + courseId + "&limit=1",
     ),
   );
   return courses?.[0] ?? null;
@@ -217,11 +205,7 @@ export async function getRisaCourseByCode(
   const courses = await readCourses(
     await requestStudentBackend(
       token,
-      "/rest/v1/risa_courses?select=" +
-        courseFields +
-        "&code=eq." +
-        code +
-        "&limit=1",
+      "/rest/v1/risa_courses?select=" + courseFields + "&code=eq." + code + "&limit=1",
     ),
   );
   return courses?.[0] ?? null;
@@ -324,11 +308,7 @@ export function risaThumbnailUrl(path: string | null): string | null {
     ) {
       return null;
     }
-    return (
-      url.origin +
-      "/storage/v1/object/public/risa-course-thumbnails/" +
-      path
-    );
+    return url.origin + "/storage/v1/object/public/risa-course-thumbnails/" + path;
   } catch {
     return null;
   }
