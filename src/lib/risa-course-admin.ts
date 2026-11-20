@@ -107,16 +107,19 @@ function parseRisaCourse(entry: unknown): RisaCourse | null {
     return null;
   }
   const row = entry as Record<string, unknown>;
+  const stringFields = [
+    "id",
+    "code",
+    "slug",
+    "title",
+    "description",
+    "created_at",
+    "level",
+  ];
   if (
-    typeof row.id !== "string" ||
-    typeof row.code !== "string" ||
-    typeof row.slug !== "string" ||
-    typeof row.title !== "string" ||
-    typeof row.description !== "string" ||
-    typeof row.created_at !== "string" ||
+    stringFields.some((field) => typeof row[field] !== "string") ||
     typeof row.is_published !== "boolean" ||
-    typeof row.level !== "string" ||
-    !validateCourseLevel(row.level)
+    !validateCourseLevel(String(row.level))
   ) {
     return null;
   }
@@ -127,14 +130,14 @@ function parseRisaCourse(entry: unknown): RisaCourse | null {
       : null;
 
   return {
-    id: row.id,
-    code: row.code,
-    slug: row.slug,
-    title: row.title,
-    description: row.description,
-    level: row.level,
-    is_published: row.is_published,
-    created_at: row.created_at,
+    id: row.id as string,
+    code: row.code as string,
+    slug: row.slug as string,
+    title: row.title as string,
+    description: row.description as string,
+    level: row.level as string,
+    is_published: row.is_published as boolean,
+    created_at: row.created_at as string,
     thumbnail_path: thumbnail,
   };
 }
@@ -259,10 +262,10 @@ export async function removeRisaCourseThumbnail(
 export async function updateRisaCoursePresentation(
   token: string,
   courseId: string,
-  levelInput: string,
-  thumbnailPath?: string,
+  changes: { level: string; thumbnailPath?: string },
 ): Promise<boolean> {
-  const level = validateCourseLevel(levelInput);
+  const level = validateCourseLevel(changes.level);
+  const thumbnailPath = changes.thumbnailPath;
   if (
     !courseIdPattern.test(courseId) ||
     !level ||
