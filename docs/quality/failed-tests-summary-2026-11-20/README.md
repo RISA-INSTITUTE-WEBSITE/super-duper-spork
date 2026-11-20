@@ -15,19 +15,19 @@ Tests scheduled **after ZAP** did not run. A skipped test is **not a passed test
 
 ## 2. Which tests failed, warned, passed, or did not run?
 
-| Test/check | Result in CI #612 | Meaning in plain English |
-| --- | --- | --- |
-| OWASP ZAP active website scan | **Failed as a CI step** (exit 2; five warning categories) | The scanner saw settings or pages worth investigating; it did not report a confirmed high-severity exploit in this run. |
-| Dependency licence audit | **Underlying command failed** (exit 1; temporarily non-blocking) | Twelve installed package entries had licences outside the script's small approved list. This is primarily a compliance decision, not a vulnerability finding. |
-| Dependency vulnerability audit (`npm audit --audit-level=high`) | **Passed** | NPM reported zero known vulnerabilities at the time of this run. |
-| Gitleaks full-history secrets scan | **Passed** | The scan reported no exposed secrets in the scanned Git history (488 commits); this does not guarantee all secrets are absent everywhere. |
-| Semgrep source-code security rules | **Passed** | The configured local rules produced no blocking finding; coverage is limited to those rules and scanned paths. |
-| HTTP routes and response-header smoke test | **Passed** | Selected pages and basic headers worked; this test does not check every security-header policy detail. |
-| Infrastructure-as-code (Checkov) | **Not applicable / no scan executed** | The workflow did not find Docker, Terraform, or Kubernetes deployment files to inspect. |
-| Formatting, lint/typecheck, build, unit coverage | **Passed** | The checked code built and met the current automated requirements; lint did emit one non-blocking warning. |
-| Playwright browser tests | **Skipped** | ZAP failed first, so the browser tests were not reached. No current pass/fail conclusion follows. |
-| Node.js 24 portability/build tests | **Skipped** | These tests were also not reached after the ZAP failure. |
-| Separate RISA Coding Standards CI | **Passed** | That other workflow was successful for the reviewed pull-request commit. |
+| Test/check                                                      | Result in CI #612                                                | Meaning in plain English                                                                                                                                      |
+| --------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OWASP ZAP active website scan                                   | **Failed as a CI step** (exit 2; five warning categories)        | The scanner saw settings or pages worth investigating; it did not report a confirmed high-severity exploit in this run.                                       |
+| Dependency licence audit                                        | **Underlying command failed** (exit 1; temporarily non-blocking) | Twelve installed package entries had licences outside the script's small approved list. This is primarily a compliance decision, not a vulnerability finding. |
+| Dependency vulnerability audit (`npm audit --audit-level=high`) | **Passed**                                                       | NPM reported zero known vulnerabilities at the time of this run.                                                                                              |
+| Gitleaks full-history secrets scan                              | **Passed**                                                       | The scan reported no exposed secrets in the scanned Git history (488 commits); this does not guarantee all secrets are absent everywhere.                     |
+| Semgrep source-code security rules                              | **Passed**                                                       | The configured local rules produced no blocking finding; coverage is limited to those rules and scanned paths.                                                |
+| HTTP routes and response-header smoke test                      | **Passed**                                                       | Selected pages and basic headers worked; this test does not check every security-header policy detail.                                                        |
+| Infrastructure-as-code (Checkov)                                | **Not applicable / no scan executed**                            | The workflow did not find Docker, Terraform, or Kubernetes deployment files to inspect.                                                                       |
+| Formatting, lint/typecheck, build, unit coverage                | **Passed**                                                       | The checked code built and met the current automated requirements; lint did emit one non-blocking warning.                                                    |
+| Playwright browser tests                                        | **Skipped**                                                      | ZAP failed first, so the browser tests were not reached. No current pass/fail conclusion follows.                                                             |
+| Node.js 24 portability/build tests                              | **Skipped**                                                      | These tests were also not reached after the ZAP failure.                                                                                                      |
+| Separate RISA Coding Standards CI                               | **Passed**                                                       | That other workflow was successful for the reviewed pull-request commit.                                                                                      |
 
 ## 3. Each OWASP ZAP warning, explained simply
 
@@ -56,6 +56,7 @@ The broad `https:` image permission is relevant to the wildcard/scheme warning. 
 **What it means:** CSRF is when another website tricks a signed-in browser into submitting an unwanted request. A traditional defence is a special anti-CSRF token in the form.
 
 **Code to inspect:**
+
 - [`src/app/students/login/page.tsx` line 78](../../../src/app/students/login/page.tsx#L78) uses `<form action={signInStudent}>`.
 - [`src/components/student-registration-form.tsx` line 37](../../../src/components/student-registration-form.tsx#L37) uses `<form action={registerStudent}>`.
 - [`src/app/students/actions.ts` lines 23–93](../../../src/app/students/actions.ts#L23-L93) contains the registration and sign-in Server Actions.
@@ -86,6 +87,7 @@ HTTP response: 404 Not Found
 ```
 
 **Code to inspect:**
+
 - [`src/components/hero-photo-background.tsx` lines 4–8](../../../src/components/hero-photo-background.tsx#L4-L8) lists `"/images/risa-home/devops.png"`.
 - [`src/components/hero-photo-background.tsx` lines 23–35](../../../src/components/hero-photo-background.tsx#L23-L35) renders the photo using Next.js `<Image>`.
 - [`next.config.ts` lines 35–38](../../../next.config.ts#L35-L38) controls allowed remote image sources.
@@ -121,16 +123,17 @@ HTTP response: 404 Not Found
 
 **Log evidence:** The script found **12 flagged installed entries out of 413** and exited with **1**. These include repeated package/platform variants:
 
-| Packages/family | Licence declaration requiring review |
-| --- | --- |
-| `@img/sharp-libvips-linux*` | LGPL-3.0-or-later |
-| `@img/sharp-wasm32` | Apache-2.0 AND LGPL-3.0-or-later AND MIT |
-| `lightningcss*` | MPL-2.0 |
-| `axe-core` | MPL-2.0 |
-| `caniuse-lite` | CC-BY-4.0 |
-| `argparse` | Python-2.0 |
+| Packages/family             | Licence declaration requiring review     |
+| --------------------------- | ---------------------------------------- |
+| `@img/sharp-libvips-linux*` | LGPL-3.0-or-later                        |
+| `@img/sharp-wasm32`         | Apache-2.0 AND LGPL-3.0-or-later AND MIT |
+| `lightningcss*`             | MPL-2.0                                  |
+| `axe-core`                  | MPL-2.0                                  |
+| `caniuse-lite`              | CC-BY-4.0                                |
+| `argparse`                  | Python-2.0                               |
 
 **Code to inspect:**
+
 - [`scripts/quality/license-audit.mjs` lines 15–25](../../../scripts/quality/license-audit.mjs#L15-L25) contains the short list of accepted licence IDs.
 - [`scripts/quality/license-audit.mjs` lines 95–104](../../../scripts/quality/license-audit.mjs#L95-L104) prints the flagged entries and exits with failure.
 - [`.github/workflows/website-ci.yml` lines 65–90](../../../.github/workflows/website-ci.yml#L65-L90) runs the audit with `continue-on-error: true` and emits a warning instead of blocking later steps.
