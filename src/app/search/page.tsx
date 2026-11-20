@@ -50,7 +50,7 @@ export default async function SearchPage({
   const params = await searchParams;
   const value = typeof params.q === "string" ? params.q : "";
   const query = value.trim().slice(0, 100);
-  const terms = query.toLowerCase().split(/\\s+/).filter(Boolean);
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   const courses = await getPublicRisaCourses();
   const entries = [
     ...pages,
