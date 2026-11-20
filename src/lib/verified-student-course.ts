@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
-import { getCourseCurriculum } from "@/lib/risa-course-curriculum";
-import { getRisaCourseById } from "@/lib/risa-course-admin";
-import { getEnrolledCourses } from "@/lib/student-learning-api";
-import { studentCookieNames } from "@/lib/student-session";
+import { getStudentIdentity, isStudentAuthConfigured } from "./student-auth-api";
+import { getCourseCurriculum } from "./risa-course-curriculum";
+import { getRisaCourseById } from "./risa-course-admin";
+import { getEnrolledCourses } from "./student-learning-api";
+import { studentCookieNames } from "./student-session";
 
 /**
  * Every learner course page verifies the Supabase session and checks enrolled,
