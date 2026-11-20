@@ -25,6 +25,32 @@ and the lesson or quiz is published.
 The Administration Centre uses RISA's existing Crystal Glass styling.
 Course creation, enrolment status and private file access remain unchanged.
 
+## Topic thumbnails and inline YouTube playback
+
+As on Edu-ca-te, each course topic has a visual card whose main image is
+the **first published video's official YouTube thumbnail**. Below the topic
+are up to three additional clickable lesson thumbnails, the topic title and
+the true number of videos and quizzes. If no lesson exists, a RISA-branded
+illustrated fallback replaces the thumbnail. No completion percentage is
+shown until RISA implements actual progress tracking.
+
+Selecting a topic displays its video playlist and an **embedded YouTube
+player within the same RISA learner page**. Selecting a lesson thumbnail
+switches that player without opening a new tab or sending the learner to a
+YouTube watch URL. The existing practice quizzes remain within the topic.
+
+Admins use the same in-page player and thumbnail selector to preview
+videos inside the course content editor, replacing the previous external
+YouTube links.
+
+Thumbnails load from the official `i.ytimg.com/vi/<ID>/hqdefault.jpg`
+endpoint. Video playback uses the privacy-enhanced
+`www.youtube-nocookie.com/embed/<ID>` endpoint, which is already
+permitted by RISA's narrow Content Security Policy. Only validated
+11-character YouTube IDs may generate media URLs. YouTube may still
+display its own branding and restrict embedding when video-owner settings
+do not allow it; RISA cannot override those YouTube rules.
+
 ## Learner experience
 
 Under **My Learning → Courses you're enrolled in**, learners can select

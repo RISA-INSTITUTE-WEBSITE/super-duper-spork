@@ -33,6 +33,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "3mb",
     },
   },
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" }],
+  },
   poweredByHeader: false,
   async headers() {
     return [

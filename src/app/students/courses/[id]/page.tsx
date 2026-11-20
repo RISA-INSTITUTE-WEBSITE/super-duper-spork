@@ -3,13 +3,9 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { StudentPracticeQuiz } from "@/components/student-practice-quiz";
+import { StudentCourseContent } from "@/components/student-course-content";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
-import {
-  getCourseCurriculum,
-  type CourseCurriculum,
-  type CourseTopic,
-} from "@/lib/risa-course-curriculum";
+import { getCourseCurriculum } from "@/lib/risa-course-curriculum";
 import { getRisaCourseById } from "@/lib/risa-course-admin";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
@@ -20,73 +16,6 @@ export const metadata: Metadata = {
   title: "Course lessons | My Learning",
   robots: { index: false, follow: false },
 };
-
-function StudentTopic({
-  topic,
-  curriculum,
-}: {
-  topic: CourseTopic;
-  curriculum: CourseCurriculum;
-}) {
-  const videos = curriculum.videos.filter((item) => item.topic_id === topic.id);
-  const quizzes = curriculum.quizzes.filter((item) => item.topic_id === topic.id);
-
-  return (
-    <section className="risa-glass-card rounded-[1.75rem] p-6 sm:p-8">
-      <h2 className="font-heading text-2xl font-bold text-slate-950">{topic.title}</h2>
-      {topic.description && (
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          {topic.description}
-        </p>
-      )}
-      {videos.length > 0 && (
-        <div className="mt-7 space-y-6">
-          <h3 className="font-heading text-lg font-bold text-slate-950">Video lessons</h3>
-          {videos.map((video) => (
-            <article
-              key={video.id}
-              className="overflow-hidden rounded-[1.3rem] border border-white bg-white/90"
-            >
-              <div className="aspect-video w-full bg-slate-950">
-                <iframe
-                  src={"https://www.youtube-nocookie.com/embed/" + video.youtube_id}
-                  title={video.title}
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  className="size-full border-0"
-                />
-              </div>
-              <h4 className="p-4 text-sm font-bold text-slate-900 sm:px-6">
-                {video.title}
-              </h4>
-            </article>
-          ))}
-        </div>
-      )}
-      {quizzes.length > 0 && (
-        <div className="mt-8 space-y-6">
-          <h3 className="font-heading text-lg font-bold text-slate-950">
-            Practice quizzes
-          </h3>
-          {quizzes.map((quiz) => (
-            <StudentPracticeQuiz
-              key={quiz.id}
-              quiz={quiz}
-              questions={curriculum.questions.filter((item) => item.quiz_id === quiz.id)}
-            />
-          ))}
-        </div>
-      )}
-      {!videos.length && !quizzes.length && (
-        <p className="mt-5 rounded-xl border border-white bg-white/75 p-5 text-sm text-slate-600">
-          Lessons and quizzes for this topic have not been published yet.
-        </p>
-      )}
-    </section>
-  );
-}
 
 async function verifiedLearnerSession() {
   if (!isStudentAuthConfigured()) {
@@ -162,9 +91,7 @@ export default async function StudentCoursePage({
             </p>
           </div>
         ) : (
-          curriculum.topics.map((topic) => (
-            <StudentTopic key={topic.id} topic={topic} curriculum={curriculum} />
-          ))
+          <StudentCourseContent curriculum={curriculum} />
         )}
       </div>
     </main>
