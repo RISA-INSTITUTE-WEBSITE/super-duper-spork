@@ -79,7 +79,7 @@ test("landing page displays published course section and links to project inform
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Explore our courses" })).toBeVisible();
   await expect(
-    page.getByText("Student accounts provide portal access only;"),
+    page.getByText("Registered learners can preview course topics and request"),
   ).toBeVisible();
   await page.getByRole("link", { name: "Discover RISA" }).click();
   await expect(page).toHaveURL(/\/about\/?$/);
@@ -289,4 +289,13 @@ test("RISA section animates original black liquid and green sphere without chang
 
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(animatedLogo).toBeVisible();
+});
+
+test("course preview and enrolment review require verified accounts", async ({ page }) => {
+  const courseId = "11111111-1111-4111-8111-111111111111";
+  await page.goto("/students/courses/" + courseId);
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+
+  await page.goto("/admin/enrolment-requests");
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
