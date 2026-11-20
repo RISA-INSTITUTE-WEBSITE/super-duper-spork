@@ -9,7 +9,7 @@ export function SiteFooter() {
     <footer className="risa-footer mt-auto border-t border-[#78eb29]/50 text-[#E9F2F8]">
       <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
         <div
-          className="risa-footer-columns grid gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_0.8fr] lg:gap-16"
+          className="risa-footer-columns grid gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_0.8fr_1fr] lg:gap-16"
         >
           <div>
             <div className="flex items-center gap-3">
@@ -20,7 +20,7 @@ export function SiteFooter() {
                 height={56}
                 className="size-14 shrink-0 rounded-full object-contain"
               />
-              <p className="font-heading text-xl font-extrabold tracking-tight text-white">
+              <p className="font-heading text-xl font-extrabold text-white">
                 RISA Institute
               </p>
             </div>
@@ -35,7 +35,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-[0.14em] text-white">
+            <h2 className="font-heading text-sm font-bold uppercase text-white">
               Explore
             </h2>
             <nav
@@ -55,7 +55,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-[0.14em] text-white">
+            <h2 className="font-heading text-sm font-bold uppercase text-white">
               Development status
             </h2>
             <p className="mt-5 max-w-sm text-sm leading-7 text-[#CADDE9]">
