@@ -33,7 +33,10 @@ for (const path of ["/students/login", "/students/register"]) {
   const cookieValue = issuedCookie?.split(";")[0].slice(cookieName.length + 1);
   check(cookieValue === first.token, path + " form value differs from its cookie");
   check(/;\s*HttpOnly\b/i.test(issuedCookie), path + " cookie is not HttpOnly");
-  check(/;\s*SameSite=Strict\b/i.test(issuedCookie), path + " cookie lacks SameSite=Strict");
+  check(
+    /;\s*SameSite=Strict\b/i.test(issuedCookie),
+    path + " cookie lacks SameSite=Strict",
+  );
   check(/;\s*Path=\/(?:;|$)/i.test(issuedCookie), path + " cookie lacks Path=/");
   if (cookieName === "__Host-risa-student-csrf") {
     check(/;\s*Secure\b/i.test(issuedCookie), path + " production cookie lacks Secure");
