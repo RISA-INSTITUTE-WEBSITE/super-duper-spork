@@ -145,6 +145,21 @@ export default async function RisaAdminPage() {
         </article>
         <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
           <h2 className="font-heading text-xl font-bold text-slate-950">
+            Enrolment requests
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-slate-600">
+            Review new enrolment requests from registered learners, approve course
+            registrations or decline requests. Only administrators can grant access.
+          </p>
+          <Link
+            href="/admin/enrolment-requests"
+            className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
+          >
+            Review enrolment requests →
+          </Link>
+        </article>
+        <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
+          <h2 className="font-heading text-xl font-bold text-slate-950">
             Account and permissions
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
