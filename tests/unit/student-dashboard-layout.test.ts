@@ -4,8 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import StudentDashboardPage from "../../src/app/students/dashboard/page";
 
-const { cookiesMock, identityMock, configuredMock, coursesMock, materialsMock, adminMock } =
-  vi.hoisted(() => ({
+const {
+  cookiesMock,
+  identityMock,
+  configuredMock,
+  coursesMock,
+  materialsMock,
+  adminMock,
+} = vi.hoisted(() => ({
     cookiesMock: vi.fn(),
     identityMock: vi.fn(),
     configuredMock: vi.fn(),
