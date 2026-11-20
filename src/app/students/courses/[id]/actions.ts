@@ -57,12 +57,11 @@ export async function requestEnrolmentAction(
     };
   }
 
-  const outcome = await submitCourseEnrolmentRequest(
-    token,
+  const outcome = await submitCourseEnrolmentRequest(token, {
     courseId,
-    identity.id,
-    identity.email,
-  );
+    studentId: identity.id,
+    email: identity.email,
+  });
   if (outcome !== "created") {
     return {
       status: "error",
