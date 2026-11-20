@@ -378,14 +378,18 @@ test("institutional footer preserves navigation and stacks correctly on mobile",
   }
 
   expect(
-    await columns.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length),
+    await columns.evaluate(
+      (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    ),
   ).toBe(3);
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
-    await columns.evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(" ").length),
+    await columns.evaluate(
+      (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    ),
   ).toBe(1);
   await expect(navigation.getByRole("link", { name: "Contact" })).toBeVisible();
   await navigation.getByRole("link", { name: "Contact" }).click();
-  await expect(page).toHaveURL(/\\/contact\\/?$/);
+  await expect(page).toHaveURL(/\/contact\/?$/);
 });
