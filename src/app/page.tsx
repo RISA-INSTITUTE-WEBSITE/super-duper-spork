@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
-import { pathways } from "@/lib/pathways";
+import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
 
 const pathwayAccents = [
   "from-sky-400 to-cyan-300",
@@ -27,7 +27,11 @@ function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   );
 }
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const courses = await getPublicRisaCourses();
+
   return (
     <main id="main-content" className="flex-1">
       <section className="risa-hero relative isolate overflow-hidden text-[#0A0F1D]">
@@ -54,7 +58,7 @@ export default function HomePage() {
                 href="/programmes"
                 className="inline-flex min-h-12 items-center justify-center gap-3 rounded-xl bg-[#155DFC] px-6 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(21,93,252,0.2)] transition hover:bg-[#154cbe] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#155DFC]"
               >
-                Explore learning pathways
+                Explore courses
                 <ArrowIcon />
               </Link>
               <Link
@@ -83,76 +87,104 @@ export default function HomePage() {
       </section>
 
       <section
-        aria-labelledby="pathways-heading"
+        aria-labelledby="courses-heading"
         className="risa-pathways-section py-20 sm:py-24"
       >
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
-                An early look
+                Real RISA courses
               </p>
               <h2
-                id="pathways-heading"
+                id="courses-heading"
                 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
               >
-                Explore proposed learning pathways.
+                Explore our courses
               </h2>
               <p className="mt-4 leading-7 text-slate-600">
-                These are examples of our intended direction, not confirmed courses.
-                Content and availability will be announced when ready.
+                Browse the courses published by RISA administrators. Each course shows its
+                institutional code, academic level and course overview.
               </p>
             </div>
             <Link
               href="/programmes"
               className="inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
             >
-              View all pathways <ArrowIcon />
+              View all courses <ArrowIcon />
             </Link>
           </div>
 
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {pathways.map(({ slug, title, description }, index) => (
-              <article
-                key={slug}
-                className="risa-pathway-card group relative isolate flex flex-col overflow-hidden rounded-[1.6rem] p-7 transition duration-200 hover:-translate-y-1 sm:p-8"
-              >
-                <div
-                  className={
-                    "absolute inset-x-0 top-0 h-1.5 rounded-t-[1.6rem] bg-gradient-to-r " +
-                    pathwayAccents[index % pathwayAccents.length]
-                  }
-                />
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-3 top-10 select-none text-[130px] font-black leading-none tracking-tight text-[#155DFC]/[0.08]"
-                >
-                  0{index + 1}
-                </span>
-                <div className="relative flex items-center justify-between">
-                  <span className="rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-blue-800">
-                    Proposed
-                  </span>
-                  <span className="text-sm font-semibold text-slate-400">
-                    0{index + 1}
-                  </span>
-                </div>
-                <h3 className="relative mt-9 text-2xl font-bold tracking-tight text-slate-950">
-                  {title}
-                </h3>
-                <p className="relative mt-4 flex-1 leading-7 text-slate-600">
-                  {description}
-                </p>
-                <Link
-                  href="/programmes"
-                  className="relative mt-9 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
-                  aria-label={"Read about proposed " + title + " learning pathway"}
-                >
-                  Learn more <ArrowIcon diagonal />
-                </Link>
-              </article>
-            ))}
-          </div>
+          {courses === null ? (
+            <p
+              role="status"
+              className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
+            >
+              The course catalogue is temporarily unavailable. Please try again shortly.
+            </p>
+          ) : courses.length === 0 ? (
+            <p className="risa-glass-card mt-10 rounded-2xl p-7 text-slate-600">
+              No published courses yet. Courses will appear here once approved and
+              published by RISA administration.
+            </p>
+          ) : (
+            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {courses.map((course, index) => {
+                const thumbnailUrl = risaThumbnailUrl(course.thumbnail_path);
+                return (
+                  <article
+                    key={course.id}
+                    className="risa-pathway-card group relative isolate flex flex-col overflow-hidden rounded-[1.6rem] transition duration-200 hover:-translate-y-1"
+                  >
+                    <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-[#dbeafe] via-[#f0f9ff] to-[#d9f7ca]">
+                      {thumbnailUrl ? (
+                        <Image
+                          src={thumbnailUrl}
+                          alt={course.title + " course thumbnail"}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                        />
+                      ) : (
+                        <div className="flex size-full items-center justify-center px-6">
+                          <span className="font-mono text-4xl font-black tracking-wider text-[#155DFC]/35">
+                            {course.code}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="relative flex flex-1 flex-col p-6 sm:p-7">
+                      <div
+                        aria-hidden="true"
+                        className={
+                          "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r " +
+                          pathwayAccents[index % pathwayAccents.length]
+                        }
+                      />
+                      <span className="w-fit rounded-full bg-white/75 px-3 py-1.5 text-xs font-bold text-blue-800">
+                        {course.level}
+                      </span>
+                      <h3 className="mt-5 text-xl font-bold leading-snug tracking-tight text-slate-950">
+                        <span className="font-mono text-[#286518]">{course.code}</span>
+                        {" — "}
+                        {course.title}
+                      </h3>
+                      <p className="mt-4 flex-1 text-sm leading-7 text-slate-600">
+                        {course.description || "Explore this RISA learning course."}
+                      </p>
+                      <Link
+                        href={"/programmes#" + course.slug}
+                        className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
+                      >
+                        Course details <ArrowIcon diagonal />
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

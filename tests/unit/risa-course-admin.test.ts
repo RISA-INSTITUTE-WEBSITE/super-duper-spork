@@ -2,7 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   createRisaCourse,
+  getPublicRisaCourses,
   getRisaAdminCourses,
+  isValidCourseThumbnail,
+  risaThumbnailUrl,
+  updateRisaCoursePresentation,
+  validateCourseLevel,
   validateNewRisaCourse,
 } from "../../src/lib/risa-course-admin";
 
@@ -25,6 +30,7 @@ const example = {
   slug: "dve101",
   title: "Introduction to Linux for DevOps",
   description: "Linux fundamentals and practical labs.",
+  level: "1st Year Level",
   is_published: false,
 };
 
@@ -54,6 +60,7 @@ describe("RISA institutional course codes", () => {
       slug: "phy-101",
       title: "General Physics",
       description: "Introduction",
+      level: "1st Year Level",
       is_published: true,
     });
   });
@@ -169,5 +176,95 @@ describe("RISA administrator course listing", () => {
     expect(await getRisaAdminCourses("admin-token")).toBeNull();
     fetchMock.mockResolvedValueOnce(Response.json({ error: "missing" }));
     expect(await getRisaAdminCourses("admin-token")).toBeNull();
+  });
+});
+
+describe("public RISA catalogue and course presentation", () => {
+  const courseId = "11111111-1111-4111-8111-111111111111";
+
+  it("loads actual published courses using anonymous credentials", async () => {
+    fetchMock.mockResolvedValueOnce(
+      Response.json([
+        {
+          ...example,
+          id: courseId,
+          created_at: "2026-11-20T00:00:00Z",
+          is_published: true,
+          thumbnail_path: null,
+        },
+      ]),
+    );
+    const courses = await getPublicRisaCourses();
+    expect(courses).toHaveLength(1);
+    expect(courses?.[0]).toMatchObject({
+      code: "DVE101",
+      level: "1st Year Level",
+      thumbnail_path: null,
+    });
+    expect(fetchMock.mock.calls[0][0]).toContain("is_published=eq.true");
+    expect(fetchMock.mock.calls[0][1].headers).not.toHaveProperty("Authorization");
+  });
+
+  it("does not expose a fake catalogue on backend errors", async () => {
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
+    expect(await getPublicRisaCourses()).toBeNull();
+  });
+
+  it("validates admin levels and image format before saving", () => {
+    expect(validateCourseLevel(" 2nd   Year Level ")).toBe("2nd Year Level");
+    expect(validateCourseLevel("<script>")).toBeNull();
+    expect(
+      isValidCourseThumbnail(new File(["x"], "course.png", { type: "image/png" })),
+    ).toBe(true);
+    expect(
+      isValidCourseThumbnail(new File(["x"], "course.svg", { type: "image/svg+xml" })),
+    ).toBe(false);
+    expect(
+      isValidCourseThumbnail(
+        new File([new Uint8Array(2 * 1024 * 1024 + 1)], "huge.jpg", {
+          type: "image/jpeg",
+        }),
+      ),
+    ).toBe(false);
+  });
+
+  it("patches only the approved course presentation columns", async () => {
+    fetchMock.mockResolvedValueOnce(Response.json([{ id: courseId }]));
+    const path = courseId + "/22222222-2222-4222-8222-222222222222.png";
+    expect(
+      await updateRisaCoursePresentation("admin-jwt", courseId, {
+        level: "2nd Year Level",
+        thumbnailPath: path,
+      }),
+    ).toBe(true);
+    const options = fetchMock.mock.calls[0][1] as RequestInit;
+    expect(options.method).toBe("PATCH");
+    expect(JSON.parse(String(options.body))).toEqual({
+      level: "2nd Year Level",
+      thumbnail_path: path,
+    });
+    expect(options.headers).toMatchObject({ Authorization: "Bearer admin-jwt" });
+  });
+
+  it("rejects unsafe image paths and malformed course IDs before any API call", async () => {
+    expect(
+      await updateRisaCoursePresentation("jwt", "bad", { level: "1st Year Level" }),
+    ).toBe(false);
+    expect(
+      await updateRisaCoursePresentation("jwt", courseId, {
+        level: "1st Year Level",
+        thumbnailPath: "https://evil.example/test.png",
+      }),
+    ).toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("constructs thumbnail URLs only for the managed storage path", () => {
+    const path = courseId + "/22222222-2222-4222-8222-222222222222.webp";
+    expect(risaThumbnailUrl(path)).toBe(
+      "https://example.supabase.co/storage/v1/object/public/risa-course-thumbnails/" +
+        path,
+    );
+    expect(risaThumbnailUrl("https://external.example/cat.png")).toBeNull();
   });
 });

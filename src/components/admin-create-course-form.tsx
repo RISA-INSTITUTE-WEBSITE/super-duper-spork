@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 
+import { courseLevels } from "@/lib/risa-course-admin";
+
 import {
   createCourseAction,
   type CourseCreationState,
@@ -94,6 +96,48 @@ export function AdminCreateCourseForm() {
           />
           <p className="mt-2 text-xs leading-5 text-slate-600">
             Use the full teaching title learners will recognize.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="risa-course-level" className="text-sm font-bold text-slate-900">
+            Academic level <span className="text-red-600">*</span>
+          </label>
+          <select
+            id="risa-course-level"
+            name="level"
+            className={fieldClass}
+            required
+            defaultValue="1st Year Level"
+          >
+            {courseLevels.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="risa-course-thumbnail"
+            className="text-sm font-bold text-slate-900"
+          >
+            Course thumbnail
+          </label>
+          <input
+            id="risa-course-thumbnail"
+            name="thumbnail"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className={
+              fieldClass +
+              " file:mr-3 file:rounded-lg file:border-0 file:bg-[#eefce5] file:px-2 file:py-1 file:text-sm"
+            }
+          />
+          <p className="mt-2 text-xs text-slate-600">
+            Optional JPG, PNG or WebP (max 2 MB).
           </p>
         </div>
       </div>

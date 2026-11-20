@@ -32,13 +32,15 @@ test("course areas come directly after the four-photo hero", async ({ page }) =>
 
   await expect(sections.nth(0)).toHaveClass(/risa-hero/);
   await expect(sections.nth(0).locator(".risa-hero-photo")).toHaveCount(4);
-  await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "pathways-heading");
+  await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "courses-heading");
   await expect(sections.nth(2)).toHaveAttribute(
     "aria-labelledby",
     "vision-mission-heading",
   );
   await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "philosophy-heading");
-  await expect(sections.nth(1).getByText("Proposed")).toHaveCount(3);
+  await expect(
+    sections.nth(1).getByRole("heading", { name: "Explore our courses" }),
+  ).toBeVisible();
 });
 
 test("primary navigation works", async ({ page }) => {
@@ -50,7 +52,7 @@ test("primary navigation works", async ({ page }) => {
     .click();
   await expect(page).toHaveURL(/\/programmes\/?$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Proposed learning pathways",
+    "Available courses",
   );
 });
 
@@ -70,14 +72,12 @@ test("basic security response headers are present", async ({ request }) => {
   expect(response.headers()["x-frame-options"]).toBe("DENY");
 });
 
-test("landing page labels pathways as proposed and links to project information", async ({
+test("landing page displays published course section and links to project information", async ({
   page,
 }) => {
   // QA-E2E-05: avoid suggesting that enrollment and applications are live.
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: "Explore proposed learning pathways." }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Explore our courses" })).toBeVisible();
   await expect(
     page.getByText("Student accounts provide portal access only;"),
   ).toBeVisible();
@@ -85,16 +85,16 @@ test("landing page labels pathways as proposed and links to project information"
   await expect(page).toHaveURL(/\/about\/?$/);
 });
 
-test("site search finds a proposed learning pathway", async ({ page }) => {
+test("site search finds published course navigation", async ({ page }) => {
   // QA-E2E-06: the header search must lead to real, relevant public content.
   await page.goto("/");
   const search = page.getByRole("search");
   await expect(search).toBeVisible();
-  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("physics");
+  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("courses");
   await search.getByRole("button", { name: "Search" }).click();
-  await expect(page).toHaveURL(/\/search\?q=physics$/);
+  await expect(page).toHaveURL(/\/search\?q=courses$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Search RISA");
-  await expect(page.getByRole("link", { name: /Physics & Measurement/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Programmes/ })).toBeVisible();
 });
 
 test("site search handles unmatched keywords", async ({ page }) => {

@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { pathways } from "@/lib/pathways";
+import { getPublicRisaCourses } from "@/lib/risa-course-admin";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Search",
-  description: "Search the public RISA website and proposed learning pathways.",
+  description: "Search RISA pages and published courses.",
 };
 
 const pages = [
@@ -39,17 +41,6 @@ const pages = [
   },
 ] as const;
 
-const entries = [
-  ...pages,
-  ...pathways.map((pathway) => ({
-    href: "/programmes",
-    title: pathway.title,
-    description: pathway.description,
-    keywords: "proposed learning pathway programme",
-    category: "Proposed pathway",
-  })),
-];
-
 export default async function SearchPage({
   searchParams,
 }: {
@@ -59,6 +50,17 @@ export default async function SearchPage({
   const value = typeof params.q === "string" ? params.q : "";
   const query = value.trim().slice(0, 100);
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const courses = await getPublicRisaCourses();
+  const entries = [
+    ...pages,
+    ...(courses ?? []).map((course) => ({
+      href: "/programmes#" + course.slug,
+      title: course.code + " — " + course.title,
+      description: course.description,
+      keywords: "course " + course.code + " " + course.level,
+      category: "Course",
+    })),
+  ];
   const results = entries.filter((entry) => {
     const content = [entry.title, entry.description, entry.keywords].join(" ");
     const text = content.toLowerCase();

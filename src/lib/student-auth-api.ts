@@ -329,3 +329,22 @@ export async function updateStudentAuthMetadata(
   });
   return response?.ok === true;
 }
+
+/** Anonymous access is limited by Supabase RLS to published catalogue rows. */
+export async function requestPublicCourseCatalogue(
+  path: string,
+): Promise<Response | null> {
+  const config = getAuthConfig();
+  if (!config || !path.startsWith("/rest/v1/risa_courses?")) {
+    return null;
+  }
+  try {
+    return await fetch(config.url + path, {
+      headers: { apikey: config.publishableKey },
+      cache: "no-store",
+      signal: AbortSignal.timeout(12000),
+    });
+  } catch {
+    return null;
+  }
+}
