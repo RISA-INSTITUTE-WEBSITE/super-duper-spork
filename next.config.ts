@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "3mb",
     },
   },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "img.youtube.com", pathname: "/vi/**" },
+    ],
+  },
   poweredByHeader: false,
   async headers() {
     return [
