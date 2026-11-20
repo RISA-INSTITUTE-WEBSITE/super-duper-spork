@@ -43,13 +43,8 @@ export async function proxy(request: NextRequest) {
   return response;
 }
 
+// Keep the signed-in header accurate on public pages as well as protected pages.
+// Static files and Next.js internals do not need authentication refresh.
 export const config = {
-  matcher: [
-    "/students/dashboard/:path*",
-    "/students/courses/:path*",
-    "/admin/:path*",
-    "/students/profile/:path*",
-    "/students/avatar",
-    "/students/materials/:path*",
-  ],
+  matcher: ["/((?!api/|_next/|.*\\..*).*)"],
 };
