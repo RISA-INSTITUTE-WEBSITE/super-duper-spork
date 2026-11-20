@@ -13,7 +13,6 @@ import {
   type EnrolledCourse,
 } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
-import { pathways } from "@/lib/pathways";
 
 export const dynamic = "force-dynamic";
 
@@ -22,12 +21,6 @@ export const metadata: Metadata = {
   description: "Your private RISA learning space.",
   robots: { index: false, follow: false },
 };
-
-const pathwayAccents = [
-  "from-sky-400 to-blue-600",
-  "from-indigo-400 to-violet-500",
-  "from-teal-400 to-emerald-600",
-] as const;
 
 function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null }) {
   return (
@@ -46,7 +39,7 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
           </h3>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
             When RISA enrols you in a published course, it will appear here. You can
-            explore the proposed learning areas below in the meantime.
+            preview the published courses in our catalogue and request enrolment in the meantime.
           </p>
         </div>
       ) : (
@@ -244,8 +237,8 @@ export default async function StudentDashboardPage() {
             Student account active
           </span>
           <span className="text-sm text-slate-600">
-            Enrolment is managed by RISA. Self-enrolment and progress tracking are not yet
-            available.
+            Browse published courses and request enrolment. RISA reviews requests before
+            granting access to full course content.
           </span>
         </div>
       </section>
@@ -299,69 +292,26 @@ export default async function StudentDashboardPage() {
       </section>
 
       <section aria-labelledby="learning-heading" className="mt-12">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
-              Discover what&apos;s next
-            </p>
-            <h2
-              id="learning-heading"
-              className="mt-2 font-heading text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl"
-            >
-              Explore learning areas
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-              Start by exploring the fields RISA plans to offer. These are proposed
-              learning pathways, not courses open for enrolment.
-            </p>
-          </div>
+        <div className="risa-science-glass rounded-[1.7rem] p-7 sm:p-9">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
+            Explore RISA courses
+          </p>
+          <h2
+            id="learning-heading"
+            className="mt-3 font-heading text-2xl font-bold text-slate-950 sm:text-3xl"
+          >
+            Preview courses before enrolling
+          </h2>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
+            Your account lets you browse published topics and blurred video thumbnails.
+            Select a locked lesson to submit an enrolment request to RISA.
+          </p>
           <Link
             href="/programmes"
-            className="inline-flex min-h-11 w-fit items-center gap-2 rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
+            className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#1d4f11]"
           >
-            View all pathways
-            <span aria-hidden="true">→</span>
+            Browse courses and previews →
           </Link>
-        </div>
-        <div className="mt-7 grid gap-5 md:grid-cols-3">
-          {pathways.map(({ slug, title, description }, index) => (
-            <article
-              key={slug}
-              className="risa-glass-card group relative flex flex-col overflow-hidden rounded-[1.6rem] p-6 transition duration-200 hover:-translate-y-1 sm:p-7"
-            >
-              <div
-                aria-hidden="true"
-                className={
-                  "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r " +
-                  pathwayAccents[index % pathwayAccents.length]
-                }
-              />
-              <div className="flex items-center justify-between">
-                <span className="inline-flex rounded-full bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
-                  Proposed
-                </span>
-                <span
-                  className="text-3xl font-black text-[#155DFC]/20"
-                  aria-hidden="true"
-                >
-                  0{index + 1}
-                </span>
-              </div>
-              <h3 className="mt-7 font-heading text-xl font-bold text-slate-950">
-                {title}
-              </h3>
-              <p className="mt-3 flex-1 text-sm leading-7 text-slate-600">
-                {description}
-              </p>
-              <Link
-                href="/programmes"
-                aria-label={"Explore proposed " + title + " learning area"}
-                className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 text-sm font-bold text-[#155DFC] underline-offset-4 transition hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#155DFC]"
-              >
-                Explore this area <span aria-hidden="true">→</span>
-              </Link>
-            </article>
-          ))}
         </div>
       </section>
 
