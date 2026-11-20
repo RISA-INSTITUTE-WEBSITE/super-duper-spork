@@ -183,7 +183,33 @@ bash tests/security/run-zap.sh
 
 The ZAP script starts a local website on port 3000 and runs Docker-based active checks against `127.0.0.1`. It writes `zap-report.json`. Active scanning should not be pointed at the production service or real learner accounts.
 
-## 9. What the findings do **not** mean
+## 9. COEP targeted remediation (20 November 2026 follow-up)
+
+A follow-up fix configures **`Cross-Origin-Embedder-Policy: require-corp` only on**
+`/about`, `/contact`, `/students/login`, `/students/register`, and
+`/students/privacy` using [`next.config.ts`](../../../next.config.ts).
+These pages do not render the YouTube lesson iframe or public course
+thumbnail cards. The [HTTP smoke checks](../../../tests/integration/http-smoke.sh)
+now verify the enforced header on each page and verify that the homepage is
+**not inadvertently placed under a strict global COEP policy**.
+
+**Why this is intentionally scoped:** RISA uses a YouTube iframe on enrolled
+learner and administrator course pages, and public Supabase-hosted thumbnails
+on the homepage and course catalogue. Strict global `require-corp` can block
+such content unless remote hosts explicitly grant access. Setting
+`unsafe-none` purely to make a warning disappear would not improve protection.
+
+**What remains open:** This is a real policy-hardening improvement for five
+selected routes, **not a full clearance of ZAP rule 90004-2**. Continue to
+monitor the scanner, then test all cross-origin thumbnails, lesson playback,
+responsive pages and authenticated features before considering a wider COEP
+rollout. Do not ignore or downgrade the remaining warning without documented
+review. Related CORP remediation is recorded separately in PR #47.
+
+References: [OWASP ZAP 90004-2](https://www.zaproxy.org/docs/alerts/90004-2/)
+and [MDN Cross-Origin-Embedder-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy).
+
+## 10. What the findings do **not** mean
 
 - A red CI check **does not prove RISA was hacked**.
 - Zero scanner `FAIL` findings **does not certify the website as secure**.
