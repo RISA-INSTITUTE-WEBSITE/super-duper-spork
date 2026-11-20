@@ -94,7 +94,7 @@ test("site search finds published course navigation", async ({ page }) => {
   await search.getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search\?q=courses$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Search RISA");
-  await expect(page.getByRole("link", { name: /Programmes/ })).toBeVisible();
+  await expect(page.getByRole("main").getByRole("link", { name: /Page Programmes/ })).toBeVisible();
 });
 
 test("site search handles unmatched keywords", async ({ page }) => {
@@ -113,10 +113,10 @@ test("mobile header opens search only when its icon is tapped", async ({ page })
   await page.getByRole("button", { name: "Open search" }).click();
   const search = page.getByRole("search");
   await expect(search).toBeVisible();
-  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("physics");
+  await search.getByRole("searchbox", { name: "Search RISA website" }).fill("courses");
   await search.getByRole("button", { name: "Search" }).click();
-  await expect(page).toHaveURL(/\/search\?q=physics$/);
-  await expect(page.getByRole("link", { name: /Physics & Measurement/ })).toBeVisible();
+  await expect(page).toHaveURL(/\/search\?q=courses$/);
+  await expect(page.getByRole("main").getByRole("link", { name: /Page Programmes/ })).toBeVisible();
 });
 
 test("mobile menu opens a sidebar and closes after navigation", async ({ page }) => {
@@ -148,7 +148,7 @@ test("navigation links use larger Outfit SemiBold text on desktop and mobile", a
   const desktopLink = page
     .getByRole("navigation", { name: "Primary navigation" })
     .getByRole("link", { name: "Home" });
-  await expect(desktopLink).toHaveCSS("font-family", /Outfit/);
+  await expect(desktopLink).toHaveCSS("font-family", /Plus Jakarta Sans/);
   await expect(desktopLink).toHaveCSS("font-size", "16px");
   await expect(desktopLink).toHaveCSS("font-weight", "600");
 
@@ -157,7 +157,7 @@ test("navigation links use larger Outfit SemiBold text on desktop and mobile", a
   const mobileLink = page
     .getByRole("navigation", { name: "Mobile navigation" })
     .getByRole("link", { name: "Home" });
-  await expect(mobileLink).toHaveCSS("font-family", /Outfit/);
+  await expect(mobileLink).toHaveCSS("font-family", /Plus Jakarta Sans/);
   await expect(mobileLink).toHaveCSS("font-size", "18px");
   await expect(mobileLink).toHaveCSS("font-weight", "600");
 });
