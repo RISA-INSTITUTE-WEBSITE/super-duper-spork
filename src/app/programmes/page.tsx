@@ -1,34 +1,82 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
-import { pathways } from "@/lib/pathways";
+import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Learning pathways",
+  title: "Courses | RISA",
+  description: "Browse published RISA courses by code and academic level.",
 };
 
-export default function ProgrammesPage() {
+export default async function ProgrammesPage() {
+  const courses = await getPublicRisaCourses();
+
   return (
-    <main
-      id="main-content"
-      className="mx-auto w-full max-w-6xl flex-1 px-5 py-14 sm:px-8"
-    >
-      <p className="font-semibold uppercase tracking-widest text-blue-800">Learning</p>
-      <h1 className="mt-3 text-4xl font-bold">Proposed learning pathways</h1>
-      <p className="mt-5 max-w-3xl leading-relaxed text-slate-600">
-        RISA is planning structured, application-oriented learning content. The pathways
-        below are illustrative and are not yet open for enrollment.
+    <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-5 py-14 sm:px-8">
+      <p className="font-semibold uppercase tracking-widest text-blue-800">
+        RISA / Course catalogue
       </p>
-      <div className="mt-10 grid gap-5 md:grid-cols-3">
-        {pathways.map(({ slug, title, description }) => (
-          <section key={slug} className="rounded-xl border border-slate-200 bg-white p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-800">
-              Planned
-            </p>
-            <h2 className="mt-3 text-xl font-semibold">{title}</h2>
-            <p className="mt-3 text-slate-600">{description}</p>
-          </section>
-        ))}
-      </div>
+      <h1 className="mt-3 text-4xl font-bold text-slate-950">Available courses</h1>
+      <p className="mt-5 max-w-3xl leading-relaxed text-slate-600">
+        Explore the courses published by RISA administration. Course enrolment and
+        learning content are accessed through the learner portal.
+      </p>
+
+      {courses === null ? (
+        <p role="status" className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900">
+          Course information is temporarily unavailable. Please try again later.
+        </p>
+      ) : courses.length === 0 ? (
+        <p className="risa-glass-card mt-10 rounded-2xl p-7 text-slate-600">
+          No published courses are available yet.
+        </p>
+      ) : (
+        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {courses.map((course) => {
+            const thumbnailUrl = risaThumbnailUrl(course.thumbnail_path);
+            return (
+              <article
+                key={course.id}
+                id={course.slug}
+                className="risa-pathway-card scroll-mt-24 overflow-hidden rounded-[1.6rem]"
+              >
+                <div className="relative aspect-video bg-gradient-to-br from-[#dbeafe] via-[#f0f9ff] to-[#eefce5]">
+                  {thumbnailUrl ? (
+                    <Image
+                      src={thumbnailUrl}
+                      alt={course.title + " course thumbnail"}
+                      fill
+                      unoptimized
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center">
+                      <span className="font-mono text-3xl font-black text-[#155DFC]/35">
+                        {course.code}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="p-6 sm:p-7">
+                  <span className="rounded-full bg-white/80 px-3 py-1.5 text-xs font-bold text-[#286518]">
+                    {course.level}
+                  </span>
+                  <h2 className="mt-5 text-xl font-bold text-slate-950">
+                    <span className="font-mono text-[#286518]">{course.code}</span>
+                    {" — "}{course.title}
+                  </h2>
+                  <p className="mt-4 text-sm leading-7 text-slate-600">
+                    {course.description || "Course details will be added by RISA."}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </main>
   );
 }
