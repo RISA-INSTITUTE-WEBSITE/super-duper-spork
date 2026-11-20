@@ -12,13 +12,13 @@ const {
   materialsMock,
   adminMock,
 } = vi.hoisted(() => ({
-    cookiesMock: vi.fn(),
-    identityMock: vi.fn(),
-    configuredMock: vi.fn(),
-    coursesMock: vi.fn(),
-    materialsMock: vi.fn(),
-    adminMock: vi.fn(),
-  }));
+  cookiesMock: vi.fn(),
+  identityMock: vi.fn(),
+  configuredMock: vi.fn(),
+  coursesMock: vi.fn(),
+  materialsMock: vi.fn(),
+  adminMock: vi.fn(),
+}));
 
 vi.mock("next/headers", () => ({ cookies: cookiesMock }));
 vi.mock("../../src/app/students/actions", () => ({ signOutStudent: vi.fn() }));
