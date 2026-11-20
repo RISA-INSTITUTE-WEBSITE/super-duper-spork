@@ -47,5 +47,5 @@ for (const path of ["/students/login", "/students/register"]) {
 
   const tampered = await readForm(path, cookieName + "=invalid");
   check(tampered.token !== first.token, path + " accepted a malformed cookie");
-  console.log("CSRF form/cookie checks passed: " + path);
+  process.stdout.write("CSRF form/cookie checks passed: " + path + "\\n");
 }
