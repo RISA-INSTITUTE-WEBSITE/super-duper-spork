@@ -41,6 +41,9 @@ export type CourseCurriculum = {
   questions: QuizQuestion[];
 };
 
+/** Public-to-registered preview: no quiz questions or playable player data are rendered. */
+export type CoursePreviewCurriculum = Pick<CourseCurriculum, "topics" | "videos">;
+
 type JsonRow = Record<string, unknown>;
 function asRecord(item: unknown): JsonRow | null {
   return item && typeof item === "object" && !Array.isArray(item)
@@ -264,6 +267,29 @@ export async function getCourseCurriculum(
     quizzes.map((quiz) => quiz.id),
   );
   return questions ? { topics, videos, quizzes, questions } : null;
+}
+
+/**
+ * Get only published topic and thumbnail metadata for signed-in visitors.
+ * Quiz questions, answer keys and private files are never requested.
+ */
+export async function getCoursePreviewCurriculum(
+  token: string,
+  courseId: string,
+): Promise<CoursePreviewCurriculum | null> {
+  if (!uuidPattern.test(courseId)) {
+    return null;
+  }
+  const topics = await getTopics(token, courseId, false);
+  if (!topics) {
+    return null;
+  }
+  const videos = await getVideos(
+    token,
+    topics.map((topic) => topic.id),
+    false,
+  );
+  return videos ? { topics, videos } : null;
 }
 
 function youtubeUrlCandidate(url: URL): string | null {
