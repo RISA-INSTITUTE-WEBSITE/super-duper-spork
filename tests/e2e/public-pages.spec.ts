@@ -199,6 +199,8 @@ test("course content authoring and enrolled lessons require login", async ({ pag
   await expect(page).toHaveURL(/\/students\/login\/?$/);
   await page.goto("/students/courses/" + id);
   await expect(page).toHaveURL(/\/students\/login\/?$/);
+  await page.goto("/students/courses/" + id + "/topics/" + id);
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
 
 test("course creation is unavailable to unauthenticated visitors", async ({ page }) => {
