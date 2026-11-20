@@ -3,7 +3,10 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 // Account-form CSRF defense is in addition to Next.js Server Action Origin checks.
 // The cookie is host-only, HttpOnly and SameSite=Strict. Never accept a token
 // based only on its shape: a matching cookie is mandatory.
-export const studentCsrfCookieName = "risa-student-csrf";
+// Browsers enforce the __Host- prefix in production: Secure + host-only + Path=/.
+// Development uses an unprefixed name so HTTP localhost still works.
+export const studentCsrfCookieName =
+  process.env.NODE_ENV === "production" ? "__Host-risa-student-csrf" : "risa-student-csrf";
 
 export const studentCsrfCookieOptions = {
   httpOnly: true,
