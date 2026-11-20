@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { signOutStudent } from "@/app/students/actions";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
   getCourseMaterials,
   getEnrolledCourses,
@@ -182,7 +183,10 @@ export default async function StudentDashboardPage() {
   const { firstName, initials } = learnerGreeting(user.fullName);
 
   // Read enrolments and resources with the learner's JWT and row-level security.
-  const courses = await getEnrolledCourses(accessToken, user.id);
+  const [courses, isAdmin] = await Promise.all([
+    getEnrolledCourses(accessToken, user.id),
+    isRisaAdministrator(accessToken, user.id),
+  ]);
   const materials = courses
     ? await getCourseMaterials(
         accessToken,
@@ -252,6 +256,14 @@ export default async function StudentDashboardPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center rounded-full bg-[#286518] px-4 text-sm font-bold text-white transition hover:bg-[#1d4f11]"
+            >
+              Administration Centre
+            </Link>
+          )}
           <Link
             href="/students/profile"
             className="inline-flex min-h-11 items-center rounded-full border border-[#78eb29]/40 bg-white/80 px-4 text-sm font-semibold text-[#286518] transition hover:bg-white"
