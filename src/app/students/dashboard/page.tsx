@@ -164,6 +164,14 @@ export default async function StudentDashboardPage() {
         courses.map((course) => course.id),
       )
     : null;
+  const courseCount =
+    courses === null
+      ? "— courses"
+      : courses.length + (courses.length === 1 ? " course" : " courses");
+  const materialCount =
+    materials === null
+      ? "— files"
+      : materials.length + (materials.length === 1 ? " file" : " files");
 
   return (
     <main
@@ -204,7 +212,7 @@ export default async function StudentDashboardPage() {
               Hi, {firstName}!
             </h1>
             <p className="mt-1 text-sm text-slate-600">
-              {courses?.length ?? "—"} courses · {materials?.length ?? "—"} files
+              {courseCount} · {materialCount}
             </p>
           </div>
         </div>
