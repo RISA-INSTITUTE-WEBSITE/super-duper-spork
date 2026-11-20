@@ -66,7 +66,7 @@ export function RisaAcademyCourseCard({ course }: { course: CatalogueCourse }) {
           <span className="text-xs font-medium text-slate-500">RISA course</span>
         </div>
         <h2 className="mt-4 text-xl font-bold leading-snug tracking-tight text-[#0a2035]">
-          {course.title}
+          {course.code} - {course.title}
         </h2>
         <p className="mt-3 line-clamp-3 flex-1 text-sm leading-7 text-slate-600">
           {course.description || "Explore this RISA course and its published topics."}
