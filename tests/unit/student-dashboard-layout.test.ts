@@ -74,7 +74,7 @@ describe("Concise RISA learner dashboard", () => {
 
     const html = renderToStaticMarkup(await StudentDashboardPage());
 
-    expect(html).toContain("1 courses · 1 files");
+    expect(html).toContain("1 course · 1 file");
     expect(html).toContain("Introduction to Physics");
     expect(html).toContain('href="/students/courses/c0000000-0000-4000-8000-000000000001"');
     expect(html).toContain('href="#course-materials"');
