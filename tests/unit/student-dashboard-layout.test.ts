@@ -42,6 +42,10 @@ describe("Concise RISA learner dashboard", () => {
   it("keeps the empty state short with direct course, profile and sign-out actions", async () => {
     const html = renderToStaticMarkup(await StudentDashboardPage());
 
+    expect(html).toContain('src="/risa-logo-animated.svg"');
+    expect(html).toContain("opacity-[0.14]");
+    expect(html).toContain("pointer-events-none");
+    expect(html).toContain("relative z-10");
     expect(html).toContain("Hi, Amahle!");
     expect(html).toContain("0 courses · 0 files");
     expect(html).toContain("No enrolled courses yet.");

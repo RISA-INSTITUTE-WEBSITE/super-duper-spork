@@ -195,11 +195,25 @@ export default async function StudentDashboardPage() {
   return (
     <main
       id="main-content"
-      className="mx-auto w-full max-w-7xl flex-1 px-5 py-8 sm:px-8 sm:py-10"
+      className="relative isolate mx-auto w-full max-w-7xl flex-1 overflow-hidden px-5 py-8 sm:px-8 sm:py-10"
     >
+      {/* Reuse the homepage SVG so the original liquid and green-orb animations stay intact. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden"
+      >
+        <Image
+          src="/risa-logo-animated.svg"
+          alt=""
+          width={1200}
+          height={1200}
+          unoptimized
+          className="h-auto w-[min(90vw,54rem)] max-w-none opacity-[0.14] sm:opacity-[0.12]"
+        />
+      </div>
       <section
         aria-labelledby="welcome-heading"
-        className="risa-science-glass flex flex-wrap items-center justify-between gap-5 rounded-[1.75rem] p-6 sm:p-8"
+        className="risa-science-glass relative z-10 flex flex-wrap items-center justify-between gap-5 rounded-[1.75rem] p-6 sm:p-8"
       >
         <div className="flex min-w-0 items-center gap-4">
           <Link
@@ -255,7 +269,7 @@ export default async function StudentDashboardPage() {
         </div>
       </section>
 
-      <section aria-labelledby="enrolled-heading" className="mt-9">
+      <section aria-labelledby="enrolled-heading" className="relative z-10 mt-9">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2
             id="enrolled-heading"
@@ -279,7 +293,7 @@ export default async function StudentDashboardPage() {
       <section
         id="course-materials"
         aria-labelledby="materials-heading"
-        className="mt-9 scroll-mt-24"
+        className="relative z-10 mt-9 scroll-mt-24"
       >
         <h2
           id="materials-heading"
