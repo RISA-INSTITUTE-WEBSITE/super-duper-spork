@@ -177,6 +177,17 @@ test("desktop navigation separates account creation and existing account login",
   await expect(navigation.getByRole("link", { name: "Students" })).toHaveCount(0);
   await expect(signUp).toHaveAttribute("href", "/students/register");
   await expect(signIn).toHaveAttribute("href", "/students/login");
+  await expect(navigation.getByRole("link", { name: /Open profile for/ })).toHaveCount(0);
+
+  // Account actions must share the Home/Programmes row, not wrap underneath.
+  const homeBounds = await navigation.getByRole("link", { name: "Home" }).boundingBox();
+  const signUpBounds = await signUp.boundingBox();
+  const signInBounds = await signIn.boundingBox();
+  expect(homeBounds).not.toBeNull();
+  expect(signUpBounds).not.toBeNull();
+  expect(signInBounds).not.toBeNull();
+  expect(Math.abs((homeBounds?.y ?? 0) - (signUpBounds?.y ?? 0))).toBeLessThan(3);
+  expect(Math.abs((homeBounds?.y ?? 0) - (signInBounds?.y ?? 0))).toBeLessThan(3);
 
   await signUp.click();
   await expect(page).toHaveURL(/\/students\/register\/?$/);
@@ -190,6 +201,20 @@ test("desktop navigation separates account creation and existing account login",
   await expect(page).toHaveURL(/\/students\/login\/?$/);
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Create an account" })).toBeVisible();
+});
+
+test("tablet uses mobile navigation instead of an overflowing desktop menu", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 820, height: 900 });
+  await page.goto("/");
+  await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeHidden();
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Mobile navigation" })
+      .getByRole("link", { name: "Sign In" }),
+  ).toBeVisible();
 });
 
 test("private student dashboard redirects visitors without a session", async ({
