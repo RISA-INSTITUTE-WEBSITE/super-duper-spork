@@ -57,31 +57,42 @@ describe("Concise RISA learner dashboard", () => {
   });
 
   it("shows enrolled courses and downloadable exercises without lengthy explanations", async () => {
-    coursesMock.mockResolvedValue([{
-      id: "c0000000-0000-4000-8000-000000000001",
-      slug: "physics",
-      title: "Introduction to Physics",
-      description: "Detailed topics and practical exercises.",
-      status: "active",
-    }]);
-    materialsMock.mockResolvedValue([{
-      id: "f0000000-0000-4000-8000-000000000001",
-      courseId: "c0000000-0000-4000-8000-000000000001",
-      title: "Exercise sheet 1",
-      description: "A lengthy description that is not needed on the dashboard.",
-      kind: "exercise",
-    }]);
+    coursesMock.mockResolvedValue([
+      {
+        id: "c0000000-0000-4000-8000-000000000001",
+        slug: "physics",
+        title: "Introduction to Physics",
+        description: "Detailed topics and practical exercises.",
+        status: "active",
+      },
+    ]);
+    materialsMock.mockResolvedValue([
+      {
+        id: "f0000000-0000-4000-8000-000000000001",
+        courseId: "c0000000-0000-4000-8000-000000000001",
+        title: "Exercise sheet 1",
+        description: "A lengthy description that is not needed on the dashboard.",
+        kind: "exercise",
+      },
+    ]);
 
     const html = renderToStaticMarkup(await StudentDashboardPage());
 
     expect(html).toContain("1 course · 1 file");
     expect(html).toContain("Introduction to Physics");
-    expect(html).toContain('href="/students/courses/c0000000-0000-4000-8000-000000000001"');
+    expect(html).toContain(
+      'href="/students/courses/c0000000-0000-4000-8000-000000000001"',
+    );
     expect(html).toContain('href="#course-materials"');
     expect(html).toContain("Exercise sheet 1");
-    expect(html).toContain('href="/students/materials/f0000000-0000-4000-8000-000000000001"');
+    expect(html).toContain(
+      'href="/students/materials/f0000000-0000-4000-8000-000000000001"',
+    );
     expect(html).not.toContain("A lengthy description that is not needed");
-    expect(coursesMock).toHaveBeenCalledWith("verified-session", "9c1e0000-0000-4000-8000-000000000001");
+    expect(coursesMock).toHaveBeenCalledWith(
+      "verified-session",
+      "9c1e0000-0000-4000-8000-000000000001",
+    );
   });
 
   it("shows explicit unavailable states instead of misleading zero counts", async () => {

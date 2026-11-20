@@ -25,7 +25,10 @@ export const metadata: Metadata = {
 function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null }) {
   if (courses === null) {
     return (
-      <p role="status" className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+      <p
+        role="status"
+        className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"
+      >
         Courses are temporarily unavailable.
       </p>
     );
@@ -62,7 +65,10 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
               href={"/students/courses/" + course.id}
               className="inline-flex min-h-10 items-center text-sm font-bold text-[#286518] hover:underline"
             >
-              Open course <span aria-hidden="true" className="ml-1">→</span>
+              Open course{" "}
+              <span aria-hidden="true" className="ml-1">
+                →
+              </span>
             </Link>
             <Link
               href="#course-materials"
@@ -86,7 +92,10 @@ function CourseMaterialsContent({
 }) {
   if (materials === null) {
     return (
-      <p role="status" className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+      <p
+        role="status"
+        className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900"
+      >
         Study materials are temporarily unavailable.
       </p>
     );
@@ -122,7 +131,10 @@ function CourseMaterialsContent({
             aria-label={"Download " + material.title}
             className="inline-flex min-h-11 shrink-0 items-center rounded-full border border-[#78eb29]/50 bg-[#eefce5] px-4 text-sm font-bold text-[#286518] transition hover:bg-white"
           >
-            Download <span aria-hidden="true" className="ml-1">↓</span>
+            Download{" "}
+            <span aria-hidden="true" className="ml-1">
+              ↓
+            </span>
           </a>
         </article>
       ))}
@@ -190,7 +202,9 @@ export default async function StudentDashboardPage() {
           >
             {user.avatarPath ? (
               <Image
-                src={"/students/avatar?updated=" + encodeURIComponent(user.updatedAt ?? "")}
+                src={
+                  "/students/avatar?updated=" + encodeURIComponent(user.updatedAt ?? "")
+                }
                 alt="Your profile picture"
                 width={80}
                 height={80}
@@ -236,14 +250,20 @@ export default async function StudentDashboardPage() {
 
       <section aria-labelledby="enrolled-heading" className="mt-9">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="enrolled-heading" className="font-heading text-xl font-bold text-slate-950 sm:text-2xl">
+          <h2
+            id="enrolled-heading"
+            className="font-heading text-xl font-bold text-slate-950 sm:text-2xl"
+          >
             My courses
           </h2>
           <Link
             href="/programmes"
             className="inline-flex min-h-11 items-center rounded-full bg-[#286518] px-5 text-sm font-bold text-white transition hover:bg-[#1d4f11]"
           >
-            Browse courses <span aria-hidden="true" className="ml-2">→</span>
+            Browse courses{" "}
+            <span aria-hidden="true" className="ml-2">
+              →
+            </span>
           </Link>
         </div>
         <EnrolledCoursesContent courses={courses} />
@@ -254,7 +274,10 @@ export default async function StudentDashboardPage() {
         aria-labelledby="materials-heading"
         className="mt-9 scroll-mt-24"
       >
-        <h2 id="materials-heading" className="font-heading text-xl font-bold text-slate-950 sm:text-2xl">
+        <h2
+          id="materials-heading"
+          className="font-heading text-xl font-bold text-slate-950 sm:text-2xl"
+        >
           Study materials
         </h2>
         <CourseMaterialsContent courses={courses} materials={materials} />
