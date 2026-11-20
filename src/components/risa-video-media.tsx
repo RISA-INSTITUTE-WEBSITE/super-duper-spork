@@ -3,10 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-import {
-  getYouTubeEmbedUrl,
-  getYouTubeThumbnailUrl,
-} from "@/lib/risa-youtube-media";
+import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from "@/lib/risa-youtube-media";
 
 /** A thumbnail is never an external navigation link. */
 export function YouTubeLessonThumbnail({
@@ -58,7 +55,10 @@ export function InlineYouTubePlayer({
   const url = getYouTubeEmbedUrl(videoId);
   if (!url) {
     return (
-      <div role="alert" className="flex aspect-video items-center justify-center bg-slate-900 p-5 text-center text-sm text-white">
+      <div
+        role="alert"
+        className="flex aspect-video items-center justify-center bg-slate-900 p-5 text-center text-sm text-white"
+      >
         This lesson has an invalid video reference.
       </div>
     );

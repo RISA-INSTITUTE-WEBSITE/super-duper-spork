@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 
-import { InlineYouTubePlayer, YouTubeLessonThumbnail } from "@/components/risa-video-media";
+import {
+  InlineYouTubePlayer,
+  YouTubeLessonThumbnail,
+} from "@/components/risa-video-media";
 import { StudentPracticeQuiz } from "@/components/student-practice-quiz";
 import type {
   CourseCurriculum,
@@ -42,7 +45,10 @@ function TopicTile({ topic, order, curriculum, onOpen }: TopicTileProps) {
               title={firstVideo.title}
             />
           ) : (
-            <div className="flex aspect-video items-center justify-center bg-gradient-to-br from-[#e9f2ff] via-white to-[#e0f2d3] text-5xl text-[#286518]/60" aria-hidden="true">
+            <div
+              className="flex aspect-video items-center justify-center bg-gradient-to-br from-[#e9f2ff] via-white to-[#e0f2d3] text-5xl text-[#286518]/60"
+              aria-hidden="true"
+            >
               ◇
             </div>
           )}
@@ -179,14 +185,23 @@ function TopicDetails({
         )}
       </header>
       {currentVideo ? (
-        <section aria-labelledby="playing-heading" className="risa-science-glass rounded-[1.6rem] p-4 sm:p-7">
+        <section
+          aria-labelledby="playing-heading"
+          className="risa-science-glass rounded-[1.6rem] p-4 sm:p-7"
+        >
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#286518]">
             Now playing on RISA
           </p>
-          <h3 id="playing-heading" className="mb-4 mt-2 font-heading text-xl font-bold text-slate-950">
+          <h3
+            id="playing-heading"
+            className="mb-4 mt-2 font-heading text-xl font-bold text-slate-950"
+          >
             {currentVideo.title}
           </h3>
-          <InlineYouTubePlayer videoId={currentVideo.youtube_id} title={currentVideo.title} />
+          <InlineYouTubePlayer
+            videoId={currentVideo.youtube_id}
+            title={currentVideo.title}
+          />
           <p className="mt-3 text-xs text-slate-600">
             This lesson plays here using YouTube&apos;s embedded player and controls.
           </p>
@@ -197,10 +212,11 @@ function TopicDetails({
         </div>
       )}
       {videos.length > 0 && (
-        <section aria-label="Videos in this topic" className="risa-glass-card rounded-[1.5rem] p-5 sm:p-7">
-          <h3 className="font-heading text-xl font-bold text-slate-950">
-            Video lessons
-          </h3>
+        <section
+          aria-label="Videos in this topic"
+          className="risa-glass-card rounded-[1.5rem] p-5 sm:p-7"
+        >
+          <h3 className="font-heading text-xl font-bold text-slate-950">Video lessons</h3>
           <p className="mt-2 text-sm text-slate-600">
             Choose a thumbnail to switch lessons without leaving this page.
           </p>
@@ -218,7 +234,10 @@ function TopicDetails({
       )}
       {quizzes.length > 0 && (
         <section aria-labelledby="topic-quiz-heading" className="space-y-5">
-          <h3 id="topic-quiz-heading" className="font-heading text-xl font-bold text-slate-950">
+          <h3
+            id="topic-quiz-heading"
+            className="font-heading text-xl font-bold text-slate-950"
+          >
             Practice quizzes
           </h3>
           {quizzes.map((quiz) => (
@@ -271,7 +290,8 @@ export function StudentCourseContent({ curriculum }: { curriculum: CourseCurricu
               Choose a topic
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Each topic shows the thumbnail of its first published video, with lesson previews below.
+              Each topic shows the thumbnail of its first published video, with lesson
+              previews below.
             </p>
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

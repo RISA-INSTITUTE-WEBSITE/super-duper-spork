@@ -28,11 +28,7 @@ describe("RISA inline YouTube video media URLs", () => {
   });
 
   it("supports permitted letters, digits, hyphens and underscores", () => {
-    expect(getYouTubeThumbnailUrl("ABCdef-_123")).toContain(
-      "/ABCdef-_123/",
-    );
-    expect(getYouTubeEmbedUrl("ABCdef-_123")).toContain(
-      "/embed/ABCdef-_123?",
-    );
+    expect(getYouTubeThumbnailUrl("ABCdef-_123")).toContain("/ABCdef-_123/");
+    expect(getYouTubeEmbedUrl("ABCdef-_123")).toContain("/embed/ABCdef-_123?");
   });
 });

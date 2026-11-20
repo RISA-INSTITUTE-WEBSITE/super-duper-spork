@@ -24,7 +24,10 @@ export function AdminTopicVideoPreviews({ videos }: { videos: TopicVideo[] }) {
       </h4>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(240px,1fr)]">
         <div className="min-w-0 rounded-[1.35rem] border border-white bg-white/75 p-3 sm:p-4">
-          <InlineYouTubePlayer videoId={activeVideo.youtube_id} title={activeVideo.title} />
+          <InlineYouTubePlayer
+            videoId={activeVideo.youtube_id}
+            title={activeVideo.title}
+          />
           <p className="mt-3 text-sm font-bold text-slate-900">{activeVideo.title}</p>
           <span className="mt-1 inline-block text-xs font-medium text-[#286518]">
             {activeVideo.is_published ? "Published lesson" : "Unpublished draft"}
