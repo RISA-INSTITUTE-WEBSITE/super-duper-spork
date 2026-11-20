@@ -113,10 +113,7 @@ export async function SiteHeader() {
             </svg>
           </button>
         </form>
-        <nav
-          aria-label="Primary navigation"
-          className="hidden shrink-0 lg:block"
-        >
+        <nav aria-label="Primary navigation" className="hidden shrink-0 lg:block">
           <ul className="flex items-center gap-0.5 whitespace-nowrap font-heading text-base font-semibold text-slate-700 xl:gap-1">
             {navigation.map(({ href, label }) => (
               <li key={href}>

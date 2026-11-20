@@ -211,7 +211,8 @@ test("tablet uses mobile navigation instead of an overflowing desktop menu", asy
   await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeHidden();
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await expect(
-    page.getByRole("navigation", { name: "Mobile navigation" })
+    page
+      .getByRole("navigation", { name: "Mobile navigation" })
       .getByRole("link", { name: "Sign In" }),
   ).toBeVisible();
 });
