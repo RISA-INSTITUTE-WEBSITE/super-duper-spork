@@ -2,13 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
+import { RisaAcademyCourseCard } from "@/components/risa-academy-course-card";
 import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
-
-const pathwayAccents = [
-  "from-sky-400 to-cyan-300",
-  "from-indigo-400 to-sky-300",
-  "from-teal-400 to-emerald-300",
-] as const;
 
 function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   return (
@@ -128,61 +123,16 @@ export default async function HomePage() {
               published by RISA administration.
             </p>
           ) : (
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {courses.map((course, index) => {
-                const thumbnailUrl = risaThumbnailUrl(course.thumbnail_path);
-                return (
-                  <article
-                    key={course.id}
-                    className="risa-pathway-card group relative isolate flex flex-col overflow-hidden rounded-[1.6rem] transition duration-200 hover:-translate-y-1"
-                  >
-                    <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-[#dbeafe] via-[#f0f9ff] to-[#d9f7ca]">
-                      {thumbnailUrl ? (
-                        <Image
-                          src={thumbnailUrl}
-                          alt={course.title + " course thumbnail"}
-                          fill
-                          unoptimized
-                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center px-6">
-                          <span className="font-mono text-4xl font-black tracking-wider text-[#155DFC]/35">
-                            {course.code}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="relative flex flex-1 flex-col p-6 sm:p-7">
-                      <div
-                        aria-hidden="true"
-                        className={
-                          "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r " +
-                          pathwayAccents[index % pathwayAccents.length]
-                        }
-                      />
-                      <span className="w-fit rounded-full bg-white/75 px-3 py-1.5 text-xs font-bold text-blue-800">
-                        {course.level}
-                      </span>
-                      <h3 className="mt-5 text-xl font-bold leading-snug tracking-tight text-slate-950">
-                        <span className="font-mono text-[#286518]">{course.code}</span>
-                        {" — "}
-                        {course.title}
-                      </h3>
-                      <p className="mt-4 flex-1 text-sm leading-7 text-slate-600">
-                        {course.description || "Explore this RISA learning course."}
-                      </p>
-                      <Link
-                        href={"/students/courses/" + course.id}
-                        className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
-                      >
-                        Preview topics <ArrowIcon diagonal />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
+            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+              {courses.map((course) => (
+                <RisaAcademyCourseCard
+                  key={course.id}
+                  course={{
+                    ...course,
+                    thumbnailUrl: risaThumbnailUrl(course.thumbnail_path),
+                  }}
+                />
+              ))}
             </div>
           )}
         </div>
