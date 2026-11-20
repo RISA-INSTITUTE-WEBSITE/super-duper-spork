@@ -1,0 +1,35 @@
+name: Temporary Sign Up Navigation Formatter
+
+on:
+  push:
+    branches:
+      - feat/risa-signup-signin-navigation
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.repository == 'RISA-INSTITUTE-WEBSITE/super-duper-spork' && github.actor == 'learnxul-lang'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: feat/risa-signup-signin-navigation
+          persist-credentials: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format modified navigation and acceptance tests
+        run: |
+          npx prettier --write src/components/site-header.tsx src/components/mobile-navigation.tsx tests/e2e/public-pages.spec.ts
+      - name: Commit formatting if needed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/site-header.tsx src/components/mobile-navigation.tsx tests/e2e/public-pages.spec.ts
+          if ! git diff --cached --quiet; then
+            git commit -m "style: format RISA sign-up navigation tests"
+            git push origin HEAD:feat/risa-signup-signin-navigation
+          fi
