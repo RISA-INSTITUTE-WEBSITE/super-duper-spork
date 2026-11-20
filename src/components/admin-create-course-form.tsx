@@ -23,10 +23,7 @@ export function AdminCreateCourseForm() {
     initialCourseCreationState,
   );
   return (
-    <form
-      action={formAction}
-      className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8"
-    >
+    <form action={formAction} className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8">
       <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#286518]">
@@ -145,8 +142,8 @@ export function AdminCreateCourseForm() {
             }
           />
           <p id="risa-thumbnail-hint" className="mt-2 text-xs text-slate-600">
-            Required JPG, PNG or WebP (max 2 MB). Add a cover image before creating
-            the course.
+            Required JPG, PNG or WebP (max 2 MB). Add a cover image before creating the
+            course.
           </p>
         </div>
       </div>

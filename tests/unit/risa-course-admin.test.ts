@@ -116,8 +116,7 @@ describe("RISA institutional course codes", () => {
 
   it("creates a course with its initial level and thumbnail in one insert", async () => {
     const courseId = "11111111-1111-4111-8111-111111111111";
-    const thumbnailPath =
-      courseId + "/22222222-2222-4222-8222-222222222222.png";
+    const thumbnailPath = courseId + "/22222222-2222-4222-8222-222222222222.png";
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
 
     expect(
