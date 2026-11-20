@@ -35,4 +35,9 @@ curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
   grep --ignore-case --quiet '^x-frame-options: DENY'
 curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
   grep --ignore-case --quiet '^content-security-policy:'
+# Regression: apply CORP to HTML and local static resources; ZAP rule 90004.
+for route in / /risa-logo.svg; do
+  curl --fail --silent --show-error --head "http://127.0.0.1:3000$route" |
+    grep --ignore-case --quiet '^cross-origin-resource-policy: same-origin'
+done
 echo "QA-HTTP checks passed"
