@@ -209,7 +209,42 @@ review. Related CORP remediation is recorded separately in PR #47.
 References: [OWASP ZAP 90004-2](https://www.zaproxy.org/docs/alerts/90004-2/)
 and [MDN Cross-Origin-Embedder-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy).
 
-## 10. What the findings do **not** mean
+## 10. Account form anti-CSRF hardening (rule 20012 follow-up)
+
+The third ZAP warning (`Anti-CSRF Tokens Check [20012]`) covers the
+`/students/login` and `/students/register` forms, where the scanner
+previously detected no recognized anti-CSRF token.
+
+**Change proposed:** RISA now issues a cryptographically random,
+32-byte, base64url-encoded CSRF token whenever either account page is
+opened without an existing well-formed token. The token is sent in an
+HttpOnly, SameSite=Strict, host-only cookie (with `Secure` and
+`__Host-` prefix on production HTTPS). A matching `csrf_token`
+hidden form value is rendered server-side. Both Server Actions verify the
+form value against the cookie using constant-time comparison **before**
+sending credentials to Supabase. Missing/forged values are rejected with
+a reload-and-retry message.
+
+**Relevant code:**
+- [`src/lib/student-csrf.ts`](../../../src/lib/student-csrf.ts) — generation, format, cookie settings and constant-time validation
+- [`src/proxy.ts`](../../../src/proxy.ts) — token issuance on account-page GET while preserving session refresh
+- [`src/app/students/actions.ts`](../../../src/app/students/actions.ts) — reject missing or mismatched tokens
+- [Sign-in form](../../../src/app/students/login/page.tsx) and
+  [registration form](../../../src/components/student-registration-form.tsx) — hidden token fields
+- [CSRF unit tests](../../../tests/unit/student-csrf.test.ts),
+  [Server Action tests](../../../tests/unit/student-account-actions-csrf.test.ts),
+  and [HTTP form/cookie test](../../../tests/security/assert-account-csrf.mjs)
+
+**Security distinction:** This is a genuine form/cookie-bound validation
+control, not a decorative hidden input, and supplements Next.js' own
+Server Action Origin/Host validation. The ZAP warning is considered
+**pending verification** until a new full scan reports its status. It
+does not automatically address warning `10202` or the other ZAP alerts.
+
+Reference: [ZAP 20012](https://www.zaproxy.org/docs/alerts/20012/)
+and [Next.js Server Action security](https://nextjs.org/docs/app/guides/data-security).
+
+## 11. What the findings do **not** mean
 
 - A red CI check **does not prove RISA was hacked**.
 - Zero scanner `FAIL` findings **does not certify the website as secure**.
