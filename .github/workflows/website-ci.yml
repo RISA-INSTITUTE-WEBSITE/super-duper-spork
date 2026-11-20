@@ -44,7 +44,13 @@ jobs:
       # Phase 1 - fastest, read-only static checks.
       # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
       - name: Phase 1 - Formatting without modifications
-        run: npm run format:check
+        run: |
+          npm run format:check || {
+            echo '=== TEMP PRETTIER FOOTER OUTPUT START ==='
+            npx prettier src/components/site-footer.tsx
+            echo '=== TEMP PRETTIER FOOTER OUTPUT END ==='
+            exit 1
+          }
 
       # QA-STATIC-02/03: enforce lint and strict TS typing before slower checks.
       - name: Phase 1 - ESLint, complexity and TypeScript
