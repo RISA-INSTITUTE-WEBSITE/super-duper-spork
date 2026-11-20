@@ -35,4 +35,17 @@ curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
   grep --ignore-case --quiet '^x-frame-options: DENY'
 curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
   grep --ignore-case --quiet '^content-security-policy:'
+# QA-HTTP-04: COEP is enforced on selected pages without third-party embeds.
+for route in /about /contact /students/login /students/register /students/privacy; do
+  curl --fail --silent --show-error --head "http://127.0.0.1:3000$route" |
+    grep --ignore-case --quiet '^cross-origin-embedder-policy: require-corp'
+done
+
+# No global COEP enforcement: homepage/course catalogue uses public Supabase
+# thumbnail images, and student/admin course views embed third-party YouTube.
+if curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
+  grep --ignore-case --quiet '^cross-origin-embedder-policy: require-corp'; then
+  echo "Unexpected global COEP enforcement: public thumbnails may break"
+  exit 1
+fi
 echo "QA-HTTP checks passed"
