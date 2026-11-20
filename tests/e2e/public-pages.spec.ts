@@ -94,7 +94,9 @@ test("site search finds published course navigation", async ({ page }) => {
   await search.getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search\?q=courses$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Search RISA");
-  await expect(page.getByRole("main").getByRole("link", { name: /Page Programmes/ })).toBeVisible();
+  await expect(
+    page.getByRole("main").getByRole("link", { name: /Page Programmes/ }),
+  ).toBeVisible();
 });
 
 test("site search handles unmatched keywords", async ({ page }) => {
@@ -116,7 +118,9 @@ test("mobile header opens search only when its icon is tapped", async ({ page })
   await search.getByRole("searchbox", { name: "Search RISA website" }).fill("courses");
   await search.getByRole("button", { name: "Search" }).click();
   await expect(page).toHaveURL(/\/search\?q=courses$/);
-  await expect(page.getByRole("main").getByRole("link", { name: /Page Programmes/ })).toBeVisible();
+  await expect(
+    page.getByRole("main").getByRole("link", { name: /Page Programmes/ }),
+  ).toBeVisible();
 });
 
 test("mobile menu opens a sidebar and closes after navigation", async ({ page }) => {
