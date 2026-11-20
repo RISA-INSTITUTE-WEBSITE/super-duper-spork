@@ -98,8 +98,12 @@ export default async function StudentCoursePage({
       </header>
 
       {enrolled === null ? (
-        <p role="alert" className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900">
-          Your enrolment status is temporarily unavailable. Course access cannot be verified.
+        <p
+          role="alert"
+          className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900"
+        >
+          Your enrolment status is temporarily unavailable. Course access cannot be
+          verified.
         </p>
       ) : isEnrolled ? (
         <div className="mt-9 space-y-6">
@@ -121,7 +125,10 @@ export default async function StudentCoursePage({
           )}
         </div>
       ) : !preview || request === undefined ? (
-        <p role="alert" className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900">
+        <p
+          role="alert"
+          className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900"
+        >
           The course preview is temporarily unavailable. Please try again.
         </p>
       ) : (

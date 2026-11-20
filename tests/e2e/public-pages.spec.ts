@@ -291,7 +291,9 @@ test("RISA section animates original black liquid and green sphere without chang
   await expect(animatedLogo).toBeVisible();
 });
 
-test("course preview and enrolment review require verified accounts", async ({ page }) => {
+test("course preview and enrolment review require verified accounts", async ({
+  page,
+}) => {
   const courseId = "11111111-1111-4111-8111-111111111111";
   await page.goto("/students/courses/" + courseId);
   await expect(page).toHaveURL(/\/students\/login\/?$/);

@@ -78,7 +78,7 @@ export async function getCourseEnrolmentRequest(
       studentId +
       "&limit=1",
   );
-  return rows === null ? undefined : rows[0] ?? null;
+  return rows === null ? undefined : (rows[0] ?? null);
 }
 
 /** Only the authenticated owner may submit; the database rechecks ownership. */
@@ -96,16 +96,20 @@ export async function submitCourseEnrolmentRequest(
   ) {
     return "unavailable";
   }
-  const response = await requestStudentBackend(token, "/rest/v1/risa_enrolment_requests", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
-    body: JSON.stringify({
-      course_id: courseId,
-      student_id: studentId,
-      email,
-      status: "pending",
-    }),
-  });
+  const response = await requestStudentBackend(
+    token,
+    "/rest/v1/risa_enrolment_requests",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        course_id: courseId,
+        student_id: studentId,
+        email,
+        status: "pending",
+      }),
+    },
+  );
   if (response?.status === 409) {
     return "duplicate";
   }
@@ -211,8 +215,10 @@ export async function reviewCourseEnrolmentRequest(
     token,
     "/rest/v1/risa_enrolment_requests?select=" +
       requestFields +
-      "&course_id=eq." + courseId +
-      "&student_id=eq." + studentId +
+      "&course_id=eq." +
+      courseId +
+      "&student_id=eq." +
+      studentId +
       "&status=eq.pending&limit=1",
   );
   if (!request?.length) {

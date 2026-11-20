@@ -24,8 +24,9 @@ export default async function ProgrammesPage() {
       </p>
       <h1 className="mt-3 text-4xl font-bold text-slate-950">Available courses</h1>
       <p className="mt-5 max-w-3xl leading-relaxed text-slate-600">
-        Explore the courses published by RISA administration. Sign in to preview published course topics and blurred video thumbnails. RISA
-        enrolment approval unlocks the full lessons, quizzes and study resources.
+        Explore the courses published by RISA administration. Sign in to preview published
+        course topics and blurred video thumbnails. RISA enrolment approval unlocks the
+        full lessons, quizzes and study resources.
       </p>
 
       {courses === null ? (

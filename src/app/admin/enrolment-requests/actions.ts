@@ -31,12 +31,7 @@ export async function reviewEnrolmentAction(formData: FormData): Promise<void> {
     redirect("/admin/enrolment-requests?result=invalid");
   }
 
-  const result = await reviewCourseEnrolmentRequest(
-    token,
-    courseId,
-    studentId,
-    decision,
-  );
+  const result = await reviewCourseEnrolmentRequest(token, courseId, studentId, decision);
   if (!result) {
     redirect("/admin/enrolment-requests?result=failed");
   }

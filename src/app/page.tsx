@@ -343,8 +343,9 @@ export default async function HomePage() {
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-500">
-            Website in development. Registered learners can preview course topics and request
-            enrolment. Access to full lessons requires approval by RISA administration.
+            Website in development. Registered learners can preview course topics and
+            request enrolment. Access to full lessons requires approval by RISA
+            administration.
           </p>
         </div>
       </section>

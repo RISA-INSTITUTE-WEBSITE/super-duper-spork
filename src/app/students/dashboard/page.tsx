@@ -39,7 +39,8 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
           </h3>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
             When RISA enrols you in a published course, it will appear here. You can
-            preview the published courses in our catalogue and request enrolment in the meantime.
+            preview the published courses in our catalogue and request enrolment in the
+            meantime.
           </p>
         </div>
       ) : (

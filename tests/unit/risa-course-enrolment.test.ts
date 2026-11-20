@@ -37,9 +37,7 @@ describe("learner enrolment request access", () => {
     expect(request?.status).toBe("pending");
     expect(fetchMock.mock.calls[0][0]).toContain("student_id=eq." + studentId);
     expect(fetchMock.mock.calls[0][0]).toContain("course_id=eq." + courseId);
-    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe(
-      "Bearer student-jwt",
-    );
+    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe("Bearer student-jwt");
   });
 
   it("returns null for no request and undefined for backend errors", async () => {

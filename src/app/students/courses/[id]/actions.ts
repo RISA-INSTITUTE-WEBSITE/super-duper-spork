@@ -39,7 +39,10 @@ export async function requestEnrolmentAction(
     getCourseEnrolmentRequest(token, courseId, identity.id),
   ]);
   if (!course?.is_published || enrolled === null || existing === undefined) {
-    return { status: "error", message: "Enrolment requests are temporarily unavailable." };
+    return {
+      status: "error",
+      message: "Enrolment requests are temporarily unavailable.",
+    };
   }
   if (enrolled.some((item) => item.id === courseId)) {
     return { status: "existing", message: "You are already enrolled in this course." };

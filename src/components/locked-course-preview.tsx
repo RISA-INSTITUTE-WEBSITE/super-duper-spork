@@ -65,9 +65,9 @@ export function LockedCoursePreview({
           Explore course topics
         </h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          Topic titles and descriptions are visible to registered learners.
-          Video previews are blurred until your enrolment is approved.
-          Select a topic or locked lesson to request access.
+          Topic titles and descriptions are visible to registered learners. Video previews
+          are blurred until your enrolment is approved. Select a topic or locked lesson to
+          request access.
         </p>
       </div>
 
@@ -103,7 +103,9 @@ export function LockedCoursePreview({
                     )}
                   </div>
                   <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/25 text-white">
-                    <span aria-hidden="true" className="text-3xl">🔒</span>
+                    <span aria-hidden="true" className="text-3xl">
+                      🔒
+                    </span>
                     <span className="rounded-full border border-white/70 bg-black/40 px-4 py-1.5 text-xs font-bold backdrop-blur-sm">
                       Enrol to unlock lessons
                     </span>
@@ -143,7 +145,10 @@ export function LockedCoursePreview({
                             title={video.title}
                           />
                         </div>
-                        <span className="absolute inset-0 flex items-center justify-center text-lg text-white drop-shadow" aria-hidden="true">
+                        <span
+                          className="absolute inset-0 flex items-center justify-center text-lg text-white drop-shadow"
+                          aria-hidden="true"
+                        >
                           🔒
                         </span>
                       </button>
@@ -180,7 +185,10 @@ export function LockedCoursePreview({
             className="risa-science-glass w-full max-w-md rounded-[1.8rem] border border-white p-6 shadow-2xl sm:p-8"
           >
             <div className="flex justify-between gap-4">
-              <span className="flex size-12 items-center justify-center rounded-xl bg-[#eefce5] text-2xl" aria-hidden="true">
+              <span
+                className="flex size-12 items-center justify-center rounded-xl bg-[#eefce5] text-2xl"
+                aria-hidden="true"
+              >
                 🔒
               </span>
               <button
@@ -196,13 +204,19 @@ export function LockedCoursePreview({
             <p className="mt-5 text-xs font-bold uppercase tracking-widest text-[#286518]">
               RISA course access
             </p>
-            <h2 id="risa-enrolment-title" className="mt-2 font-heading text-2xl font-bold text-slate-950">
+            <h2
+              id="risa-enrolment-title"
+              className="mt-2 font-heading text-2xl font-bold text-slate-950"
+            >
               Enrol to unlock this course
             </h2>
-            <p id="risa-enrolment-description" className="mt-3 text-sm leading-7 text-slate-700">
-              Your RISA account lets you preview <strong>{courseName}</strong>.
-              Request enrolment to access the complete lessons, quizzes and study resources
-              after RISA approves your registration.
+            <p
+              id="risa-enrolment-description"
+              className="mt-3 text-sm leading-7 text-slate-700"
+            >
+              Your RISA account lets you preview <strong>{courseName}</strong>. Request
+              enrolment to access the complete lessons, quizzes and study resources after
+              RISA approves your registration.
             </p>
             {selectedTitle && (
               <p className="mt-4 rounded-xl bg-white/70 px-4 py-3 text-sm text-slate-700">
@@ -227,18 +241,20 @@ export function LockedCoursePreview({
               </p>
             )}
 
-            {!requestStatus && state.status !== "success" && state.status !== "existing" && (
-              <form action={formAction} className="mt-6">
-                <input type="hidden" name="courseId" value={courseId} />
-                <button
-                  type="submit"
-                  disabled={pending}
-                  className="min-h-12 w-full rounded-xl bg-[#286518] px-5 py-3 text-sm font-bold text-white hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-[#286518] disabled:opacity-60"
-                >
-                  {pending ? "Sending request..." : "Request course enrolment"}
-                </button>
-              </form>
-            )}
+            {!requestStatus &&
+              state.status !== "success" &&
+              state.status !== "existing" && (
+                <form action={formAction} className="mt-6">
+                  <input type="hidden" name="courseId" value={courseId} />
+                  <button
+                    type="submit"
+                    disabled={pending}
+                    className="min-h-12 w-full rounded-xl bg-[#286518] px-5 py-3 text-sm font-bold text-white hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-[#286518] disabled:opacity-60"
+                  >
+                    {pending ? "Sending request..." : "Request course enrolment"}
+                  </button>
+                </form>
+              )}
             <button
               type="button"
               onClick={() => setDialogOpen(false)}
