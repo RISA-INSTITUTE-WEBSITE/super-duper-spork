@@ -1,0 +1,46 @@
+name: One-time RISA course catalogue formatter
+
+on:
+  push:
+    branches:
+      - feat/live-course-catalogue
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.repository == 'RISA-INSTITUTE-WEBSITE/super-duper-spork' && github.actor == 'learnxul-lang'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: feat/live-course-catalogue
+          persist-credentials: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format only changed course catalogue sources
+        run: |
+          npx prettier --write \
+            src/app/admin/courses/actions.ts \
+            src/app/admin/courses/page.tsx \
+            src/app/page.tsx \
+            src/app/programmes/page.tsx \
+            src/app/search/page.tsx \
+            src/components/admin-create-course-form.tsx \
+            src/components/admin-edit-course-form.tsx \
+            src/lib/risa-course-admin.ts \
+            src/lib/student-auth-api.ts \
+            tests/e2e/public-pages.spec.ts \
+            tests/unit/risa-course-admin.test.ts
+      - name: Commit formatting on feature branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/app/admin/courses/actions.ts src/app/admin/courses/page.tsx src/app/page.tsx src/app/programmes/page.tsx src/app/search/page.tsx src/components/admin-create-course-form.tsx src/components/admin-edit-course-form.tsx src/lib/risa-course-admin.ts src/lib/student-auth-api.ts tests/e2e/public-pages.spec.ts tests/unit/risa-course-admin.test.ts
+          if ! git diff --cached --quiet; then
+            git commit -m "style: apply Prettier to RISA course catalogue changes"
+            git push origin HEAD:feat/live-course-catalogue
+          fi
