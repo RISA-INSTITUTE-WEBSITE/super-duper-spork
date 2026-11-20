@@ -38,7 +38,9 @@ function TopicQuizzes({
         <StudentPracticeQuiz
           key={quiz.id}
           quiz={quiz}
-          questions={curriculum.questions.filter((question) => question.quiz_id === quiz.id)}
+          questions={curriculum.questions.filter(
+            (question) => question.quiz_id === quiz.id,
+          )}
         />
       ))}
     </section>
@@ -56,11 +58,20 @@ export default async function StudentTopicPage({
 
   if (!curriculum) {
     return (
-      <main id="main-content" className="mx-auto w-full max-w-5xl flex-1 px-5 py-12 sm:px-8">
-        <Link href={courseHref} className="text-sm font-semibold text-[#286518] hover:underline">
+      <main
+        id="main-content"
+        className="mx-auto w-full max-w-5xl flex-1 px-5 py-12 sm:px-8"
+      >
+        <Link
+          href={courseHref}
+          className="text-sm font-semibold text-[#286518] hover:underline"
+        >
           ← Back to course topics
         </Link>
-        <p role="alert" className="mt-7 rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900">
+        <p
+          role="alert"
+          className="mt-7 rounded-xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
+        >
           Topic lessons are temporarily unavailable. Please try again.
         </p>
       </main>
@@ -78,15 +89,25 @@ export default async function StudentTopicPage({
       id="main-content"
       className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 sm:px-8 lg:py-16"
     >
-      <nav aria-label="Course breadcrumbs" className="flex flex-wrap items-center gap-2 text-sm">
-        <Link href="/students/dashboard" className="font-semibold text-[#286518] hover:underline">
+      <nav
+        aria-label="Course breadcrumbs"
+        className="flex flex-wrap items-center gap-2 text-sm"
+      >
+        <Link
+          href="/students/dashboard"
+          className="font-semibold text-[#286518] hover:underline"
+        >
           My Learning
         </Link>
-        <span aria-hidden="true" className="text-slate-400">/</span>
+        <span aria-hidden="true" className="text-slate-400">
+          /
+        </span>
         <Link href={courseHref} className="font-semibold text-[#286518] hover:underline">
           {course.code} topics
         </Link>
-        <span aria-hidden="true" className="text-slate-400">/</span>
+        <span aria-hidden="true" className="text-slate-400">
+          /
+        </span>
         <span className="text-slate-600">{topic.title}</span>
       </nav>
 
@@ -103,8 +124,8 @@ export default async function StudentTopicPage({
           </p>
         )}
         <p className="mt-5 text-xs font-semibold text-[#286518]">
-          {videos.length} {videos.length === 1 ? "Video lesson" : "Video lessons"} ·
-          Watch directly on RISA
+          {videos.length} {videos.length === 1 ? "Video lesson" : "Video lessons"} · Watch
+          directly on RISA
         </p>
       </header>
 

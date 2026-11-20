@@ -1,11 +1,7 @@
 import Link from "next/link";
 
 import { YouTubeThumbnail } from "@/components/youtube-thumbnail";
-import type {
-  CourseTopic,
-  TopicQuiz,
-  TopicVideo,
-} from "@/lib/risa-course-curriculum";
+import type { CourseTopic, TopicQuiz, TopicVideo } from "@/lib/risa-course-curriculum";
 
 type StudentTopicCardProps = {
   courseId: string;
@@ -72,7 +68,9 @@ export function StudentTopicCard({
 
       <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-white/90 pt-5">
         <span className="inline-flex items-center gap-2 text-xs font-extrabold text-slate-700">
-          <span aria-hidden="true" className="text-[#800000]">▣</span>
+          <span aria-hidden="true" className="text-[#800000]">
+            ▣
+          </span>
           {lessonCount} {lessonCount === 1 ? "Lesson" : "Lessons"}
           {quizCount > 0 && (
             <span className="font-semibold text-slate-500">

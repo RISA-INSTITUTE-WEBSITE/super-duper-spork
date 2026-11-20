@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  getYouTubeEmbedUrl,
-  getYouTubeThumbnailUrl,
-} from "../../src/lib/youtube-media";
+import { getYouTubeEmbedUrl, getYouTubeThumbnailUrl } from "../../src/lib/youtube-media";
 
 describe("validated RISA video artwork and embedded player URLs", () => {
   const id = "dQw4w9WgXcQ";

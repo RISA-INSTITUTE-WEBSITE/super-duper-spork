@@ -63,8 +63,8 @@ export default async function StudentCoursePage({
               Choose a topic
             </h2>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              Each card shows the first video lesson&apos;s thumbnail. Select a topic
-              to watch its videos here on RISA and access practice quizzes.
+              Each card shows the first video lesson&apos;s thumbnail. Select a topic to
+              watch its videos here on RISA and access practice quizzes.
             </p>
           </div>
           {curriculum && (
