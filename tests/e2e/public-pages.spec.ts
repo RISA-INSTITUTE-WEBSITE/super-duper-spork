@@ -183,8 +183,10 @@ test("desktop navigation separates account creation and existing account login",
   await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
 
   await page.goto("/");
-  await page.getByRole("navigation", { name: "Primary navigation" })
-    .getByRole("link", { name: "Sign In" }).click();
+  await page
+    .getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Sign In" })
+    .click();
   await expect(page).toHaveURL(/\/students\/login\/?$/);
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Create an account" })).toBeVisible();
@@ -243,10 +245,12 @@ test("mobile navigation separates Sign Up and Sign In without a Students entry",
 
   await expect(navigation.getByRole("link", { name: "Students" })).toHaveCount(0);
   await expect(navigation.getByRole("link", { name: "Sign Up" })).toHaveAttribute(
-    "href", "/students/register",
+    "href",
+    "/students/register",
   );
   await expect(navigation.getByRole("link", { name: "Sign In" })).toHaveAttribute(
-    "href", "/students/login",
+    "href",
+    "/students/login",
   );
 
   await navigation.getByRole("link", { name: "Sign Up" }).click();
@@ -256,8 +260,10 @@ test("mobile navigation separates Sign Up and Sign In without a Students entry",
 
   await page.goto("/");
   await page.getByRole("button", { name: "Open navigation menu" }).click();
-  await page.getByRole("navigation", { name: "Mobile navigation" })
-    .getByRole("link", { name: "Sign In" }).click();
+  await page
+    .getByRole("navigation", { name: "Mobile navigation" })
+    .getByRole("link", { name: "Sign In" })
+    .click();
   await expect(page).toHaveURL(/\/students\/login\/?$/);
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
