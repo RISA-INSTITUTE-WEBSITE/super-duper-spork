@@ -8,7 +8,8 @@ const navigation = [
   { href: "/programmes", label: "Programmes" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
-  { href: "/students/login", label: "Students" },
+  { href: "/students/register", label: "Sign Up" },
+  { href: "/students/login", label: "Sign In" },
 ] as const;
 
 export function SiteHeader() {
@@ -83,7 +84,12 @@ export function SiteHeader() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex min-h-10 items-center rounded-xl px-3 py-2 transition hover:bg-[#eefce5] hover:text-[#286518] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
+                  className={
+                    "inline-flex min-h-10 items-center rounded-xl px-3 py-2 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518] " +
+                    (label === "Sign Up"
+                      ? "bg-[#286518] text-white hover:bg-[#1d4f11]"
+                      : "hover:bg-[#eefce5] hover:text-[#286518]")
+                  }
                 >
                   {label}
                 </Link>

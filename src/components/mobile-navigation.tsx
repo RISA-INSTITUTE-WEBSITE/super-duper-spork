@@ -8,7 +8,8 @@ const navigation = [
   { href: "/programmes", label: "Programmes" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
-  { href: "/students/login", label: "Students" },
+  { href: "/students/register", label: "Sign Up" },
+  { href: "/students/login", label: "Sign In" },
 ] as const;
 
 function SearchIcon() {
@@ -243,7 +244,12 @@ export function MobileNavigation() {
                     <Link
                       href={href}
                       onClick={() => setMenuOpen(false)}
-                      className="flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold text-slate-800 transition hover:bg-[#eefce5] hover:text-[#286518] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
+                      className={
+                        "flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518] " +
+                        (label === "Sign Up"
+                          ? "bg-[#286518] text-white hover:bg-[#1d4f11]"
+                          : "text-slate-800 hover:bg-[#eefce5] hover:text-[#286518]")
+                      }
                     >
                       {label}
                     </Link>
