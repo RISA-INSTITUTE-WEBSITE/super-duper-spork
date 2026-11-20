@@ -73,9 +73,15 @@ export function validateNewRisaCourse(input: {
   };
 }
 
+export type InitialCourseThumbnail = {
+  courseId: string;
+  thumbnailPath: string;
+};
+
 export async function createRisaCourse(
   token: string,
   course: NewRisaCourse,
+  thumbnail?: InitialCourseThumbnail,
 ): Promise<CreateCourseResult> {
   const validated = validateNewRisaCourse({
     code: course.code,
@@ -84,7 +90,13 @@ export async function createRisaCourse(
     level: course.level,
     isPublished: course.is_published,
   });
-  if (!validated) {
+  if (
+    !validated ||
+    (thumbnail &&
+      (!courseIdPattern.test(thumbnail.courseId) ||
+        !thumbnailPathPattern.test(thumbnail.thumbnailPath) ||
+        !thumbnail.thumbnailPath.startsWith(thumbnail.courseId + "/")))
+  ) {
     return "unavailable";
   }
 
@@ -94,7 +106,12 @@ export async function createRisaCourse(
       "Content-Type": "application/json",
       Prefer: "return=minimal",
     },
-    body: JSON.stringify(validated),
+    body: JSON.stringify({
+      ...validated,
+      ...(thumbnail
+        ? { id: thumbnail.courseId, thumbnail_path: thumbnail.thumbnailPath }
+        : {}),
+    }),
   });
   if (response?.status === 409) {
     return "duplicate";
