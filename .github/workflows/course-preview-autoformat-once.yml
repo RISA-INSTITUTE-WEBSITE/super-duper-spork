@@ -1,0 +1,49 @@
+name: Temporary Course Preview Formatter
+
+on:
+  push:
+    branches:
+      - feat/course-preview-enrolment
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.repository == 'RISA-INSTITUTE-WEBSITE/super-duper-spork' && github.actor == 'learnxul-lang'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: feat/course-preview-enrolment
+          persist-credentials: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Format only changed preview source and tests
+        run: |
+          npx prettier --write \
+            src/app/admin/page.tsx \
+            src/app/admin/enrolment-requests/actions.ts \
+            src/app/admin/enrolment-requests/page.tsx \
+            src/app/page.tsx \
+            src/app/programmes/page.tsx \
+            src/app/students/courses/\[id\]/actions.ts \
+            src/app/students/courses/\[id\]/page.tsx \
+            src/app/students/dashboard/page.tsx \
+            src/components/locked-course-preview.tsx \
+            src/lib/risa-course-curriculum.ts \
+            src/lib/risa-course-enrolment.ts \
+            tests/e2e/public-pages.spec.ts \
+            tests/unit/risa-course-curriculum.test.ts \
+            tests/unit/risa-course-enrolment.test.ts
+      - name: Commit source formatting once
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src tests
+          if ! git diff --cached --quiet; then
+            git commit -m "style: format RISA preview and enrolment workflow"
+            git push origin HEAD:feat/course-preview-enrolment
+          fi
