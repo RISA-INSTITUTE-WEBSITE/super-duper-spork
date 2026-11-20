@@ -6,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { LockedCoursePreview } from "@/components/locked-course-preview";
 import { StudentCourseContent } from "@/components/student-course-content";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
-import { getRisaCourseById } from "@/lib/risa-course-admin";
+import { getRisaCourseById, type RisaCourse } from "@/lib/risa-course-admin";
 import {
   getCourseCurriculum,
   getCoursePreviewCurriculum,
@@ -112,6 +112,43 @@ async function CourseAccess({
   );
 }
 
+function CourseBanner({
+  course,
+  isEnrolled,
+}: {
+  course: RisaCourse;
+  isEnrolled: boolean;
+}) {
+  return (
+    <>
+        <Link
+          href={isEnrolled ? "/students/dashboard" : "/programmes"}
+          className="text-sm font-semibold text-[#286518] hover:underline"
+        >
+          {isEnrolled ? "← Back to My Learning" : "← All available courses"}
+        </Link>
+        <header className="risa-science-glass mt-6 rounded-[2rem] p-7 sm:p-10">
+          <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono text-sm font-bold text-[#286518]">
+            {course.code}
+          </span>
+          <h1 className="mt-5 font-heading text-3xl font-bold text-slate-950 sm:text-4xl">
+            {course.title}
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+            {course.description || "Discover the RISA curriculum."}
+          </p>
+          <p className="mt-4 text-xs font-semibold text-[#286518]">
+            {course.level} ·{" "}
+            {isEnrolled
+              ? "Enrolled learner · Full course access"
+              : "Registered learner · Preview only"}
+          </p>
+        </header>
+  
+    </>
+  );
+}
+
 export default async function StudentCoursePage({
   params,
 }: {
@@ -139,29 +176,7 @@ export default async function StudentCoursePage({
       id="main-content"
       className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 sm:px-8 lg:py-16"
     >
-      <Link
-        href={isEnrolled ? "/students/dashboard" : "/programmes"}
-        className="text-sm font-semibold text-[#286518] hover:underline"
-      >
-        {isEnrolled ? "← Back to My Learning" : "← All available courses"}
-      </Link>
-      <header className="risa-science-glass mt-6 rounded-[2rem] p-7 sm:p-10">
-        <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono text-sm font-bold text-[#286518]">
-          {course.code}
-        </span>
-        <h1 className="mt-5 font-heading text-3xl font-bold text-slate-950 sm:text-4xl">
-          {course.title}
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          {course.description || "Discover the RISA curriculum."}
-        </p>
-        <p className="mt-4 text-xs font-semibold text-[#286518]">
-          {course.level} ·{" "}
-          {isEnrolled
-            ? "Enrolled learner · Full course access"
-            : "Registered learner · Preview only"}
-        </p>
-      </header>
+      <CourseBanner course={course} isEnrolled={isEnrolled} />
       <CourseAccess
         token={token}
         courseId={id}
