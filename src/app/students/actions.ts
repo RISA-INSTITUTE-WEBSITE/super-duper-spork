@@ -21,18 +21,18 @@ import {
 } from "@/lib/student-session";
 import { validateLogin, validateRegistration } from "@/lib/student-validation";
 
-async function hasValidAccountCsrf(formData: FormData): Promise<boolean> {
+async function requireValidAccountForm(formData: FormData, path: string): Promise<void> {
+  if (!isStudentAuthConfigured()) {
+    redirect(path + "?error=setup");
+  }
   const cookie = (await cookies()).get(studentCsrfCookieName)?.value;
-  return verifyStudentCsrfToken(cookie, formData.get("csrf_token"));
+  if (!verifyStudentCsrfToken(cookie, formData.get("csrf_token"))) {
+    redirect(path + "?error=csrf");
+  }
 }
 
 export async function registerStudent(formData: FormData): Promise<void> {
-  if (!isStudentAuthConfigured()) {
-    redirect("/students/register?error=setup");
-  }
-  if (!(await hasValidAccountCsrf(formData))) {
-    redirect("/students/register?error=csrf");
-  }
+  await requireValidAccountForm(formData, "/students/register");
 
   const fullName = String(formData.get("fullName") ?? "").trim();
   const email = String(formData.get("email") ?? "")
@@ -73,12 +73,7 @@ export async function registerStudent(formData: FormData): Promise<void> {
 }
 
 export async function signInStudent(formData: FormData): Promise<void> {
-  if (!isStudentAuthConfigured()) {
-    redirect("/students/login?error=setup");
-  }
-  if (!(await hasValidAccountCsrf(formData))) {
-    redirect("/students/login?error=csrf");
-  }
+  await requireValidAccountForm(formData, "/students/login");
 
   const email = String(formData.get("email") ?? "")
     .trim()
