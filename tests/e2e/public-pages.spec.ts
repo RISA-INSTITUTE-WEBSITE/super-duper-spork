@@ -354,3 +354,42 @@ test("course preview and enrolment review require verified accounts", async ({
   await page.goto("/admin/enrolment-requests");
   await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
+
+test("institutional footer preserves navigation and stacks correctly on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const footer = page.locator("footer.risa-footer");
+  const navigation = footer.getByRole("navigation", { name: "Footer navigation" });
+  const columns = footer.locator(".risa-footer-columns");
+
+  await expect(footer.getByText("RISA Institute", { exact: true })).toBeVisible();
+  await expect(footer.getByRole("heading", { name: "Explore" })).toBeVisible();
+  await expect(footer.getByRole("heading", { name: "Development status" })).toBeVisible();
+
+  for (const [name, href] of [
+    ["Programmes", "/programmes"],
+    ["About RISA", "/about"],
+    ["Contact", "/contact"],
+  ]) {
+    await expect(navigation.getByRole("link", { name })).toHaveAttribute("href", href);
+  }
+
+  expect(
+    await columns.evaluate(
+      (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    ),
+  ).toBe(3);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await columns.evaluate(
+      (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    ),
+  ).toBe(1);
+  await expect(navigation.getByRole("link", { name: "Contact" })).toBeVisible();
+  await navigation.getByRole("link", { name: "Contact" }).click();
+  await expect(page).toHaveURL(/\/contact\/?$/);
+});
