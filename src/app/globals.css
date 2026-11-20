@@ -81,6 +81,40 @@ body {
   );
 }
 
+/* A synchronized, one-time entrance on the homepage only. The navbar and
+   hero copy ease into place while the first image pulls gently back. Keeping
+   these animations separate from the photo carousel preserves its 4s rotation. */
+body:has(.risa-hero) .risa-navbar,
+.risa-hero-content {
+  animation: risa-home-opening-content 1.65s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transform-origin: center top;
+}
+
+.risa-hero-photo:first-child img {
+  animation: risa-home-opening-photo 1.65s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  transform-origin: center center;
+}
+
+@keyframes risa-home-opening-content {
+  from {
+    opacity: 0.78;
+    transform: scale(1.025);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes risa-home-opening-photo {
+  from {
+    transform: scale(1.065);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 @keyframes risa-hero-photo-cycle {
   0% {
     opacity: 0;
@@ -205,6 +239,12 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  body:has(.risa-hero) .risa-navbar,
+  .risa-hero-content,
+  .risa-hero-photo:first-child img {
+    animation: none;
+  }
+
   .risa-hero-photo {
     animation: none;
     opacity: 0;
