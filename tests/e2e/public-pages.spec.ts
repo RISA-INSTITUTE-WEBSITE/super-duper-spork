@@ -166,28 +166,28 @@ test("navigation links use larger Outfit SemiBold text on desktop and mobile", a
   await expect(mobileLink).toHaveCSS("font-weight", "600");
 });
 
-test("students can locate registration but signup is safely gated until configured", async ({
+test("desktop navigation separates account creation and existing account login", async ({
   page,
 }) => {
   await page.goto("/");
+  const navigation = page.getByRole("navigation", { name: "Primary navigation" });
+  const signUp = navigation.getByRole("link", { name: "Sign Up" });
+  const signIn = navigation.getByRole("link", { name: "Sign In" });
 
-  await page
-    .getByRole("navigation", { name: "Primary navigation" })
-    .getByRole("link", { name: "Students" })
-    .click();
+  await expect(navigation.getByRole("link", { name: "Students" })).toHaveCount(0);
+  await expect(signUp).toHaveAttribute("href", "/students/register");
+  await expect(signIn).toHaveAttribute("href", "/students/login");
 
-  await expect(page).toHaveURL(/\/students\/login\/?$/);
-  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
-  await page.getByRole("link", { name: "Create an account" }).click();
-
+  await signUp.click();
   await expect(page).toHaveURL(/\/students\/register\/?$/);
   await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Create student account" }),
-  ).toBeDisabled();
-  await expect(page.getByRole("status")).toContainText(
-    "Student registration is being prepared",
-  );
+
+  await page.goto("/");
+  await page.getByRole("navigation", { name: "Primary navigation" })
+    .getByRole("link", { name: "Sign In" }).click();
+  await expect(page).toHaveURL(/\/students\/login\/?$/);
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Create an account" })).toBeVisible();
 });
 
 test("private student dashboard redirects visitors without a session", async ({
@@ -233,15 +233,33 @@ test("unverified visitors cannot open private learner profile or files", async (
   expect(privateMaterial.status()).toBe(404);
 });
 
-test("mobile students entry opens the student portal", async ({ page }) => {
+test("mobile navigation separates Sign Up and Sign In without a Students entry", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page.getByRole("button", { name: "Open navigation menu" }).click();
-  await page
-    .getByRole("navigation", { name: "Mobile navigation" })
-    .getByRole("link", { name: "Students" })
-    .click();
+  const navigation = page.getByRole("navigation", { name: "Mobile navigation" });
+
+  await expect(navigation.getByRole("link", { name: "Students" })).toHaveCount(0);
+  await expect(navigation.getByRole("link", { name: "Sign Up" })).toHaveAttribute(
+    "href", "/students/register",
+  );
+  await expect(navigation.getByRole("link", { name: "Sign In" })).toHaveAttribute(
+    "href", "/students/login",
+  );
+
+  await navigation.getByRole("link", { name: "Sign Up" }).click();
+  await expect(page).toHaveURL(/\/students\/register\/?$/);
+  await expect(page.getByRole("heading", { name: "Create your account" })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "RISA navigation menu" })).toHaveCount(0);
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  await page.getByRole("navigation", { name: "Mobile navigation" })
+    .getByRole("link", { name: "Sign In" }).click();
   await expect(page).toHaveURL(/\/students\/login\/?$/);
+  await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
 
 test("homepage progress content sits on the white section without a boxed banner", async ({
