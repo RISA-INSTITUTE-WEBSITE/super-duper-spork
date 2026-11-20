@@ -20,9 +20,7 @@ export function SiteFooter() {
                 height={56}
                 className="size-14 shrink-0 rounded-full object-contain"
               />
-              <p className="font-heading text-xl font-extrabold text-white">
-                RISA Institute
-              </p>
+              <p className="font-heading text-xl font-extrabold text-white">RISA Institute</p>
             </div>
             <div
               className="mt-5 h-0.5 w-16 rounded-full bg-[#78eb29]"
@@ -35,22 +33,14 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <h2 className="font-heading text-sm font-bold uppercase text-white">
-              Explore
-            </h2>
+            <h2 className="font-heading text-sm font-bold uppercase text-white">Explore</h2>
             <nav
               aria-label="Footer navigation"
               className="mt-3 flex flex-col items-start gap-1 text-sm"
             >
-              <Link href="/programmes" className={footerLinkClass}>
-                Programmes
-              </Link>
-              <Link href="/about" className={footerLinkClass}>
-                About RISA
-              </Link>
-              <Link href="/contact" className={footerLinkClass}>
-                Contact
-              </Link>
+              <Link href="/programmes" className={footerLinkClass}>Programmes</Link>
+              <Link href="/about" className={footerLinkClass}>About RISA</Link>
+              <Link href="/contact" className={footerLinkClass}>Contact</Link>
             </nav>
           </div>
 
