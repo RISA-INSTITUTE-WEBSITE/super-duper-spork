@@ -10,7 +10,13 @@ import { reviewCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
 import { uuidPattern } from "@/lib/risa-course-curriculum";
 import { studentCookieNames } from "@/lib/student-session";
 
-export async function reviewEnrolmentAction(formData: FormData): Promise<void> {
+type Decision = {
+  courseId: string;
+  studentId: string;
+  decision: "approved" | "declined";
+};
+
+async function verifiedAdminToken(): Promise<string> {
   const token = (await cookies()).get(studentCookieNames.access)?.value;
   if (!token) {
     redirect("/students/login");
@@ -19,24 +25,35 @@ export async function reviewEnrolmentAction(formData: FormData): Promise<void> {
   if (!identity || !(await isRisaAdministrator(token, identity.id))) {
     notFound();
   }
+  return token;
+}
 
+function readDecision(formData: FormData): Decision | null {
   const courseId = String(formData.get("courseId") ?? "");
   const studentId = String(formData.get("studentId") ?? "");
   const decision = String(formData.get("decision") ?? "");
-  if (
-    !uuidPattern.test(courseId) ||
-    !uuidPattern.test(studentId) ||
-    (decision !== "approved" && decision !== "declined")
-  ) {
+  if (!uuidPattern.test(courseId) || !uuidPattern.test(studentId)) {
+    return null;
+  }
+  if (decision !== "approved" && decision !== "declined") {
+    return null;
+  }
+  return { courseId, studentId, decision };
+}
+
+export async function reviewEnrolmentAction(formData: FormData): Promise<void> {
+  const token = await verifiedAdminToken();
+  const selection = readDecision(formData);
+  if (!selection) {
     redirect("/admin/enrolment-requests?result=invalid");
   }
 
-  const result = await reviewCourseEnrolmentRequest(token, courseId, studentId, decision);
+  const result = await reviewCourseEnrolmentRequest(token, selection);
   if (!result) {
     redirect("/admin/enrolment-requests?result=failed");
   }
   revalidatePath("/admin/enrolment-requests");
   revalidatePath("/students/dashboard");
-  revalidatePath("/students/courses/" + courseId);
-  redirect("/admin/enrolment-requests?result=" + decision);
+  revalidatePath("/students/courses/" + selection.courseId);
+  redirect("/admin/enrolment-requests?result=" + selection.decision);
 }
