@@ -33,22 +33,9 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
 
   if (courses.length === 0) {
     return (
-      <div className="risa-science-glass mt-5 flex flex-wrap items-center justify-between gap-4 rounded-[1.5rem] p-6">
-        <div>
-          <h3 className="font-heading text-lg font-bold text-slate-950">
-            No enrolled courses yet
-          </h3>
-          <p className="mt-1 text-sm text-slate-600">
-            Explore available courses and request enrolment.
-          </p>
-        </div>
-        <Link
-          href="/programmes"
-          className="inline-flex min-h-11 items-center rounded-full bg-[#286518] px-5 text-sm font-bold text-white transition hover:bg-[#1d4f11]"
-        >
-          Explore courses <span aria-hidden="true" className="ml-2">→</span>
-        </Link>
-      </div>
+      <p className="risa-science-glass mt-5 rounded-[1.5rem] p-6 text-sm text-slate-600">
+        No enrolled courses yet. Browse courses to get started.
+      </p>
     );
   }
 
@@ -189,8 +176,8 @@ export default async function StudentDashboardPage() {
       >
         <div className="flex min-w-0 items-center gap-4">
           <Link
-            href="/students/profile"
-            aria-label="Edit your learner profile"
+            href="/students/dashboard"
+            aria-label="My Learning dashboard"
             className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gradient-to-br from-[#38b6ff] via-[#155DFC] to-[#123e8a] font-heading text-xl font-bold text-white shadow-md focus-visible:outline-2 focus-visible:outline-[#286518] sm:size-20"
           >
             {user.avatarPath ? (
