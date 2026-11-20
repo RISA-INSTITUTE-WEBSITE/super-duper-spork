@@ -4,13 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import StudentDashboardPage from "../../src/app/students/dashboard/page";
 
-const { cookiesMock, identityMock, configuredMock, coursesMock, materialsMock } =
+const { cookiesMock, identityMock, configuredMock, coursesMock, materialsMock, adminMock } =
   vi.hoisted(() => ({
     cookiesMock: vi.fn(),
     identityMock: vi.fn(),
     configuredMock: vi.fn(),
     coursesMock: vi.fn(),
     materialsMock: vi.fn(),
+    adminMock: vi.fn(),
   }));
 
 vi.mock("next/headers", () => ({ cookies: cookiesMock }));
@@ -22,6 +23,9 @@ vi.mock("../../src/lib/student-auth-api", () => ({
 vi.mock("../../src/lib/student-learning-api", () => ({
   getEnrolledCourses: coursesMock,
   getCourseMaterials: materialsMock,
+}));
+vi.mock("../../src/lib/risa-admin-api", () => ({
+  isRisaAdministrator: adminMock,
 }));
 
 beforeEach(() => {
@@ -37,6 +41,7 @@ beforeEach(() => {
   });
   coursesMock.mockReset().mockResolvedValue([]);
   materialsMock.mockReset().mockResolvedValue([]);
+  adminMock.mockReset().mockResolvedValue(false);
 });
 
 describe("Concise RISA learner dashboard", () => {
@@ -56,12 +61,27 @@ describe("Concise RISA learner dashboard", () => {
     expect(html).toContain("No study materials available yet.");
     expect(html).toContain('href="/programmes"');
     expect(html).toContain('href="/students/profile"');
+    expect(html).not.toContain('href="/admin"');
     expect(html).toContain('aria-label="My Learning dashboard"');
     expect(html).toContain("Sign out");
     expect(html).not.toContain("Student account active");
     expect(html).not.toContain("Your account and helpful links");
     expect(html).not.toContain("Welcome to your learning space");
     expect(html).not.toContain("Browse courses and previews");
+  });
+
+  it("lets a verified administrator switch from My Learning to administration", async () => {
+    adminMock.mockResolvedValue(true);
+
+    const html = renderToStaticMarkup(await StudentDashboardPage());
+
+    expect(adminMock).toHaveBeenCalledWith(
+      "verified-session",
+      "9c1e0000-0000-4000-8000-000000000001",
+    );
+    expect(html).toContain('href="/admin"');
+    expect(html).toContain("Administration Centre");
+    expect(html).toContain("Hi, Amahle!");
   });
 
   it("removes only the exterior ring from the dashboard animation", () => {
