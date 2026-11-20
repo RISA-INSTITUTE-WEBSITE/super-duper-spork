@@ -104,7 +104,9 @@ export async function createCourseAction(
     isPublished: formData.get("isPublished") === "on",
   });
   if (!input) {
-    return error("Enter a valid course code, title, academic level and overview (up to 1,200 characters).");
+    return error(
+      "Enter a valid course code, title, academic level and overview (up to 1,200 characters).",
+    );
   }
 
   const thumbnail = formThumbnail(formData);
@@ -121,14 +123,21 @@ export async function createCourseAction(
   }
 
   const thumbnailSaved = thumbnail
-    ? await saveInitialThumbnail({ token, code: input.code, level: input.level, image: thumbnail })
+    ? await saveInitialThumbnail({
+        token,
+        code: input.code,
+        level: input.level,
+        image: thumbnail,
+      })
     : true;
   refreshCoursePages();
   return {
     status: "success",
     message: thumbnailSaved
       ? "Course " + input.code + " created successfully."
-      : "Course " + input.code + " created, but its thumbnail could not be saved. Retry from Edit course.",
+      : "Course " +
+        input.code +
+        " created, but its thumbnail could not be saved. Retry from Edit course.",
   };
 }
 

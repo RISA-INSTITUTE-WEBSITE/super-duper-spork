@@ -232,7 +232,10 @@ describe("public RISA catalogue and course presentation", () => {
     fetchMock.mockResolvedValueOnce(Response.json([{ id: courseId }]));
     const path = courseId + "/22222222-2222-4222-8222-222222222222.png";
     expect(
-      await updateRisaCoursePresentation("admin-jwt", courseId, { level: "2nd Year Level", thumbnailPath: path }),
+      await updateRisaCoursePresentation("admin-jwt", courseId, {
+        level: "2nd Year Level",
+        thumbnailPath: path,
+      }),
     ).toBe(true);
     const options = fetchMock.mock.calls[0][1] as RequestInit;
     expect(options.method).toBe("PATCH");
@@ -244,15 +247,14 @@ describe("public RISA catalogue and course presentation", () => {
   });
 
   it("rejects unsafe image paths and malformed course IDs before any API call", async () => {
-    expect(await updateRisaCoursePresentation("jwt", "bad", { level: "1st Year Level" })).toBe(
-      false,
-    );
     expect(
-      await updateRisaCoursePresentation(
-        "jwt",
-        courseId,
-        { level: "1st Year Level", thumbnailPath: "https://evil.example/test.png" },
-      ),
+      await updateRisaCoursePresentation("jwt", "bad", { level: "1st Year Level" }),
+    ).toBe(false);
+    expect(
+      await updateRisaCoursePresentation("jwt", courseId, {
+        level: "1st Year Level",
+        thumbnailPath: "https://evil.example/test.png",
+      }),
     ).toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
   });
