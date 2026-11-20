@@ -37,7 +37,7 @@ export default async function HomePage() {
       <section className="risa-hero relative isolate overflow-hidden text-[#0A0F1D]">
         <HeroPhotoBackground />
         <div className="relative mx-auto w-full max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:py-24">
-          <div className="max-w-2xl">
+          <div className="risa-hero-content max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/95 bg-white/65 px-4 py-2 text-xs font-semibold tracking-wide text-[#34569E] shadow-sm backdrop-blur-md">
               <span className="size-2 rounded-full bg-[#155DFC]" aria-hidden="true" />
               Our Slogan
