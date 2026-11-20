@@ -6,7 +6,9 @@ import { randomBytes, timingSafeEqual } from "node:crypto";
 // Browsers enforce the __Host- prefix in production: Secure + host-only + Path=/.
 // Development uses an unprefixed name so HTTP localhost still works.
 export const studentCsrfCookieName =
-  process.env.NODE_ENV === "production" ? "__Host-risa-student-csrf" : "risa-student-csrf";
+  process.env.NODE_ENV === "production"
+    ? "__Host-risa-student-csrf"
+    : "risa-student-csrf";
 
 export const studentCsrfCookieOptions = {
   httpOnly: true,
