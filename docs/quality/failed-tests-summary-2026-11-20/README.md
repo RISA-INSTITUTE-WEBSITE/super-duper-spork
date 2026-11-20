@@ -226,6 +226,7 @@ sending credentials to Supabase. Missing/forged values are rejected with
 a reload-and-retry message.
 
 **Relevant code:**
+
 - [`src/lib/student-csrf.ts`](../../../src/lib/student-csrf.ts) — generation, format, cookie settings and constant-time validation
 - [`src/proxy.ts`](../../../src/proxy.ts) — token issuance on account-page GET while preserving session refresh
 - [`src/app/students/actions.ts`](../../../src/app/students/actions.ts) — reject missing or mismatched tokens
