@@ -6,12 +6,13 @@ import { notFound, redirect } from "next/navigation";
 import { LockedCoursePreview } from "@/components/locked-course-preview";
 import { StudentCourseContent } from "@/components/student-course-content";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { getRisaCourseById } from "@/lib/risa-course-admin";
 import {
   getCourseCurriculum,
   getCoursePreviewCurriculum,
   uuidPattern,
+  type CourseCurriculum,
 } from "@/lib/risa-course-curriculum";
-import { getRisaCourseById } from "@/lib/risa-course-admin";
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
@@ -27,8 +28,7 @@ async function verifiedLearnerSession() {
   if (!isStudentAuthConfigured()) {
     redirect("/students/login");
   }
-  const jar = await cookies();
-  const token = jar.get(studentCookieNames.access)?.value;
+  const token = (await cookies()).get(studentCookieNames.access)?.value;
   if (!token) {
     redirect("/students/login");
   }
@@ -37,6 +37,77 @@ async function verifiedLearnerSession() {
     redirect("/students/login");
   }
   return { token, identity };
+}
+
+function CourseAlert({ message }: { message: string }) {
+  return (
+    <p role="alert" className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900">
+      {message}
+    </p>
+  );
+}
+
+function EnrolledTopics({ curriculum }: { curriculum: CourseCurriculum | null }) {
+  if (!curriculum) {
+    return <CourseAlert message="Course content is currently unavailable. Please try again." />;
+  }
+  if (curriculum.topics.length === 0) {
+    return (
+      <div className="risa-glass-card mt-9 rounded-[1.5rem] p-7">
+        <h2 className="font-heading text-xl font-bold text-slate-950">
+          Lessons are coming soon
+        </h2>
+        <p className="mt-3 text-sm text-slate-600">
+          RISA has not yet published topics for this course.
+        </p>
+      </div>
+    );
+  }
+  return <StudentCourseContent curriculum={curriculum} />;
+}
+
+async function CourseAccess({
+  token,
+  courseId,
+  studentId,
+  courseName,
+  isEnrolled,
+  isVerified,
+}: {
+  token: string;
+  courseId: string;
+  studentId: string;
+  courseName: string;
+  isEnrolled: boolean;
+  isVerified: boolean;
+}) {
+  if (!isVerified) {
+    return (
+      <CourseAlert message="Your enrolment status is temporarily unavailable. Course access cannot be verified." />
+    );
+  }
+  if (isEnrolled) {
+    const curriculum = await getCourseCurriculum(token, courseId);
+    return <EnrolledTopics curriculum={curriculum} />;
+  }
+
+  const [preview, request] = await Promise.all([
+    getCoursePreviewCurriculum(token, courseId),
+    getCourseEnrolmentRequest(token, courseId, studentId),
+  ]);
+  if (!preview || request === undefined) {
+    return (
+      <CourseAlert message="The course preview is temporarily unavailable. Please try again." />
+    );
+  }
+  return (
+    <LockedCoursePreview
+      courseId={courseId}
+      courseName={courseName}
+      curriculum={preview}
+      requestStatus={request?.status ?? null}
+    />
+  );
 }
 
 export default async function StudentCoursePage({
@@ -49,24 +120,17 @@ export default async function StudentCoursePage({
     notFound();
   }
   const { token, identity } = await verifiedLearnerSession();
-  const enrolled = await getEnrolledCourses(token, identity.id);
-  const course = await getRisaCourseById(token, id);
+  const [enrolled, course] = await Promise.all([
+    getEnrolledCourses(token, identity.id),
+    getRisaCourseById(token, id),
+  ]);
   if (!course) {
     notFound();
   }
-
   const isEnrolled = enrolled?.some((item) => item.id === id) ?? false;
   if (!isEnrolled && !course.is_published) {
     notFound();
   }
-
-  const [curriculum, preview, request] = await Promise.all([
-    isEnrolled ? getCourseCurriculum(token, id) : Promise.resolve(null),
-    isEnrolled ? Promise.resolve(null) : getCoursePreviewCurriculum(token, id),
-    isEnrolled
-      ? Promise.resolve(null)
-      : getCourseEnrolmentRequest(token, id, identity.id),
-  ]);
 
   return (
     <main
@@ -96,49 +160,14 @@ export default async function StudentCoursePage({
             : "Registered learner · Preview only"}
         </p>
       </header>
-
-      {enrolled === null ? (
-        <p
-          role="alert"
-          className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900"
-        >
-          Your enrolment status is temporarily unavailable. Course access cannot be
-          verified.
-        </p>
-      ) : isEnrolled ? (
-        <div className="mt-9 space-y-6">
-          {!curriculum ? (
-            <p role="alert" className="rounded-xl bg-amber-50 p-5 text-sm text-amber-900">
-              Course content is currently unavailable. Please try again.
-            </p>
-          ) : curriculum.topics.length === 0 ? (
-            <div className="risa-glass-card rounded-[1.5rem] p-7">
-              <h2 className="font-heading text-xl font-bold text-slate-950">
-                Lessons are coming soon
-              </h2>
-              <p className="mt-3 text-sm text-slate-600">
-                RISA has not yet published topics for this course.
-              </p>
-            </div>
-          ) : (
-            <StudentCourseContent curriculum={curriculum} />
-          )}
-        </div>
-      ) : !preview || request === undefined ? (
-        <p
-          role="alert"
-          className="mt-9 rounded-xl bg-amber-50 p-5 text-sm text-amber-900"
-        >
-          The course preview is temporarily unavailable. Please try again.
-        </p>
-      ) : (
-        <LockedCoursePreview
-          courseId={id}
-          courseName={course.title}
-          curriculum={preview}
-          requestStatus={request?.status ?? null}
-        />
-      )}
+      <CourseAccess
+        token={token}
+        courseId={id}
+        studentId={identity.id}
+        courseName={course.title}
+        isEnrolled={isEnrolled}
+        isVerified={enrolled !== null}
+      />
     </main>
   );
 }
