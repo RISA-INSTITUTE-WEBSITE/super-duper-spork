@@ -84,10 +84,9 @@ export async function getCourseEnrolmentRequest(
 /** Only the authenticated owner may submit; the database rechecks ownership. */
 export async function submitCourseEnrolmentRequest(
   token: string,
-  courseId: string,
-  studentId: string,
-  email: string,
+  input: { courseId: string; studentId: string; email: string },
 ): Promise<RequestSubmissionResult> {
+  const { courseId, studentId, email } = input;
   if (
     !uuidPattern.test(courseId) ||
     !uuidPattern.test(studentId) ||
@@ -165,12 +164,17 @@ async function grantCourseEnrolment(
   return response?.ok === true;
 }
 
+type ReviewSelection = {
+  courseId: string;
+  studentId: string;
+  decision: "approved" | "declined";
+};
+
 async function markRequestReviewed(
   token: string,
-  courseId: string,
-  studentId: string,
-  decision: "approved" | "declined",
+  selection: ReviewSelection,
 ): Promise<boolean> {
+  const { courseId, studentId, decision } = selection;
   const response = await requestStudentBackend(
     token,
     "/rest/v1/risa_enrolment_requests?course_id=eq." +
@@ -204,10 +208,9 @@ async function markRequestReviewed(
 /** Only a verified administrator can invoke this from server actions. */
 export async function reviewCourseEnrolmentRequest(
   token: string,
-  courseId: string,
-  studentId: string,
-  decision: "approved" | "declined",
+  selection: ReviewSelection,
 ): Promise<boolean> {
+  const { courseId, studentId, decision } = selection;
   if (!uuidPattern.test(courseId) || !uuidPattern.test(studentId)) {
     return false;
   }
@@ -230,5 +233,5 @@ export async function reviewCourseEnrolmentRequest(
       return false;
     }
   }
-  return markRequestReviewed(token, courseId, studentId, decision);
+  return markRequestReviewed(token, selection);
 }
