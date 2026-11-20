@@ -143,7 +143,9 @@ body {
 }
 
 .risa-footer {
-  background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  background:
+    radial-gradient(ellipse at 100% 0%, rgba(56, 182, 255, 0.1), transparent 48%),
+    linear-gradient(135deg, #10263d 0%, #0b1d31 100%);
 }
 
 /* Option 01: original Orbital Spin loader (not the later redesign). */
