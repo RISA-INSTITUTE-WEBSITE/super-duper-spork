@@ -58,12 +58,17 @@ function refreshCoursePages(courseId?: string) {
 }
 
 /** Thumbnail failure never makes an already-created course disappear. */
-async function saveInitialThumbnail(
-  token: string,
-  code: string,
-  level: string,
-  image: File,
-): Promise<boolean> {
+async function saveInitialThumbnail({
+  token,
+  code,
+  level,
+  image,
+}: {
+  token: string;
+  code: string;
+  level: string;
+  image: File;
+}): Promise<boolean> {
   const course = await getRisaCourseByCode(token, code);
   if (!course) {
     return false;
@@ -116,7 +121,7 @@ export async function createCourseAction(
   }
 
   const thumbnailSaved = thumbnail
-    ? await saveInitialThumbnail(token, input.code, input.level, thumbnail)
+    ? await saveInitialThumbnail({ token, code: input.code, level: input.level, image: thumbnail })
     : true;
   refreshCoursePages();
   return {
@@ -127,12 +132,17 @@ export async function createCourseAction(
   };
 }
 
-async function saveExistingPresentation(
-  token: string,
-  course: RisaCourse,
-  level: string,
-  thumbnail: File | null,
-): Promise<CourseCreationState> {
+async function saveExistingPresentation({
+  token,
+  course,
+  level,
+  thumbnail,
+}: {
+  token: string;
+  course: RisaCourse;
+  level: string;
+  thumbnail: File | null;
+}): Promise<CourseCreationState> {
   const path = thumbnail
     ? await uploadRisaCourseThumbnail(token, course.id, thumbnail)
     : null;
@@ -185,5 +195,5 @@ export async function updateCoursePresentationAction(
   if (thumbnail && !isValidCourseThumbnail(thumbnail)) {
     return error("Upload a JPG, PNG or WebP image no larger than 2 MB.");
   }
-  return saveExistingPresentation(token, course, level, thumbnail);
+  return saveExistingPresentation({ token, course, level, thumbnail });
 }
