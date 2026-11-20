@@ -2,8 +2,6 @@
 // in the matching host-only cookie; a returning browser must keep that value.
 // This checks rendered HTTP behavior without Supabase credentials or real users.
 const base = "http://127.0.0.1:3000";
-const cookieName =
-  process.env.NODE_ENV === "production" ? "__Host-risa-student-csrf" : "risa-student-csrf";
 
 function check(condition, message) {
   if (!condition) {
@@ -29,13 +27,17 @@ for (const path of ["/students/login", "/students/register"]) {
   const first = await readForm(path);
   const issuedCookie = first.response.headers
     .getSetCookie()
-    .find((header) => header.startsWith(cookieName + "="));
+    .find((header) => /^(?:__Host-)?risa-student-csrf=/.test(header));
+  const cookieName = issuedCookie?.split("=")[0];
   check(Boolean(issuedCookie), path + " did not issue its CSRF cookie");
   const cookieValue = issuedCookie?.split(";")[0].slice(cookieName.length + 1);
   check(cookieValue === first.token, path + " form value differs from its cookie");
   check(/;\s*HttpOnly\b/i.test(issuedCookie), path + " cookie is not HttpOnly");
   check(/;\s*SameSite=Strict\b/i.test(issuedCookie), path + " cookie lacks SameSite=Strict");
-  check(/;\s*Path=\/\b?/i.test(issuedCookie), path + " cookie lacks Path=/");
+  check(/;\s*Path=\/(?:;|$)/i.test(issuedCookie), path + " cookie lacks Path=/");
+  if (cookieName === "__Host-risa-student-csrf") {
+    check(/;\s*Secure\b/i.test(issuedCookie), path + " production cookie lacks Secure");
+  }
 
   const returning = await readForm(path, cookieName + "=" + cookieValue);
   check(returning.token === first.token, path + " replaced a valid returning token");
