@@ -288,6 +288,13 @@ export function LockedCoursePreview({
         are blurred until your enrolment is approved. Select a topic or locked lesson to
         request access.
       </p>
+      <button
+        type="button"
+        onClick={() => openPrompt("Course enrolment")}
+        className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-[#286518]"
+      >
+        {requestStatus === "pending" ? "View enrolment request" : "Request enrolment"}
+      </button>
       {curriculum.topics.length === 0 ? (
         <p className="risa-glass-card mt-7 rounded-2xl p-7 text-sm text-slate-600">
           RISA has not published any topics for this course yet.
