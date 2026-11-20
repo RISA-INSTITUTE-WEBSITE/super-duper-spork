@@ -85,14 +85,22 @@ export default async function RisaAdminPage() {
               Administrator access verified
             </div>
           </div>
-          <form action={signOutStudent}>
-            <button
-              type="submit"
-              className="min-h-11 rounded-xl border border-white bg-white/85 px-5 py-2 text-sm font-semibold text-[#286518] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#286518]"
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/students/dashboard"
+              className="inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
             >
-              Sign out
-            </button>
-          </form>
+              My Learning
+            </Link>
+            <form action={signOutStudent}>
+              <button
+                type="submit"
+                className="min-h-11 rounded-xl border border-white bg-white/85 px-5 py-2 text-sm font-semibold text-[#286518] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#286518]"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </section>
 
