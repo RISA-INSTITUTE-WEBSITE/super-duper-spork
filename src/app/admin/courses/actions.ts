@@ -87,6 +87,18 @@ async function saveInitialThumbnail({
   return saved;
 }
 
+function newCourseFromForm(
+  formData: FormData,
+): ReturnType<typeof validateNewRisaCourse> {
+  return validateNewRisaCourse({
+    code: String(formData.get("code") ?? ""),
+    title: String(formData.get("title") ?? ""),
+    description: String(formData.get("description") ?? ""),
+    level: String(formData.get("level") ?? ""),
+    isPublished: formData.get("isPublished") === "on",
+  });
+}
+
 export async function createCourseAction(
   _previous: CourseCreationState,
   formData: FormData,
@@ -96,13 +108,7 @@ export async function createCourseAction(
     return error("Administrator access is required.");
   }
 
-  const input = validateNewRisaCourse({
-    code: String(formData.get("code") ?? ""),
-    title: String(formData.get("title") ?? ""),
-    description: String(formData.get("description") ?? ""),
-    level: String(formData.get("level") ?? ""),
-    isPublished: formData.get("isPublished") === "on",
-  });
+  const input = newCourseFromForm(formData);
   if (!input) {
     return error(
       "Enter a valid course code, title, academic level and overview (up to 1,200 characters).",
