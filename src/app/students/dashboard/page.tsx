@@ -197,18 +197,18 @@ export default async function StudentDashboardPage() {
       id="main-content"
       className="relative isolate mx-auto w-full max-w-7xl flex-1 overflow-hidden px-5 py-8 sm:px-8 sm:py-10"
     >
-      {/* Reuse the homepage SVG so the original liquid and green-orb animations stay intact. */}
+      {/* Dashboard-only logo removes the outer black ring but keeps the homepage animations. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden"
       >
         <Image
-          src="/risa-logo-animated.svg"
+          src="/risa-logo-dashboard-animated.svg"
           alt=""
           width={1200}
           height={1200}
           unoptimized
-          className="h-auto w-[min(90vw,54rem)] max-w-none opacity-[0.14] sm:opacity-[0.12]"
+          className="h-auto max-h-[75%] w-[min(76vw,28rem)] max-w-full object-contain opacity-[0.14] sm:w-[min(64vw,30rem)] sm:opacity-[0.12]"
         />
       </div>
       <section
