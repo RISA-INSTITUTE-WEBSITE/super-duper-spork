@@ -121,30 +121,29 @@ function CourseBanner({
 }) {
   return (
     <>
-        <Link
-          href={isEnrolled ? "/students/dashboard" : "/programmes"}
-          className="text-sm font-semibold text-[#286518] hover:underline"
-        >
-          {isEnrolled ? "← Back to My Learning" : "← All available courses"}
-        </Link>
-        <header className="risa-science-glass mt-6 rounded-[2rem] p-7 sm:p-10">
-          <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono text-sm font-bold text-[#286518]">
-            {course.code}
-          </span>
-          <h1 className="mt-5 font-heading text-3xl font-bold text-slate-950 sm:text-4xl">
-            {course.title}
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            {course.description || "Discover the RISA curriculum."}
-          </p>
-          <p className="mt-4 text-xs font-semibold text-[#286518]">
-            {course.level} ·{" "}
-            {isEnrolled
-              ? "Enrolled learner · Full course access"
-              : "Registered learner · Preview only"}
-          </p>
-        </header>
-  
+      <Link
+        href={isEnrolled ? "/students/dashboard" : "/programmes"}
+        className="text-sm font-semibold text-[#286518] hover:underline"
+      >
+        {isEnrolled ? "← Back to My Learning" : "← All available courses"}
+      </Link>
+      <header className="risa-science-glass mt-6 rounded-[2rem] p-7 sm:p-10">
+        <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono text-sm font-bold text-[#286518]">
+          {course.code}
+        </span>
+        <h1 className="mt-5 font-heading text-3xl font-bold text-slate-950 sm:text-4xl">
+          {course.title}
+        </h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          {course.description || "Discover the RISA curriculum."}
+        </p>
+        <p className="mt-4 text-xs font-semibold text-[#286518]">
+          {course.level} ·{" "}
+          {isEnrolled
+            ? "Enrolled learner · Full course access"
+            : "Registered learner · Preview only"}
+        </p>
+      </header>
     </>
   );
 }
