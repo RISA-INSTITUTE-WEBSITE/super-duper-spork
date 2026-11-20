@@ -87,9 +87,7 @@ async function saveInitialThumbnail({
   return saved;
 }
 
-function newCourseFromForm(
-  formData: FormData,
-): ReturnType<typeof validateNewRisaCourse> {
+function newCourseFromForm(formData: FormData): ReturnType<typeof validateNewRisaCourse> {
   return validateNewRisaCourse({
     code: String(formData.get("code") ?? ""),
     title: String(formData.get("title") ?? ""),
