@@ -76,7 +76,11 @@ export async function proxy(request: NextRequest) {
 
   const response = NextResponse.next({ request });
   if (csrfToken) {
-    response.cookies.set(studentCsrfCookieName, csrfToken, studentCsrfCookieOptions);
+    response.cookies.set(
+      studentCsrfCookieName,
+      csrfToken,
+      studentCsrfCookieOptions,
+    );
   }
   return refreshStudentSessionIfNeeded(request, response, csrfToken);
 }
