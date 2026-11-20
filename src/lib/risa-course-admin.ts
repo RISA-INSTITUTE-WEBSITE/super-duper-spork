@@ -78,6 +78,14 @@ export type InitialCourseThumbnail = {
   thumbnailPath: string;
 };
 
+function validInitialThumbnail(thumbnail: InitialCourseThumbnail): boolean {
+  return (
+    courseIdPattern.test(thumbnail.courseId) &&
+    thumbnailPathPattern.test(thumbnail.thumbnailPath) &&
+    thumbnail.thumbnailPath.startsWith(thumbnail.courseId + "/")
+  );
+}
+
 export async function createRisaCourse(
   token: string,
   course: NewRisaCourse,
@@ -90,13 +98,7 @@ export async function createRisaCourse(
     level: course.level,
     isPublished: course.is_published,
   });
-  if (
-    !validated ||
-    (thumbnail &&
-      (!courseIdPattern.test(thumbnail.courseId) ||
-        !thumbnailPathPattern.test(thumbnail.thumbnailPath) ||
-        !thumbnail.thumbnailPath.startsWith(thumbnail.courseId + "/")))
-  ) {
+  if (!validated || (thumbnail && !validInitialThumbnail(thumbnail))) {
     return "unavailable";
   }
 
