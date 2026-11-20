@@ -12,6 +12,7 @@ import {
   updateStudentAuthMetadata,
 } from "@/lib/student-auth-api";
 import { uploadStudentAvatar } from "@/lib/student-learning-api";
+import { studentCsrfCookieName, verifyStudentCsrfToken } from "@/lib/student-csrf";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
   clearStudentSession,
@@ -20,9 +21,17 @@ import {
 } from "@/lib/student-session";
 import { validateLogin, validateRegistration } from "@/lib/student-validation";
 
+async function hasValidAccountCsrf(formData: FormData): Promise<boolean> {
+  const cookie = (await cookies()).get(studentCsrfCookieName)?.value;
+  return verifyStudentCsrfToken(cookie, formData.get("csrf_token"));
+}
+
 export async function registerStudent(formData: FormData): Promise<void> {
   if (!isStudentAuthConfigured()) {
     redirect("/students/register?error=setup");
+  }
+  if (!(await hasValidAccountCsrf(formData))) {
+    redirect("/students/register?error=csrf");
   }
 
   const fullName = String(formData.get("fullName") ?? "").trim();
@@ -66,6 +75,9 @@ export async function registerStudent(formData: FormData): Promise<void> {
 export async function signInStudent(formData: FormData): Promise<void> {
   if (!isStudentAuthConfigured()) {
     redirect("/students/login?error=setup");
+  }
+  if (!(await hasValidAccountCsrf(formData))) {
+    redirect("/students/login?error=csrf");
   }
 
   const email = String(formData.get("email") ?? "")
