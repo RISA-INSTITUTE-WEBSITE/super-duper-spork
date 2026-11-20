@@ -23,7 +23,11 @@ export function AdminCreateCourseForm() {
     initialCourseCreationState,
   );
   return (
-    <form action={formAction} className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8">
+    <form
+      action={formAction}
+      encType="multipart/form-data"
+      className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8"
+    >
       <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#286518]">
@@ -33,7 +37,7 @@ export function AdminCreateCourseForm() {
             Create a course
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
-            Give each course a unique institutional code and clear title.
+            Set the course code, academic level and thumbnail when creating a course.
           </p>
         </div>
         <span className="rounded-full bg-white px-4 py-2 text-xs font-bold text-[#286518]">
@@ -110,8 +114,11 @@ export function AdminCreateCourseForm() {
             name="level"
             className={fieldClass}
             required
-            defaultValue="1st Year Level"
+            defaultValue=""
           >
+            <option value="" disabled>
+              Select an academic level
+            </option>
             {courseLevels.map((level) => (
               <option key={level} value={level}>
                 {level}
@@ -124,20 +131,23 @@ export function AdminCreateCourseForm() {
             htmlFor="risa-course-thumbnail"
             className="text-sm font-bold text-slate-900"
           >
-            Course thumbnail
+            Course thumbnail <span className="text-red-600">*</span>
           </label>
           <input
             id="risa-course-thumbnail"
             name="thumbnail"
             type="file"
             accept="image/png,image/jpeg,image/webp"
+            required
+            aria-describedby="risa-thumbnail-hint"
             className={
               fieldClass +
               " file:mr-3 file:rounded-lg file:border-0 file:bg-[#eefce5] file:px-2 file:py-1 file:text-sm"
             }
           />
-          <p className="mt-2 text-xs text-slate-600">
-            Optional JPG, PNG or WebP (max 2 MB).
+          <p id="risa-thumbnail-hint" className="mt-2 text-xs text-slate-600">
+            Required JPG, PNG or WebP (max 2 MB). Add a cover image before creating
+            the course.
           </p>
         </div>
       </div>
@@ -167,8 +177,8 @@ export function AdminCreateCourseForm() {
         />
         <span className="text-sm leading-6 text-slate-700">
           <strong className="block text-slate-950">Publish this course now</strong>
-          Leave unchecked to save as a draft. Published courses become available only to
-          learners enrolled by RISA.
+          Leave unchecked to save as a draft. Published courses appear in the public
+          catalogue; full lessons still require RISA enrolment approval.
         </span>
       </label>
 
