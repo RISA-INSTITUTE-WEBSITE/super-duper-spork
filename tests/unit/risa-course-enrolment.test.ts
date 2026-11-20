@@ -51,12 +51,11 @@ describe("learner enrolment request access", () => {
   it("submits own pending request without setting an enrolment status", async () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
     expect(
-      await submitCourseEnrolmentRequest(
-        "student-jwt",
+      await submitCourseEnrolmentRequest("student-jwt", {
         courseId,
         studentId,
-        "learner@example.com",
-      ),
+        email: "learner@example.com",
+      }),
     ).toBe("created");
     const options = fetchMock.mock.calls[0][1] as RequestInit;
     expect(options.method).toBe("POST");
@@ -71,10 +70,10 @@ describe("learner enrolment request access", () => {
   it("handles repeat submissions and rejects invalid identities", async () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 409 }));
     expect(
-      await submitCourseEnrolmentRequest("jwt", courseId, studentId, "learner@risa.za"),
+      await submitCourseEnrolmentRequest("jwt", { courseId, studentId, email: "learner@risa.za" }),
     ).toBe("duplicate");
     expect(
-      await submitCourseEnrolmentRequest("jwt", courseId, "invalid", "learner@risa.za"),
+      await submitCourseEnrolmentRequest("jwt", { courseId, studentId: "invalid", email: "learner@risa.za" }),
     ).toBe("unavailable");
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -82,7 +81,7 @@ describe("learner enrolment request access", () => {
   it("never treats backend failure as registration success", async () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
     expect(
-      await submitCourseEnrolmentRequest("jwt", courseId, studentId, "learner@risa.za"),
+      await submitCourseEnrolmentRequest("jwt", { courseId, studentId, email: "learner@risa.za" }),
     ).toBe("unavailable");
   });
 });
@@ -99,7 +98,7 @@ describe("administrator enrolment approval", () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
     fetchMock.mockResolvedValueOnce(Response.json([{ status: "approved" }]));
     expect(
-      await reviewCourseEnrolmentRequest("admin-jwt", courseId, studentId, "approved"),
+      await reviewCourseEnrolmentRequest("admin-jwt", { courseId, studentId, decision: "approved" }),
     ).toBe(true);
     expect(fetchMock.mock.calls).toHaveLength(3);
     expect(fetchMock.mock.calls[1][0]).toContain("/rest/v1/risa_enrollments");
@@ -116,19 +115,19 @@ describe("administrator enrolment approval", () => {
     fetchMock.mockResolvedValueOnce(Response.json([courseRequest]));
     fetchMock.mockResolvedValueOnce(Response.json([{ status: "declined" }]));
     expect(
-      await reviewCourseEnrolmentRequest("admin-jwt", courseId, studentId, "declined"),
+      await reviewCourseEnrolmentRequest("admin-jwt", { courseId, studentId, decision: "declined" }),
     ).toBe(true);
     expect(fetchMock.mock.calls).toHaveLength(2);
     expect(fetchMock.mock.calls[1][0]).toContain("risa_enrolment_requests?");
   });
 
   it("fails closed on request lookup errors and invalid IDs", async () => {
-    expect(await reviewCourseEnrolmentRequest("jwt", "bad", studentId, "approved")).toBe(
+    expect(await reviewCourseEnrolmentRequest("jwt", { courseId: "bad", studentId, decision: "approved" })).toBe(
       false,
     );
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
     expect(
-      await reviewCourseEnrolmentRequest("jwt", courseId, studentId, "approved"),
+      await reviewCourseEnrolmentRequest("jwt", { courseId, studentId, decision: "approved" }),
     ).toBe(false);
   });
 
@@ -136,7 +135,7 @@ describe("administrator enrolment approval", () => {
     fetchMock.mockResolvedValueOnce(Response.json([courseRequest]));
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
     expect(
-      await reviewCourseEnrolmentRequest("jwt", courseId, studentId, "approved"),
+      await reviewCourseEnrolmentRequest("jwt", { courseId, studentId, decision: "approved" }),
     ).toBe(false);
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
@@ -147,7 +146,7 @@ describe("administrator enrolment approval", () => {
     fetchMock.mockResolvedValueOnce(Response.json([{ status: "active" }]));
     fetchMock.mockResolvedValueOnce(Response.json([{ status: "approved" }]));
     expect(
-      await reviewCourseEnrolmentRequest("jwt", courseId, studentId, "approved"),
+      await reviewCourseEnrolmentRequest("jwt", { courseId, studentId, decision: "approved" }),
     ).toBe(true);
   });
 
@@ -156,7 +155,7 @@ describe("administrator enrolment approval", () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 409 }));
     fetchMock.mockResolvedValueOnce(Response.json([]));
     expect(
-      await reviewCourseEnrolmentRequest("jwt", courseId, studentId, "approved"),
+      await reviewCourseEnrolmentRequest("jwt", { courseId, studentId, decision: "approved" }),
     ).toBe(false);
   });
 });
