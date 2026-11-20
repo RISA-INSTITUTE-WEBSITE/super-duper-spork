@@ -33,7 +33,7 @@ async function getHeaderUser(): Promise<HeaderUser | null> {
   const initials =
     identity.fullName
       .trim()
-      .split(/\\s+/)
+      .split(/\s+/)
       .slice(0, 2)
       .map((part) => part.charAt(0))
       .join("")
