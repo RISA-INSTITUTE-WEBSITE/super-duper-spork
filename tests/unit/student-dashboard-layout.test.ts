@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -42,7 +43,10 @@ describe("Concise RISA learner dashboard", () => {
   it("keeps the empty state short with direct course, profile and sign-out actions", async () => {
     const html = renderToStaticMarkup(await StudentDashboardPage());
 
-    expect(html).toContain('src="/risa-logo-animated.svg"');
+    expect(html).toContain('src="/risa-logo-dashboard-animated.svg"');
+    expect(html).not.toContain('src="/risa-logo-animated.svg"');
+    expect(html).toContain("w-[min(76vw,28rem)]");
+    expect(html).toContain("max-h-[75%]");
     expect(html).toContain("opacity-[0.14]");
     expect(html).toContain("pointer-events-none");
     expect(html).toContain("relative z-10");
@@ -58,6 +62,19 @@ describe("Concise RISA learner dashboard", () => {
     expect(html).not.toContain("Your account and helpful links");
     expect(html).not.toContain("Welcome to your learning space");
     expect(html).not.toContain("Browse courses and previews");
+  });
+
+  it("removes only the exterior ring from the dashboard animation", () => {
+    const original = readFileSync("public/risa-logo-animated.svg", "utf8");
+    const dashboard = readFileSync("public/risa-logo-dashboard-animated.svg", "utf8");
+
+    expect(original).toContain('<path fill="#000000" fill-rule="evenodd"');
+    expect(dashboard).not.toContain('<path fill="#000000" fill-rule="evenodd"');
+    expect(dashboard).toContain("risa-original-black-liquid");
+    expect(dashboard).toContain("risa-natural-surface");
+    expect(dashboard).toContain("risa-natural-slosh");
+    expect(dashboard).toContain("risa-green-orb-size");
+    expect(dashboard).toContain("prefers-reduced-motion");
   });
 
   it("shows enrolled courses and downloadable exercises without lengthy explanations", async () => {
