@@ -65,7 +65,6 @@ export default async function StudentLoginPage({
                 : error === "csrf"
                   ? "This form has expired. Reload the page and try again."
                   : error === "verify"
-                : error === "verify"
                   ? "Please verify your email address before signing in."
                   : error === "confirmation"
                     ? "We could not confirm your email. Please request a new confirmation email through the RISA team."
