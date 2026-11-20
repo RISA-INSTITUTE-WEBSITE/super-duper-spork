@@ -25,7 +25,6 @@ export function AdminCreateCourseForm() {
   return (
     <form
       action={formAction}
-      encType="multipart/form-data"
       className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8"
     >
       <div className="mb-7 flex flex-wrap items-center justify-between gap-3">
