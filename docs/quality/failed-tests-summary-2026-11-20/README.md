@@ -109,6 +109,7 @@ HTTP response: 404 Not Found
 ## 4. Why does ZAP make the entire CI job red?
 
 **Code involved:**
+
 - [`tests/security/run-zap.sh` lines 29–43](../../../tests/security/run-zap.sh#L29-L43) runs `zap-full-scan.py`, saves `zap-report.json`, then returns the scanner's exit status.
 - [`tests/security/zap/rules.conf` lines 1–7](../../../tests/security/zap/rules.conf#L1-L7) explicitly marks four security-header rules as `FAIL`, but does not provide an approved decision for these five warning categories.
 - [`.github/workflows/website-ci.yml` lines 120–142](../../../.github/workflows/website-ci.yml#L120-L142) runs ZAP **before** the browser and Node.js 24 checks.
