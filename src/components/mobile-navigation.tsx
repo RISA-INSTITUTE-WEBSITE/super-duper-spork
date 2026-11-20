@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { signOutStudent } from "@/app/students/actions";
+import { HeaderProfileLink, type HeaderUser } from "@/components/header-profile-link";
+
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/programmes", label: "Programmes" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
-  { href: "/students/register", label: "Sign Up" },
-  { href: "/students/login", label: "Sign In" },
 ] as const;
 
 function SearchIcon() {
@@ -59,7 +60,7 @@ function trapSidebarFocus(event: KeyboardEvent, sidebar: HTMLDivElement | null):
   }
 }
 
-export function MobileNavigation() {
+export function MobileNavigation({ user }: { user: HeaderUser | null }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -122,7 +123,7 @@ export function MobileNavigation() {
   }
 
   return (
-    <div className="flex shrink-0 items-center gap-1 md:hidden">
+    <div className="flex shrink-0 items-center gap-1 lg:hidden">
       <button
         type="button"
         aria-label={searchOpen ? "Close search" : "Open search"}
@@ -136,6 +137,7 @@ export function MobileNavigation() {
       >
         <SearchIcon />
       </button>
+      {user && <HeaderProfileLink user={user} />}
       <button
         ref={menuButtonRef}
         type="button"
@@ -196,7 +198,7 @@ export function MobileNavigation() {
       </div>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           <button
             type="button"
             tabIndex={-1}
@@ -244,17 +246,70 @@ export function MobileNavigation() {
                     <Link
                       href={href}
                       onClick={() => setMenuOpen(false)}
-                      className={
-                        "flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518] " +
-                        (label === "Sign Up"
-                          ? "bg-[#286518] text-white hover:bg-[#1d4f11]"
-                          : "text-slate-800 hover:bg-[#eefce5] hover:text-[#286518]")
-                      }
+                      className="flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold text-slate-800 transition hover:bg-[#eefce5] hover:text-[#286518] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
                     >
                       {label}
                     </Link>
                   </li>
                 ))}
+                {user ? (
+                  <>
+                    <li className="pt-4">
+                      <p className="px-4 text-xs font-bold uppercase tracking-[0.14em] text-[#286518]">
+                        Signed in as {user.fullName}
+                      </p>
+                    </li>
+                    <li>
+                      <Link
+                        href="/students/dashboard"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold text-slate-800 transition hover:bg-[#eefce5] hover:text-[#286518]"
+                      >
+                        My Learning
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/students/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold text-slate-800 transition hover:bg-[#eefce5] hover:text-[#286518]"
+                      >
+                        Edit profile
+                      </Link>
+                    </li>
+                    <li>
+                      <form action={signOutStudent}>
+                        <button
+                          type="submit"
+                          className="flex min-h-12 w-full items-center rounded-xl px-4 py-3 text-left font-heading text-lg font-semibold text-[#286518] transition hover:bg-[#eefce5]"
+                        >
+                          Sign out
+                        </button>
+                      </form>
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li>
+                      <Link
+                        href="/students/login"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-12 items-center rounded-xl px-4 py-3 font-heading text-lg font-semibold text-[#286518] transition hover:bg-[#eefce5]"
+                      >
+                        Sign In
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/students/register"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex min-h-12 items-center justify-center rounded-full bg-[#286518] px-4 py-3 font-heading text-lg font-semibold text-white transition hover:bg-[#1d4f11]"
+                      >
+                        Sign Up
+                      </Link>
+                    </li>
+                  </>
+                )}
               </ul>
             </nav>
             <div className="mt-auto border-t border-slate-100 pt-6 text-xs text-slate-500">
