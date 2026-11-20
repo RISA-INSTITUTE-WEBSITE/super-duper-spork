@@ -16,6 +16,7 @@ import {
   uploadRisaCourseThumbnail,
   validateCourseLevel,
   validateNewRisaCourse,
+  type RisaCourse,
 } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -24,12 +25,20 @@ export type CourseCreationState = {
   message: string;
 };
 
+function error(message: string): CourseCreationState {
+  return { status: "error", message };
+}
+
 async function authorizedAdminToken(): Promise<string | null> {
   const jar = await cookies();
   const token = jar.get(studentCookieNames.access)?.value;
-  if (!token) return null;
+  if (!token) {
+    return null;
+  }
   const identity = await getStudentIdentity(token);
-  if (!identity || !(await isRisaAdministrator(token, identity.id))) return null;
+  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
+    return null;
+  }
   return token;
 }
 
@@ -48,13 +57,38 @@ function refreshCoursePages(courseId?: string) {
   }
 }
 
+/** Thumbnail failure never makes an already-created course disappear. */
+async function saveInitialThumbnail(
+  token: string,
+  code: string,
+  level: string,
+  image: File,
+): Promise<boolean> {
+  const course = await getRisaCourseByCode(token, code);
+  if (!course) {
+    return false;
+  }
+  const path = await uploadRisaCourseThumbnail(token, course.id, image);
+  if (!path) {
+    return false;
+  }
+  const saved = await updateRisaCoursePresentation(token, course.id, {
+    level,
+    thumbnailPath: path,
+  });
+  if (!saved) {
+    await removeRisaCourseThumbnail(token, path);
+  }
+  return saved;
+}
+
 export async function createCourseAction(
   _previous: CourseCreationState,
   formData: FormData,
 ): Promise<CourseCreationState> {
   const token = await authorizedAdminToken();
   if (!token) {
-    return { status: "error", message: "Administrator access is required." };
+    return error("Administrator access is required.");
   }
 
   const input = validateNewRisaCourse({
@@ -65,61 +99,65 @@ export async function createCourseAction(
     isPublished: formData.get("isPublished") === "on",
   });
   if (!input) {
-    return {
-      status: "error",
-      message:
-        "Enter a valid course code, title, academic level and overview (up to 1,200 characters).",
-    };
+    return error("Enter a valid course code, title, academic level and overview (up to 1,200 characters).");
   }
 
   const thumbnail = formThumbnail(formData);
   if (thumbnail && !isValidCourseThumbnail(thumbnail)) {
-    return {
-      status: "error",
-      message: "Upload a JPG, PNG or WebP image no larger than 2 MB.",
-    };
+    return error("Upload a JPG, PNG or WebP image no larger than 2 MB.");
   }
 
   const outcome = await createRisaCourse(token, input);
   if (outcome === "duplicate") {
-    return {
-      status: "error",
-      message: "This course code is already in use. Choose a different unique code.",
-    };
+    return error("This course code is already in use. Choose a different unique code.");
   }
   if (outcome !== "created") {
-    return {
-      status: "error",
-      message: "Course creation failed. Check your permissions and try again.",
-    };
+    return error("Course creation failed. Check your permissions and try again.");
   }
 
-  if (thumbnail) {
-    const course = await getRisaCourseByCode(token, input.code);
-    const path = course
-      ? await uploadRisaCourseThumbnail(token, course.id, thumbnail)
-      : null;
-    if (
-      !course ||
-      !path ||
-      !(await updateRisaCoursePresentation(token, course.id, input.level, path))
-    ) {
-      if (path) await removeRisaCourseThumbnail(token, path);
-      refreshCoursePages();
-      return {
-        status: "success",
-        message:
-          "Course " +
-          input.code +
-          " created, but the thumbnail could not be saved. You can retry from Edit course.",
-      };
-    }
-  }
-
+  const thumbnailSaved = thumbnail
+    ? await saveInitialThumbnail(token, input.code, input.level, thumbnail)
+    : true;
   refreshCoursePages();
   return {
     status: "success",
-    message: "Course " + input.code + " created successfully.",
+    message: thumbnailSaved
+      ? "Course " + input.code + " created successfully."
+      : "Course " + input.code + " created, but its thumbnail could not be saved. Retry from Edit course.",
+  };
+}
+
+async function saveExistingPresentation(
+  token: string,
+  course: RisaCourse,
+  level: string,
+  thumbnail: File | null,
+): Promise<CourseCreationState> {
+  const path = thumbnail
+    ? await uploadRisaCourseThumbnail(token, course.id, thumbnail)
+    : null;
+  if (thumbnail && !path) {
+    return error("Thumbnail upload failed. Please retry.");
+  }
+
+  const saved = await updateRisaCoursePresentation(token, course.id, {
+    level,
+    ...(path ? { thumbnailPath: path } : {}),
+  });
+  if (!saved) {
+    if (path) {
+      await removeRisaCourseThumbnail(token, path);
+    }
+    return error("Course changes could not be saved.");
+  }
+
+  if (path && course.thumbnail_path) {
+    await removeRisaCourseThumbnail(token, course.thumbnail_path);
+  }
+  refreshCoursePages(course.id);
+  return {
+    status: "success",
+    message: "Course level and thumbnail settings saved.",
   };
 }
 
@@ -129,53 +167,23 @@ export async function updateCoursePresentationAction(
 ): Promise<CourseCreationState> {
   const token = await authorizedAdminToken();
   if (!token) {
-    return { status: "error", message: "Administrator access is required." };
+    return error("Administrator access is required.");
   }
 
   const courseId = String(formData.get("courseId") ?? "");
   const level = validateCourseLevel(String(formData.get("level") ?? ""));
   if (!courseIdPattern.test(courseId) || !level) {
-    return { status: "error", message: "Choose a valid course level." };
+    return error("Choose a valid course level.");
   }
 
   const course = await getRisaCourseById(token, courseId);
   if (!course) {
-    return { status: "error", message: "Course not found or access denied." };
+    return error("Course not found or access denied.");
   }
 
   const thumbnail = formThumbnail(formData);
   if (thumbnail && !isValidCourseThumbnail(thumbnail)) {
-    return {
-      status: "error",
-      message: "Upload a JPG, PNG or WebP image no larger than 2 MB.",
-    };
+    return error("Upload a JPG, PNG or WebP image no larger than 2 MB.");
   }
-
-  let path: string | null = null;
-  if (thumbnail) {
-    path = await uploadRisaCourseThumbnail(token, courseId, thumbnail);
-    if (!path) {
-      return { status: "error", message: "Thumbnail upload failed. Please retry." };
-    }
-  }
-
-  const saved = await updateRisaCoursePresentation(
-    token,
-    courseId,
-    level,
-    path ?? undefined,
-  );
-  if (!saved) {
-    if (path) await removeRisaCourseThumbnail(token, path);
-    return { status: "error", message: "Course changes could not be saved." };
-  }
-
-  if (path && course.thumbnail_path) {
-    await removeRisaCourseThumbnail(token, course.thumbnail_path);
-  }
-  refreshCoursePages(courseId);
-  return {
-    status: "success",
-    message: "Course level and thumbnail settings saved.",
-  };
+  return saveExistingPresentation(token, course, level, thumbnail);
 }
