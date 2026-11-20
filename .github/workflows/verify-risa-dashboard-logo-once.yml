@@ -21,7 +21,7 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - name: Format check changed dashboard files
-        run: npx prettier --check src/app/students/dashboard/page.tsx tests/unit/student-dashboard-layout.test.ts public/risa-logo-dashboard-animated.svg
+        run: npx prettier --check src/app/students/dashboard/page.tsx tests/unit/student-dashboard-layout.test.ts
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test
