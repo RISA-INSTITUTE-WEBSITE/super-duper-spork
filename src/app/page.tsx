@@ -174,10 +174,10 @@ export default async function HomePage() {
                         {course.description || "Explore this RISA learning course."}
                       </p>
                       <Link
-                        href={"/programmes#" + course.slug}
+                        href={"/students/courses/" + course.id}
                         className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
                       >
-                        Course details <ArrowIcon diagonal />
+                        Preview topics <ArrowIcon diagonal />
                       </Link>
                     </div>
                   </article>
@@ -343,8 +343,8 @@ export default async function HomePage() {
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-500">
-            Website in development. Student accounts provide portal access only; programme
-            applications and enrolment are not available yet.
+            Website in development. Registered learners can preview course topics and request
+            enrolment. Access to full lessons requires approval by RISA administration.
           </p>
         </div>
       </section>
