@@ -324,15 +324,9 @@ export function StudentCourseContent({ curriculum }: { curriculum: CourseCurricu
       ) : (
         <>
           <div className="mb-7">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
-              RISA curriculum
-            </p>
-            <h2 className="mt-2 font-heading text-2xl font-extrabold text-[#0a2035] sm:text-3xl">
+            <h2 className="font-heading text-2xl font-extrabold text-[#0a2035] sm:text-3xl">
               Choose a topic
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Select a topic to explore its ordered video lessons and practice quizzes.
-            </p>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {curriculum.topics.map((topic, index) => (
