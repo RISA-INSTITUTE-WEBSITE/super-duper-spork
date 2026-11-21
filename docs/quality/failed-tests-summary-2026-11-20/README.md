@@ -362,6 +362,12 @@ without cookies. **Do not globally add `require-corp` to enrolled
 course pages with YouTube iframes**: it could break embedded lesson players.
 Browsers with different COEP implementations require compatibility tests.
 
+A first verification scan, [CI #682](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44901894511),
+cleared both **CSP 10055** and **File Inclusion 43**, leaving exactly
+one COEP 90004 warning on `/search?q`. Because search results render
+text links rather than external media, we extended the strict COEP
+route list to include `/search` and added a regression test for it.
+
 All three changes are covered by the same [live HTTP tests](../../../tests/security/assert-security-headers.mjs)
 and [unit tests](../../../tests/unit/risa-security-policy.test.ts).
 Scanner clearance and learner-facing compatibility remain **pending
