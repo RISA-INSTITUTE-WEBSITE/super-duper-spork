@@ -103,6 +103,8 @@ describe("RISA Edu-style topic cards", () => {
     );
 
     expect(html).toContain("Choose a topic");
+    expect(html).not.toContain("RISA curriculum");
+    expect(html).not.toContain("Select a topic to explore");
     expect(html).toContain("Mechanics");
     expect(html).toContain("1 Lesson");
     expect(html).toContain("subject-chevron-action");
