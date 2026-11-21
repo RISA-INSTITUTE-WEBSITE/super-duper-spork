@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 
+import { setLessonCompletedAction } from "@/app/students/courses/[id]/lesson-progress-actions";
 import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
+import { RisaLessonCompletionControl } from "@/components/risa-lesson-completion-control";
 import { RisaTopicCard } from "@/components/risa-topic-card";
 import {
   InlineYouTubePlayer,
@@ -111,10 +113,12 @@ function TopicBanner({
   topic,
   lessonCount,
   quizCount,
+  completedCount,
 }: {
   topic: CourseTopic;
   lessonCount: number;
   quizCount: number;
+  completedCount: number | null;
 }) {
   return (
     <div
@@ -159,6 +163,14 @@ function TopicBanner({
             Video Lessons
           </p>
         </div>
+        {completedCount !== null && (
+          <div className="shrink-0 rounded-2xl border border-white/20 bg-black/20 px-4 py-2.5 text-center backdrop-blur-md">
+            <p className="text-2xl font-black text-white">{completedCount}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-white/85">
+              Completed
+            </p>
+          </div>
+        )}
         {quizCount > 0 && (
           <div className="shrink-0 rounded-2xl border border-white/20 bg-black/20 px-4 py-2.5 text-center backdrop-blur-md">
             <p className="text-2xl font-black text-white">{quizCount}</p>
@@ -176,16 +188,28 @@ export function TopicDetails({
   topic,
   curriculum,
   selectedVideoId,
+  completedVideoIds,
+  savingProgress,
+  progressError,
   onSelectVideo,
+  onToggleComplete,
 }: {
   topic: CourseTopic;
   curriculum: CourseCurriculum;
   selectedVideoId: string | null;
+  completedVideoIds: string[] | null;
+  savingProgress: boolean;
+  progressError: string | null;
   onSelectVideo: (videoId: string) => void;
+  onToggleComplete: (videoId: string, complete: boolean) => void;
 }) {
   const videos = topicVideos(curriculum, topic.id);
   const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
   const currentVideo = videos.find((video) => video.id === selectedVideoId);
+  const completedCount =
+    completedVideoIds === null
+      ? null
+      : videos.filter((video) => completedVideoIds.includes(video.id)).length;
 
   // A selected lesson is its own focused view: the breadcrumb above provides
   // navigation back to the topic playlist and course catalogue.
@@ -206,13 +230,31 @@ export function TopicDetails({
           videoId={currentVideo.youtube_id}
           title={currentVideo.title}
         />
+        <RisaLessonCompletionControl
+          completed={completedVideoIds?.includes(currentVideo.id) ?? false}
+          completedCount={completedCount}
+          totalCount={videos.length}
+          saving={savingProgress}
+          error={progressError}
+          onToggle={() =>
+            onToggleComplete(
+              currentVideo.id,
+              !completedVideoIds?.includes(currentVideo.id),
+            )
+          }
+        />
       </section>
     );
   }
 
   return (
     <div className="space-y-6">
-      <TopicBanner topic={topic} lessonCount={videos.length} quizCount={quizzes.length} />
+      <TopicBanner
+        topic={topic}
+        lessonCount={videos.length}
+        quizCount={quizzes.length}
+        completedCount={completedCount}
+      />
 
       <section aria-labelledby="risa-topic-playlist-heading" className="space-y-4">
         <div className="flex items-center gap-3">
@@ -279,15 +321,24 @@ export function TopicDetails({
 
 export function StudentCourseContent({
   curriculum,
+  courseId,
   courseName,
   courseBanner,
+  initialCompletedVideoIds,
 }: {
   curriculum: CourseCurriculum;
+  courseId: string;
   courseName: string;
   courseBanner: ReactNode;
+  initialCompletedVideoIds: string[] | null;
 }) {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [completedVideoIds, setCompletedVideoIds] = useState<string[] | null>(
+    initialCompletedVideoIds,
+  );
+  const [progressError, setProgressError] = useState<string | null>(null);
+  const [savingProgress, startProgressSave] = useTransition();
   const selectedTopic = curriculum.topics.find((topic) => topic.id === selectedTopicId);
   const currentVideo = selectedTopic
     ? topicVideos(curriculum, selectedTopic.id).find(
@@ -353,6 +404,25 @@ export function StudentCourseContent({
     navigateTo(null, null);
   };
 
+  const toggleCompleted = (videoId: string, completed: boolean) => {
+    if (savingProgress || completedVideoIds === null) {
+      return;
+    }
+    setProgressError(null);
+    startProgressSave(async () => {
+      try {
+        const result = await setLessonCompletedAction(courseId, videoId, completed);
+        if (result.status === "success") {
+          setCompletedVideoIds(result.completedVideoIds);
+        } else {
+          setProgressError(result.message);
+        }
+      } catch {
+        setProgressError("Unable to save lesson progress. Please try again.");
+      }
+    });
+  };
+
   return (
     <>
       <RisaCourseBreadcrumb
@@ -378,7 +448,11 @@ export function StudentCourseContent({
             topic={selectedTopic}
             curriculum={curriculum}
             selectedVideoId={selectedVideoId}
+            completedVideoIds={completedVideoIds}
+            savingProgress={savingProgress}
+            progressError={progressError}
             onSelectVideo={selectVideo}
+            onToggleComplete={toggleCompleted}
           />
         ) : (
           <>
@@ -386,6 +460,11 @@ export function StudentCourseContent({
               <h2 className="font-heading text-2xl font-extrabold text-[#0a2035] sm:text-3xl">
                 Choose a topic
               </h2>
+              <p className="mt-2 text-sm font-medium text-[#286518]" role="status">
+                {completedVideoIds === null
+                  ? "Saved progress is temporarily unavailable."
+                  : `${completedVideoIds.length} of ${curriculum.videos.length} lessons completed`}
+              </p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {curriculum.topics.map((topic, index) => (
