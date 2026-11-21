@@ -3,8 +3,8 @@
  *
  * Walks installed node_modules manifests, checks declared SPDX identifiers
  * against RISA's initial allowlist, and exits non-zero for any unreviewed
- * license or unreadable manifest. It makes no legal determination: flagged
- * licenses require an explicit human compliance decision (issue #3).
+ * license or unreadable manifest. It makes no legal determination: nonbaseline
+ * expressions must match an exact, documented owner-reviewed exception.
  *
  * This script is deliberately fail-closed; do not turn unknown licenses into
  * silent warnings just to make the CI green.
