@@ -41,7 +41,7 @@ describe("RISA Edu-style topic cards", () => {
     );
 
     expect(html).toContain("Mechanics");
-    expect(html).toContain("Introduction to forces");
+    expect(html).toContain("i.ytimg.com/vi/M7lc1UVf-VE/hqdefault.jpg");
     expect(html).toContain(">2</span>");
     expect(html).toContain("1 Lesson");
     expect(html).toContain("subject-chevron-action");
