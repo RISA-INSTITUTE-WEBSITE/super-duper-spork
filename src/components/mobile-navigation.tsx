@@ -169,6 +169,7 @@ export function MobileNavigation({ user }: { user: HeaderUser | null }) {
         className="absolute inset-x-0 top-full z-30 border-b border-[#78eb29] bg-white px-5 py-4 shadow-lg sm:px-8"
       >
         <form
+          id="risa-mobile-search-form"
           role="search"
           action="/search"
           method="get"
