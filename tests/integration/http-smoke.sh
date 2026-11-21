@@ -52,4 +52,7 @@ fi
 # unpredictable CSRF token and browser cookie before any authentication request.
 node tests/security/assert-account-csrf.mjs
 
+# QA-HTTP-06: nonce-bound Next.js hydration and narrowly compatible COEP/CORP.
+node tests/security/assert-security-headers.mjs
+
 echo "QA-HTTP checks passed"
