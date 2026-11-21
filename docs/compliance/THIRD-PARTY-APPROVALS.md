@@ -30,18 +30,30 @@ and is the documentary basis for the **narrow** license-audit exceptions in
 
 ## Reviewed inventory (exact versions and licences)
 
-| Package(s) | Approved version(s) | Declared SPDX | Entries in current lockfile | Compliance review item |
-| --- | --- | --- | ---: | --- |
-| `@img/sharp-libvips-linux-x64`, `@img/sharp-libvips-linuxmusl-x64` | `1.3.4` | `LGPL-3.0-or-later` | 2 | Verify bundled libvips distribution, licence copy, notices and applicable user-relinking/source obligations |
-| `@img/sharp-wasm32` | `0.35.5` | `Apache-2.0 AND LGPL-3.0-or-later AND MIT` | 1 | Retain each licence and notice; confirm wasm and libvips distribution terms |
-| `argparse` | `2.0.1` | `Python-2.0` | 1 | Retain relevant copyright and licence notices |
-| `axe-core` | `4.14.1` | `MPL-2.0` | 1 | Verify file-level copyleft and notice requirements if redistributed |
-| `caniuse-lite` | `1.0.30001826` | `CC-BY-4.0` | 1 | Review attribution and licence-link obligations if redistributed |
-| `lightningcss`, `lightningcss-linux-x64-gnu`, `lightningcss-linux-x64-musl` | `1.32.0`, `1.33.0` | `MPL-2.0` | 6 | Review file-level copyleft, notices and actual build-tool redistribution |
+The approved current lockfile entries are grouped by their SPDX expression.
+No additional versions or packages are included by implication.
 
-**Total:** 12 installed-lockfile entries across 9 exact package names; two
-nested versions of the three Lightning CSS names account for 6 entries.
-Optional platform packages appear in the lockfile even when not shipped.
+- **LGPL-3.0-or-later:** `@img/sharp-libvips-linux-x64` and
+  `@img/sharp-libvips-linuxmusl-x64`, version `1.3.4` (2 entries).
+  Verify the bundled libvips redistribution model, licence copies, notices
+  and applicable relinking/source obligations.
+- **Apache-2.0 AND LGPL-3.0-or-later AND MIT:** `@img/sharp-wasm32`,
+  version `0.35.5` (1 entry). Retain all applicable licence texts and
+  notices; confirm wasm and bundled native library distribution terms.
+- **Python-2.0:** `argparse`, version `2.0.1` (1 entry). Preserve the
+  relevant copyright and licence notices.
+- **MPL-2.0:** `axe-core`, version `4.14.1` (1 entry). Assess file-level
+  copyleft requirements and notices if the package is redistributed.
+- **CC-BY-4.0:** `caniuse-lite`, version `1.0.30001826` (1 entry).
+  Review attribution and licence-link obligations upon redistribution.
+- **MPL-2.0:** `lightningcss`, `lightningcss-linux-x64-gnu`, and
+  `lightningcss-linux-x64-musl`, with exact versions `1.32.0` and
+  `1.33.0` (6 entries). Review covered-source and notice requirements,
+  including whether the build tools are redistributed.
+
+**Total:** 12 installed-lockfile entries across 9 exact package names.
+The three Lightning CSS names each have two nested versions. Optional
+platform packages are listed in the lockfile even when not shipped.
 
 ## Distribution and notice verification checklist
 
