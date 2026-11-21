@@ -62,28 +62,32 @@ IaC/container security scans will be mandatory when Docker, Terraform or
 Kubernetes files are introduced; no such deployment artifacts were verified
 in the initial website scaffold.
 
-## Temporary dependency and licence audit exception (18 November 2026)
+## Dependency and licence audit status (21 November 2026)
 
-At the repository owner's explicit request, the two GitHub Actions steps
-`Phase 2 - Dependency vulnerability audit` and
-`Phase 2 - Dependency license audit` are temporarily **non-blocking** using
-`continue-on-error: true`. Both commands still execute, and failed outcomes
-produce conspicuous GitHub Actions warnings. No vulnerabilities were fixed, no
-licences were reviewed or approved, and no audit findings were suppressed from
-the logs.
+The earlier security-advisory issue
+[#4](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/4)
+is closed, and the latest `npm audit` runs show zero vulnerabilities.
+The dependency vulnerability audit **remains temporarily non-blocking** by
+prior owner instruction, however: new findings still emit an Actions warning
+and must be reviewed before release.
 
-This override applies to the workflow in `.github/workflows/website-ci.yml`
-until it is explicitly reverted. The underlying findings in
-[issue #4](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/4)
-and the legal review in
-[issue #3](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/3)
-remain open. Branch protection and independent review in
-[issue #2](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/2)
-are unchanged, and this exception does **not** approve a production release.
+A repository owner left an
+[approval comment on issue #3](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/3#issuecomment-6991988893)
+regarding the dependency licences. The follow-up
+[third-party approval register](../compliance/THIRD-PARTY-APPROVALS.md)
+documents exact packages, versions, SPDX declarations and outstanding notice
+obligations. Issue #3 is closed. The technical compliance fixes for
+[issue #8](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/8)
+and [issue #9](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/9)
+restore a **blocking licence audit** with package/version-specific exceptions.
+A changed license or package version does not automatically inherit approval.
 
-After resolving these dependencies and licence obligations, remove the two
-`continue-on-error` properties and the temporary reporting step, then rerun
-all checks.
+This records the owner's inclusion decision, **not legal certification** that
+all distribution notices and source obligations have been fulfilled. Review
+the actual shipped artefacts before a new redistribution or release.
+Branch protection still requires owner action under
+[issue #2](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/2).
+Do not treat a green dependency audit as a substitute for these controls.
 
 ## GitHub merge rules (configuration outside the repository)
 
