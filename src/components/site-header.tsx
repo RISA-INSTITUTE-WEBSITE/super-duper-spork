@@ -78,6 +78,7 @@ export async function SiteHeader() {
         </Link>
         <MobileNavigation user={user} />
         <form
+          id="risa-desktop-search-form"
           role="search"
           action="/search"
           method="get"

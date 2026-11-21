@@ -80,7 +80,11 @@ export default async function StudentLoginPage({
             </p>
           )}
 
-          <form action={signInStudent} className="mt-8 space-y-5">
+          <form
+            id="risa-student-login-form"
+            action={signInStudent}
+            className="mt-8 space-y-5"
+          >
             <input type="hidden" name="csrf_token" value={csrfToken} />
             <fieldset disabled={!enabled} className="space-y-5">
               <div>
