@@ -40,7 +40,11 @@ export function StudentRegistrationForm({
   ];
 
   return (
-    <form action={registerStudent} className="mt-8 space-y-5">
+    <form
+      id="risa-student-registration-form"
+      action={registerStudent}
+      className="mt-8 space-y-5"
+    >
       <input type="hidden" name="csrf_token" value={csrfToken} />
       <fieldset disabled={!enabled} className="space-y-5">
         <div>
