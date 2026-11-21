@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Lexend } from "next/font/google";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -16,6 +17,13 @@ import {
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
+
+// Load Lexend only for RISA module headings; keep site-wide typography unchanged.
+const moduleHeadingFont = Lexend({
+  subsets: ["latin"],
+  weight: "700",
+  display: "swap",
+});
 
 export const dynamic = "force-dynamic";
 
@@ -128,7 +136,7 @@ function CourseBanner({
         {isEnrolled ? "← Back to My Learning" : "← All available courses"}
       </Link>
       <header className="mt-5 w-full max-w-4xl rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:px-7 sm:py-6">
-        <h1 className="font-heading text-2xl font-bold leading-snug tracking-tight text-slate-950 sm:text-3xl">
+        <h1 className={`${moduleHeadingFont.className} text-2xl font-bold leading-snug tracking-tight text-slate-950 sm:text-3xl`}>
           {course.code} - {course.title}
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
