@@ -386,7 +386,7 @@ export function StudentCourseContent({
           ...(currentVideo ? [{ label: currentVideo.title }] : []),
         ]}
       />
-      {courseBanner}
+      {!selectedTopic && courseBanner}
       <section id="course-topic-content" className="mt-9 scroll-mt-24">
         {selectedTopic ? (
           <TopicDetails
