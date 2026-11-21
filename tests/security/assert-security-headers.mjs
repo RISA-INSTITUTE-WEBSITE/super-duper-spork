@@ -33,14 +33,19 @@ const nonce = script.find((value) => value.startsWith("'nonce-"))?.slice(7, -1);
 
 check(Boolean(nonce), "Homepage is missing a nonce-based CSP");
 check(style.includes("'nonce-" + nonce + "'"), "Style nonce does not match script nonce");
-check(!script.includes("'unsafe-inline'"), "JavaScript unsafe-inline must not be allowed");
+check(
+  !script.includes("'unsafe-inline'"),
+  "JavaScript unsafe-inline must not be allowed",
+);
 check(!style.includes("'unsafe-inline'"), "Inline style blocks must require nonce");
 check(!image.includes("https:"), "CSP still permits all HTTPS image origins");
 check(image.includes("https://i.ytimg.com"), "YouTube thumbnails would be blocked");
 check(image.includes("blob:"), "Profile image previews would be blocked");
 check(image.includes("data:"), "Inline data images would be blocked");
 
-const inlineScripts = [...homepage.html.matchAll(/<script\b[^>]*>/g)].map((match) => match[0]);
+const inlineScripts = [...homepage.html.matchAll(/<script\b[^>]*>/g)].map(
+  (match) => match[0],
+);
 check(inlineScripts.length > 0, "Expected Next.js hydration scripts in home HTML");
 check(
   inlineScripts.every((tag) => tag.includes('nonce="' + nonce + '"')),
@@ -67,7 +72,10 @@ const repeat = await page("/");
 const secondNonce = policyDirectives(repeat.headers.get("content-security-policy") ?? "")
   .get("script-src")
   ?.find((value) => value.startsWith("'nonce-"));
-check(Boolean(secondNonce) && secondNonce !== "'nonce-" + nonce + "'", "Nonce was reused");
+check(
+  Boolean(secondNonce) && secondNonce !== "'nonce-" + nonce + "'",
+  "Nonce was reused",
+);
 
 const programmes = await page("/programmes");
 check(
@@ -84,7 +92,9 @@ check(
 for (const path of ["/robots.txt", "/sitemap.xml"]) {
   const response = await fetch(base + path);
   check(response.ok, path + " cannot be fetched");
-  const fallback = policyDirectives(response.headers.get("content-security-policy") ?? "");
+  const fallback = policyDirectives(
+    response.headers.get("content-security-policy") ?? "",
+  );
   check(
     !(fallback.get("script-src") ?? []).includes("'unsafe-inline'"),
     path + " still enables arbitrary inline JavaScript",
@@ -92,14 +102,21 @@ for (const path of ["/robots.txt", "/sitemap.xml"]) {
 }
 
 const hero = await fetch(base + "/images/risa-home/devops.png");
-check(hero.ok && (hero.headers.get("content-type") ?? "").startsWith("image/"), "Hero photo missing");
+check(
+  hero.ok && (hero.headers.get("content-type") ?? "").startsWith("image/"),
+  "Hero photo missing",
+);
 
 // Invalid optimizer parameters should never yield file contents or stack traces.
 const malformed = await fetch(base + "/_next/image?url=%2Fimage&w=3840&q=75");
 check(malformed.status >= 400, "Malformed image request unexpectedly returned success");
 const errorBody = await malformed.text();
 check(
-  !/(?:process\.env|BEGIN PRIVATE KEY|\/home\/runner\/work|webpack-internal)/i.test(errorBody),
+  !/(?:process\.env|BEGIN PRIVATE KEY|\/home\/runner\/work|webpack-internal)/i.test(
+    errorBody,
+  ),
   "Image error leaked sensitive internals",
 );
-process.stdout.write("RISA nonce CSP, cross-origin policies and image safeguards passed\n");
+process.stdout.write(
+  "RISA nonce CSP, cross-origin policies and image safeguards passed\n",
+);
