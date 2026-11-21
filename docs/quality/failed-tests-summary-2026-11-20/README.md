@@ -370,8 +370,19 @@ route list to include `/search` and added a regression test for it.
 
 All three changes are covered by the same [live HTTP tests](../../../tests/security/assert-security-headers.mjs)
 and [unit tests](../../../tests/unit/risa-security-policy.test.ts).
-Scanner clearance and learner-facing compatibility remain **pending
-the next CI run**. Do not downgrade or disable the three ZAP rules.
+[CI #684](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44902456498)
+confirmed that **all three warning families now PASS**; the isolated
+active ZAP scan reported **143 PASS, zero WARN, and zero FAIL**. The full
+workflow then exposed an independent browser-test setup issue: Playwright
+could not start a server because the preceding test runner left port
+3000 occupied. The integration and DAST scripts now start the Next.js
+binary directly rather than leaving child processes behind an `npm`
+wrapper, and the workflow verifies port cleanup before Playwright.
+
+Browser compatibility with authenticated YouTube lessons and real
+Supabase thumbnails remains a separate acceptance check; scanner
+clearance is not a general security certification. No ZAP rules have
+been downgraded or disabled.
 
 ## 13. What the findings do **not** mean
 
