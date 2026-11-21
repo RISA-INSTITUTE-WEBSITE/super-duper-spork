@@ -7,7 +7,7 @@ set -euo pipefail
 # Start the Node process directly: killing an npm wrapper leaves next start alive.
 ./node_modules/.bin/next start --hostname 0.0.0.0 --port 3000 > /tmp/risa-http-smoke.log 2>&1 &
 server_pid=$!
-trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+trap 'kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true' EXIT
 
 # QA-HTTP-01: wait for readiness and prove the homepage responds successfully.
 ready=0
