@@ -260,18 +260,25 @@ It recorded five detailed instances under the remaining **beta** rule
   a matching host-only cookie, and server-side token comparison before
   any attempt to register a learner.
 
+The first targeted test, [CI #673](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44880459521),
+removed those five detailed alerts but still found **one new 20012 instance**
+on `/students/login`, now correctly identified as the **sign-in Server
+Action**. Its form likewise contains a random CSRF token and has
+server-side validation before sign-in.
+
 **Why the scanner misread these forms:** This beta rule inspects HTML forms
 and compares hidden fields across repeated requests. Read-only GET search
 forms are not CSRF-sensitive, and a repeated Next.js Server Action request
 is not necessarily a fresh GET with the same form/cookie context. The rule
-does not independently prove that an attacker can register a learner
+does not independently prove that an attacker can sign in or register
 without the required token.
 
 **Narrowly reviewed scanner exceptions:** The search forms now have
 `id="risa-desktop-search-form"` and
 `id="risa-mobile-search-form"`. Registration has
-`id="risa-student-registration-form"`. The ZAP invocation uses the
-official `rules.csrf.ignorelist` option for **exactly these three IDs**.
+`id="risa-student-registration-form"` and sign-in has
+`id="risa-student-login-form"`. The ZAP invocation uses the
+ZAP-supported `rules.csrf.ignorelist` option for **exactly these four IDs**.
 Rule 20012 remains active for every other form, and all other ZAP
 policies remain unchanged.
 
@@ -279,14 +286,14 @@ policies remain unchanged.
 
 - The live [account-form smoke test](../../../tests/security/assert-account-csrf.mjs)
   verifies that both search forms still submit **GET /search**, that the
-  protected registration form uses POST, and that login/registration
+  protected sign-in and registration forms use POST, and that both
   present matching random form/cookie tokens.
 - [Server Action tests](../../../tests/unit/student-account-actions-csrf.test.ts)
   verify that missing or forged tokens do not reach Supabase and that
   properly validated requests preserve normal authentication behaviour.
 - [The scanner runner](../../../tests/security/run-zap.sh) documents
   the exact exceptions. If search becomes state-changing or registration
-  loses its CSRF guard, these exceptions **must be removed** and reviewed
+  or login loses its CSRF guard, these exceptions **must be removed** and reviewed
   again.
 
 This is an **evidence-based scanner exclusion**, not a new browser security
