@@ -20,6 +20,24 @@ async function readForm(path, cookie) {
   const csrfInput = inputs.find((input) => /\bname="csrf_token"/.test(input));
   const value = csrfInput?.match(/\bvalue="([A-Za-z0-9_-]{43})"/)?.[1];
   check(Boolean(value), path + " is missing its hidden CSRF token");
+  const forms = [...html.matchAll(/<form\\b[^>]*>/g)].map((match) => match[0]);
+  for (const id of ["risa-desktop-search-form", "risa-mobile-search-form"]) {
+    const search = forms.find((tag) => tag.includes('id="' + id + '"'));
+    check(Boolean(search), path + " is missing " + id);
+    check(
+      /\\baction="\\/search"/.test(search) && /\\bmethod="get"/i.test(search),
+      id + " must remain a read-only GET /search form",
+    );
+  }
+
+  if (path === "/students/register") {
+    const registration = forms.find((tag) =>
+      tag.includes('id="risa-student-registration-form"'),
+    );
+    check(Boolean(registration), "Missing documented student registration form");
+    check(/\\bmethod="post"/i.test(registration), "Registration must submit via POST");
+  }
+
   return { response, token: value };
 }
 
