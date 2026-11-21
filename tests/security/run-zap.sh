@@ -30,12 +30,12 @@ fi
 
 # ZAP beta rule 20012 compares hidden inputs on repeated HTML responses.
 # Its CI #671 report identified four READ-ONLY GET /search forms, plus the
-# Next.js registration Server Action already protected by cookie-bound CSRF.
-# The forms are explicitly exempted by ID; all OTHER forms remain scanned.
+# Next.js sign-in and registration Server Actions have cookie-bound CSRF.
+# These four forms are exempted by ID; all OTHER forms remain scanned.
 # HTTP + unit tests run before ZAP and verify both safe search methods and
-# actual server-side rejection of forged/missing registration tokens.
+# actual rejection of forged/missing sign-in and registration tokens.
 # NEVER add other form IDs without evidence and matching regression tests.
-csrf_reviewed_forms="risa-desktop-search-form,risa-mobile-search-form,risa-student-registration-form"
+csrf_reviewed_forms="risa-desktop-search-form,risa-mobile-search-form,risa-student-login-form,risa-student-registration-form"
 
 # Docker uses host networking so 127.0.0.1 refers to this runner's server.
 # The policy stays blocking; only the report location changes.
