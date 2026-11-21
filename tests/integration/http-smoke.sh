@@ -4,7 +4,8 @@
 # Fails immediately if pages, missing-route semantics or required headers regress.
 set -euo pipefail
 
-npm run start -- --hostname 0.0.0.0 --port 3000 > /tmp/risa-http-smoke.log 2>&1 &
+# Start the Node process directly: killing an npm wrapper leaves next start alive.
+./node_modules/.bin/next start --hostname 0.0.0.0 --port 3000 > /tmp/risa-http-smoke.log 2>&1 &
 server_pid=$!
 trap 'kill "$server_pid" 2>/dev/null || true' EXIT
 
