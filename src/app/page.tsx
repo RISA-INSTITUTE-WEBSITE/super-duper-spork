@@ -247,7 +247,17 @@ export default async function HomePage() {
           className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
         />
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,29rem)] lg:gap-14">
+          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-10">
+            <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-[0_18px_45px_-22px_rgba(15,23,42,0.4)] ring-1 ring-slate-200/80 md:max-w-none">
+              <Image
+                src="https://images.pexels.com/photos/5039250/pexels-photo-5039250.jpeg"
+                alt="Student studying among open books and notes"
+                width={738}
+                height={750}
+                unoptimized
+                className="aspect-[4/5] w-full object-cover object-center"
+              />
+            </div>
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
                 The RISA commitment
@@ -277,7 +287,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div aria-hidden="true" className="flex justify-center lg:justify-end">
+            <div aria-hidden="true" className="flex justify-center md:col-span-2 lg:col-span-1 lg:justify-end">
               <Image
                 src="/risa-logo-animated.svg"
                 alt=""
