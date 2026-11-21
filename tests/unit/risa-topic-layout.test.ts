@@ -42,9 +42,10 @@ describe("RISA Edu-style topic cards", () => {
 
     expect(html).toContain("Mechanics");
     expect(html).toContain("Introduction to forces");
-    expect(html).toContain("02</");
+    expect(html).toContain(">2</span>");
     expect(html).toContain("1 Lesson");
-    expect(html).toContain("1 quiz");
+    expect(html).toContain("subject-chevron-action");
+    expect(html).toContain("text-[#800000]");
     expect(html).toContain("View Mechanics");
     expect(html).toContain("topic-card-" + topic.id);
   });
@@ -104,7 +105,7 @@ describe("RISA Edu-style topic cards", () => {
     expect(html).toContain("Choose a topic");
     expect(html).toContain("Mechanics");
     expect(html).toContain("1 Lesson");
-    expect(html).toContain("1 quiz");
+    expect(html).toContain("subject-chevron-action");
     expect(html).not.toContain("data-player");
   });
 });
