@@ -12,6 +12,17 @@ type RisaTopicCardProps = {
   onSelect: () => void;
 };
 
+function TopicQuizCount({ locked, quizCount }: { locked: boolean; quizCount?: number }) {
+  if (locked || !quizCount) {
+    return null;
+  }
+  return (
+    <span className="font-medium text-slate-500">
+      · {quizCount} {quizCount === 1 ? "quiz" : "quizzes"}
+    </span>
+  );
+}
+
 /**
  * Edu-ca-te-inspired Crystal Glass topic card, styled with RISA branding.
  * The caller supplies only the curriculum permitted by the course access gate.
@@ -126,11 +137,7 @@ export function RisaTopicCard({
               <path d="m10 9 5 3-5 3V9Z" />
             </svg>
             {videos.length} {lessonLabel}
-            {!locked && quizCount !== undefined && quizCount > 0 && (
-              <span className="font-medium text-slate-500">
-                · {quizCount} {quizCount === 1 ? "quiz" : "quizzes"}
-              </span>
-            )}
+            <TopicQuizCount locked={locked} quizCount={quizCount} />
           </span>
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#eefce5] text-[#286518] transition-transform group-hover:translate-x-0.5 motion-reduce:transform-none">
             <svg
