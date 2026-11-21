@@ -7,6 +7,7 @@ import { RisaTopicCard } from "@/components/risa-topic-card";
 import {
   resolveCourseNavigation,
   StudentCourseContent,
+  TopicDetails,
 } from "@/components/student-course-content";
 import type { CourseCurriculum } from "@/lib/risa-course-curriculum";
 
@@ -139,6 +140,62 @@ describe("RISA Edu-style topic cards", () => {
     expect(html).toContain('aria-current="page"');
     expect(html.match(/<button/g)).toHaveLength(2);
     expect(html).not.toContain("Back to My Learning");
+  });
+
+  it("shows only the selected video and title in the lesson view", () => {
+    const curriculum: CourseCurriculum = {
+      topics: [topic],
+      videos: [video],
+      quizzes: [
+        {
+          id: "44444444-4444-4444-8444-444444444444",
+          topic_id: topic.id,
+          title: "Practice quiz",
+          description: "",
+          is_published: true,
+        },
+      ],
+      questions: [],
+    };
+
+    const html = renderToStaticMarkup(
+      createElement(TopicDetails, {
+        topic,
+        curriculum,
+        selectedVideoId: video.id,
+        onSelectVideo: () => {},
+      }),
+    );
+    expect(html).toContain("Introduction to forces");
+    expect(html).toContain('data-player="true"');
+    expect(html).toContain('id="risa-topic-player"');
+    expect(html).not.toContain("Lesson Video Playlist");
+    expect(html).not.toContain("RISA · Course Topic");
+    expect(html).not.toContain("Video Lessons");
+    expect(html).not.toContain("Practice quizzes");
+    expect(html).not.toContain("Lesson 1");
+  });
+
+  it("retains the topic banner and lesson list before a video is selected", () => {
+    const curriculum: CourseCurriculum = {
+      topics: [topic],
+      videos: [video],
+      quizzes: [],
+      questions: [],
+    };
+    const html = renderToStaticMarkup(
+      createElement(TopicDetails, {
+        topic,
+        curriculum,
+        selectedVideoId: null,
+        onSelectVideo: () => {},
+      }),
+    );
+
+    expect(html).toContain("RISA · Course Topic");
+    expect(html).toContain("Lesson Video Playlist (1)");
+    expect(html).toContain("Introduction to forces");
+    expect(html).not.toContain('data-player="true"');
   });
 
   it("rejects unknown topic or video URLs outside the authorized curriculum", () => {

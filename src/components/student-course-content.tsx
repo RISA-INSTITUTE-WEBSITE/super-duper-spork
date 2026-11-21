@@ -39,12 +39,10 @@ export function resolveCourseNavigation(
 function LessonSelector({
   video,
   order,
-  isActive,
   onSelect,
 }: {
   video: TopicVideo;
   order: number;
-  isActive: boolean;
   onSelect: () => void;
 }) {
   return (
@@ -55,7 +53,6 @@ function LessonSelector({
       <button
         type="button"
         onClick={onSelect}
-        aria-pressed={isActive}
         aria-label={"Open lesson " + order + ": " + video.title}
         className="relative flex flex-1 min-w-0 items-start gap-4 rounded-lg text-left cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]"
       >
@@ -84,9 +81,6 @@ function LessonSelector({
             <span className="rounded-full border border-[#DCE9F6] bg-[#EAF1FF] px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.075em] text-[#5274C3]">
               Lesson {order}
             </span>
-            {isActive && (
-              <span className="text-[11px] font-bold text-[#0D9488]">Now playing</span>
-            )}
           </div>
           <h3 className="font-heading text-[17px] font-extrabold leading-[1.28] tracking-[-0.025em] text-[#0A0F1D] transition-colors group-hover:text-[#2814D1] sm:text-[19px]">
             {video.title}
@@ -178,7 +172,7 @@ function TopicBanner({
   );
 }
 
-function TopicDetails({
+export function TopicDetails({
   topic,
   curriculum,
   selectedVideoId,
@@ -192,6 +186,29 @@ function TopicDetails({
   const videos = topicVideos(curriculum, topic.id);
   const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
   const currentVideo = videos.find((video) => video.id === selectedVideoId);
+
+  // A selected lesson is its own focused view: the breadcrumb above provides
+  // navigation back to the topic playlist and course catalogue.
+  if (currentVideo) {
+    return (
+      <section
+        id="risa-topic-player"
+        aria-labelledby="playing-heading"
+        className="scroll-mt-24 space-y-4"
+      >
+        <h2
+          id="playing-heading"
+          className="font-heading text-xl font-extrabold text-[#0a2035] sm:text-2xl"
+        >
+          {currentVideo.title}
+        </h2>
+        <InlineYouTubePlayer
+          videoId={currentVideo.youtube_id}
+          title={currentVideo.title}
+        />
+      </section>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -232,44 +249,12 @@ function TopicDetails({
                 key={video.id}
                 video={video}
                 order={index + 1}
-                isActive={currentVideo?.id === video.id}
                 onSelect={() => onSelectVideo(video.id)}
               />
             ))}
           </div>
         )}
       </section>
-
-      {currentVideo && (
-        <section
-          id="risa-topic-player"
-          aria-labelledby="playing-heading"
-          className="scroll-mt-24 overflow-hidden rounded-[26px] border border-[#dce9f6] bg-[#f8fcff] shadow-[0_12px_28px_rgba(46,61,85,0.10)]"
-        >
-          <div
-            aria-hidden="true"
-            className="h-1 bg-gradient-to-r from-[#155DFC] via-[#38b6ff] to-[#286518]"
-          />
-          <div className="p-4 sm:p-6">
-            <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#286518]">
-              Now playing on RISA
-            </p>
-            <h3
-              id="playing-heading"
-              className="mb-4 mt-2 font-heading text-xl font-extrabold text-[#0a2035] sm:text-2xl"
-            >
-              {currentVideo.title}
-            </h3>
-            <InlineYouTubePlayer
-              videoId={currentVideo.youtube_id}
-              title={currentVideo.title}
-            />
-            <p className="mt-3 text-xs text-slate-600">
-              Lessons play here using YouTube&apos;s embedded player and native controls.
-            </p>
-          </div>
-        </section>
-      )}
 
       {quizzes.length > 0 && (
         <section aria-labelledby="topic-quiz-heading" className="space-y-5">
