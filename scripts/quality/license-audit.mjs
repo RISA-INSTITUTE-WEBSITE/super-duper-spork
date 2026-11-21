@@ -12,22 +12,11 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-const allowedLicenseIds = new Set([
-  "MIT",
-  "ISC",
-  "Apache-2.0",
-  "BSD-2-Clause",
-  "BSD-3-Clause",
-  "0BSD",
-  "CC0-1.0",
-  "Unlicense",
-  "BlueOak-1.0.0",
-]);
-
-const allowedOperators = new Set(["OR", "AND", "WITH"]);
+import { isLicenseApproved, isReviewedException } from "./license-policy.mjs";
 const nodeModules = path.resolve("node_modules");
 const errors = [];
 let checked = 0;
+let reviewedCount = 0;
 
 async function inspectPackage(directory) {
   const manifestPath = path.join(directory, "package.json");
@@ -43,13 +32,12 @@ async function inspectPackage(directory) {
       return;
     }
 
-    const identifiers = license.match(/[A-Za-z0-9][A-Za-z0-9.+-]*/g) ?? [];
-    const rejected = identifiers.filter(
-      (identifier) =>
-        !allowedLicenseIds.has(identifier) && !allowedOperators.has(identifier),
-    );
-    if (rejected.length > 0) {
-      errors.push(`${packageName}: review license "${license}"`);
+    if (!isLicenseApproved({ name: packageName, version: manifest.version, license })) {
+      errors.push(
+        `${packageName}@${manifest.version ?? "unknown"}: review license "${license}"`,
+      );
+    } else if (isReviewedException({ name: packageName, version: manifest.version, license })) {
+      reviewedCount += 1;
     }
   } catch (error) {
     if (error?.code !== "ENOENT") {
@@ -103,5 +91,5 @@ if (errors.length > 0) {
 }
 
 process.stdout.write(
-  `License audit passed: ${checked} packages have approved SPDX licenses.\n`,
+  `License audit passed: ${checked} packages assessed (${reviewedCount} exact reviewed exceptions).\n`,
 );
