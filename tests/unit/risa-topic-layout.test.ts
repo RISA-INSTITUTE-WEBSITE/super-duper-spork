@@ -106,8 +106,10 @@ describe("RISA Edu-style topic cards", () => {
     const html = renderToStaticMarkup(
       createElement(StudentCourseContent, {
         curriculum,
+        courseId: topic.course_id,
         courseName: "Mechanics 1",
         courseBanner: createElement("header", null, "PHY101 - Mechanics 1"),
+        initialCompletedVideoIds: [],
       }),
     );
 
@@ -163,12 +165,18 @@ describe("RISA Edu-style topic cards", () => {
         topic,
         curriculum,
         selectedVideoId: video.id,
+        completedVideoIds: [],
+        savingProgress: false,
+        progressError: null,
         onSelectVideo: () => {},
+        onToggleComplete: () => {},
       }),
     );
     expect(html).toContain("Introduction to forces");
     expect(html).toContain('data-player="true"');
     expect(html).toContain('id="risa-topic-player"');
+    expect(html).toContain("Mark as complete");
+    expect(html).toContain("0 of 1 lessons completed");
     expect(html).not.toContain("Lesson Video Playlist");
     expect(html).not.toContain("RISA · Course Topic");
     expect(html).not.toContain("Video Lessons");
@@ -188,12 +196,17 @@ describe("RISA Edu-style topic cards", () => {
         topic,
         curriculum,
         selectedVideoId: null,
+        completedVideoIds: [],
+        savingProgress: false,
+        progressError: null,
         onSelectVideo: () => {},
+        onToggleComplete: () => {},
       }),
     );
 
     expect(html).toContain("RISA · Course Topic");
     expect(html).toContain("Lesson Video Playlist (1)");
+    expect(html).toContain("Completed");
     expect(html).toContain("Introduction to forces");
     expect(html).not.toContain('data-player="true"');
   });
@@ -223,5 +236,30 @@ describe("RISA Edu-style topic cards", () => {
         new URLSearchParams("topic=unknown-topic&video=" + video.id),
       ),
     ).toEqual({ topicId: null, videoId: null });
+  });
+  it("recognizes previously completed lessons in the video view", () => {
+    const curriculum: CourseCurriculum = {
+      topics: [topic],
+      videos: [video],
+      quizzes: [],
+      questions: [],
+    };
+    const html = renderToStaticMarkup(
+      createElement(TopicDetails, {
+        topic,
+        curriculum,
+        selectedVideoId: video.id,
+        completedVideoIds: [video.id],
+        savingProgress: false,
+        progressError: null,
+        onSelectVideo: () => {},
+        onToggleComplete: () => {},
+      }),
+    );
+    expect(html).toContain("Lesson completed");
+    expect(html).toContain("1 of 1 lessons completed");
+    expect(html).toContain("Mark as incomplete");
+    expect(html).toContain('aria-pressed="true"');
+    expect(html).not.toContain("Lesson Video Playlist");
   });
 });

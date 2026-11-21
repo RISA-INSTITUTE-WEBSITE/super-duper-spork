@@ -15,6 +15,7 @@ import {
   type CourseCurriculum,
 } from "@/lib/risa-course-curriculum";
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
+import { getLearnerLessonCompletions } from "@/lib/risa-lesson-progress";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -58,9 +59,11 @@ function CourseAlert({ message }: { message: string }) {
 function EnrolledTopics({
   curriculum,
   course,
+  completedVideoIds,
 }: {
   curriculum: CourseCurriculum | null;
   course: RisaCourse;
+  completedVideoIds: string[] | null;
 }) {
   if (!curriculum) {
     return (
@@ -88,7 +91,9 @@ function EnrolledTopics({
   return (
     <StudentCourseContent
       curriculum={curriculum}
+      courseId={course.id}
       courseName={course.title}
+      initialCompletedVideoIds={completedVideoIds}
       courseBanner={<CourseBanner course={course} isEnrolled />}
     />
   );
@@ -117,7 +122,20 @@ async function CourseAccess({
   }
   if (isEnrolled) {
     const curriculum = await getCourseCurriculum(token, course.id);
-    return <EnrolledTopics curriculum={curriculum} course={course} />;
+    const completedVideoIds = curriculum
+      ? await getLearnerLessonCompletions(
+          token,
+          studentId,
+          curriculum.videos.map((video) => video.id),
+        )
+      : null;
+    return (
+      <EnrolledTopics
+        curriculum={curriculum}
+        course={course}
+        completedVideoIds={completedVideoIds}
+      />
+    );
   }
 
   const [preview, request] = await Promise.all([
