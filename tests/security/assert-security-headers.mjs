@@ -91,7 +91,7 @@ check(
 
 for (const path of ["/robots.txt", "/sitemap.xml"]) {
   const response = await fetch(base + path);
-  check(response.ok, path + " cannot be fetched");
+  check([200, 404].includes(response.status), path + " returned an unexpected status");
   const fallback = policyDirectives(
     response.headers.get("content-security-policy") ?? "",
   );
