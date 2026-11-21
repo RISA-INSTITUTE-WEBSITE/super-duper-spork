@@ -25,7 +25,9 @@ export const metadata: Metadata = {
   icons: { icon: "/risa-logo.svg" },
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: Readonly<{ children: ReactNode }>) {
   // Nonces are per-request; static HTML cannot receive matching script nonces.
   await headers();
 
