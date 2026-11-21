@@ -14,7 +14,7 @@ server_pid=$!
 report_dir="$(mktemp -d)"
 chmod 0777 "$report_dir"
 cp tests/security/zap/rules.conf "$report_dir/rules.conf"
-trap 'kill "$server_pid" 2>/dev/null || true; rm -rf "$report_dir"' EXIT
+trap 'kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; rm -rf "$report_dir"' EXIT
 
 ready=0
 for attempt in $(seq 1 45); do
