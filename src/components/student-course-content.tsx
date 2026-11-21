@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
+import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
 import { RisaTopicCard } from "@/components/risa-topic-card";
 import {
   InlineYouTubePlayer,
@@ -16,6 +17,23 @@ import type {
 
 function topicVideos(curriculum: CourseCurriculum, topicId: string): TopicVideo[] {
   return curriculum.videos.filter((video) => video.topic_id === topicId);
+}
+
+/**
+ * Only accept topic/video query parameters that are present in the learner's
+ * already-authorized curriculum. URL state never grants access to content.
+ */
+export function resolveCourseNavigation(
+  curriculum: CourseCurriculum,
+  search: URLSearchParams,
+): { topicId: string | null; videoId: string | null } {
+  const topic = curriculum.topics.find((item) => item.id === search.get("topic"));
+  const video = topic
+    ? curriculum.videos.find(
+        (item) => item.topic_id === topic.id && item.id === search.get("video"),
+      )
+    : undefined;
+  return { topicId: topic?.id ?? null, videoId: video?.id ?? null };
 }
 
 function LessonSelector({
@@ -165,28 +183,18 @@ function TopicDetails({
   curriculum,
   selectedVideoId,
   onSelectVideo,
-  onBack,
 }: {
   topic: CourseTopic;
   curriculum: CourseCurriculum;
   selectedVideoId: string | null;
   onSelectVideo: (videoId: string) => void;
-  onBack: () => void;
 }) {
   const videos = topicVideos(curriculum, topic.id);
   const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
-  const currentVideo = videos.find((video) => video.id === selectedVideoId) ?? videos[0];
+  const currentVideo = videos.find((video) => video.id === selectedVideoId);
 
   return (
     <div className="space-y-6">
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#286518] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]"
-      >
-        <span aria-hidden="true">←</span> All course topics
-      </button>
-
       <TopicBanner topic={topic} lessonCount={videos.length} quizCount={quizzes.length} />
 
       <section aria-labelledby="risa-topic-playlist-heading" className="space-y-4">
@@ -284,14 +292,59 @@ function TopicDetails({
   );
 }
 
-export function StudentCourseContent({ curriculum }: { curriculum: CourseCurriculum }) {
+export function StudentCourseContent({
+  curriculum,
+  courseName,
+  courseBanner,
+}: {
+  curriculum: CourseCurriculum;
+  courseName: string;
+  courseBanner: ReactNode;
+}) {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
   const selectedTopic = curriculum.topics.find((topic) => topic.id === selectedTopicId);
+  const currentVideo = selectedTopic
+    ? topicVideos(curriculum, selectedTopic.id).find(
+        (video) => video.id === selectedVideoId,
+      )
+    : undefined;
+
+  // Match Edu-ca-te's browser-history navigation while validating IDs against
+  // the approved course curriculum returned by RISA's server.
+  useEffect(() => {
+    const syncFromUrl = () => {
+      const navigation = resolveCourseNavigation(
+        curriculum,
+        new URLSearchParams(window.location.search),
+      );
+      setSelectedTopicId(navigation.topicId);
+      setSelectedVideoId(navigation.videoId);
+    };
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, [curriculum]);
+
+  const navigateTo = (topicId: string | null, videoId: string | null) => {
+    const url = new URL(window.location.href);
+    if (topicId) {
+      url.searchParams.set("topic", topicId);
+    } else {
+      url.searchParams.delete("topic");
+    }
+    if (topicId && videoId) {
+      url.searchParams.set("video", videoId);
+    } else {
+      url.searchParams.delete("video");
+    }
+    window.history.pushState(null, "", url.pathname + url.search + url.hash);
+    setSelectedTopicId(topicId);
+    setSelectedVideoId(videoId);
+  };
 
   const showTopic = (topicId: string) => {
-    setSelectedTopicId(topicId);
-    setSelectedVideoId(topicVideos(curriculum, topicId)[0]?.id ?? null);
+    navigateTo(topicId, null);
     document.getElementById("course-topic-content")?.scrollIntoView({
       behavior: "smooth",
       block: "start",
@@ -299,51 +352,73 @@ export function StudentCourseContent({ curriculum }: { curriculum: CourseCurricu
   };
 
   const selectVideo = (videoId: string) => {
-    setSelectedVideoId(videoId);
-    document.getElementById("risa-topic-player")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
+    if (!selectedTopicId) {
+      return;
+    }
+    navigateTo(selectedTopicId, videoId);
+    requestAnimationFrame(() => {
+      document.getElementById("risa-topic-player")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     });
   };
 
   const showAllTopics = () => {
-    setSelectedTopicId(null);
-    setSelectedVideoId(null);
+    navigateTo(null, null);
   };
 
   return (
-    <section id="course-topic-content" className="mt-9 scroll-mt-24">
-      {selectedTopic ? (
-        <TopicDetails
-          topic={selectedTopic}
-          curriculum={curriculum}
-          selectedVideoId={selectedVideoId}
-          onSelectVideo={selectVideo}
-          onBack={showAllTopics}
-        />
-      ) : (
-        <>
-          <div className="mb-7">
-            <h2 className="font-heading text-2xl font-extrabold text-[#0a2035] sm:text-3xl">
-              Choose a topic
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            {curriculum.topics.map((topic, index) => (
-              <RisaTopicCard
-                key={topic.id}
-                topic={topic}
-                order={index + 1}
-                videos={topicVideos(curriculum, topic.id)}
-                quizCount={
-                  curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id).length
-                }
-                onSelect={() => showTopic(topic.id)}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </section>
+    <>
+      <RisaCourseBreadcrumb
+        items={[
+          { label: courseName, onClick: selectedTopic ? showAllTopics : undefined },
+          ...(selectedTopic
+            ? [
+                {
+                  label: selectedTopic.title,
+                  onClick: currentVideo
+                    ? () => navigateTo(selectedTopic.id, null)
+                    : undefined,
+                },
+              ]
+            : []),
+          ...(currentVideo ? [{ label: currentVideo.title }] : []),
+        ]}
+      />
+      {courseBanner}
+      <section id="course-topic-content" className="mt-9 scroll-mt-24">
+        {selectedTopic ? (
+          <TopicDetails
+            topic={selectedTopic}
+            curriculum={curriculum}
+            selectedVideoId={selectedVideoId}
+            onSelectVideo={selectVideo}
+          />
+        ) : (
+          <>
+            <div className="mb-7">
+              <h2 className="font-heading text-2xl font-extrabold text-[#0a2035] sm:text-3xl">
+                Choose a topic
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {curriculum.topics.map((topic, index) => (
+                <RisaTopicCard
+                  key={topic.id}
+                  topic={topic}
+                  order={index + 1}
+                  videos={topicVideos(curriculum, topic.id)}
+                  quizCount={
+                    curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id).length
+                  }
+                  onSelect={() => showTopic(topic.id)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+    </>
   );
 }

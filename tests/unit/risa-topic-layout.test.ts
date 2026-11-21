@@ -2,8 +2,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 
+import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
 import { RisaTopicCard } from "@/components/risa-topic-card";
-import { StudentCourseContent } from "@/components/student-course-content";
+import {
+  resolveCourseNavigation,
+  StudentCourseContent,
+} from "@/components/student-course-content";
 import type { CourseCurriculum } from "@/lib/risa-course-curriculum";
 
 vi.mock("@/components/risa-video-media", () => ({
@@ -99,9 +103,15 @@ describe("RISA Edu-style topic cards", () => {
       questions: [],
     };
     const html = renderToStaticMarkup(
-      createElement(StudentCourseContent, { curriculum }),
+      createElement(StudentCourseContent, {
+        curriculum,
+        courseName: "Mechanics 1",
+        courseBanner: createElement("header", null, "PHY101 - Mechanics 1"),
+      }),
     );
 
+    expect(html).toContain('aria-label="Course breadcrumb"');
+    expect(html).toContain("PHY101 - Mechanics 1");
     expect(html).toContain("Choose a topic");
     expect(html).not.toContain("RISA curriculum");
     expect(html).not.toContain("Select a topic to explore");
@@ -109,5 +119,52 @@ describe("RISA Edu-style topic cards", () => {
     expect(html).toContain("1 Lesson");
     expect(html).toContain("subject-chevron-action");
     expect(html).not.toContain("data-player");
+  });
+
+  it("uses Edu-ca-te's clickable course/topic/video breadcrumb hierarchy", () => {
+    const html = renderToStaticMarkup(
+      createElement(RisaCourseBreadcrumb, {
+        items: [
+          { label: "Mechanics 1", onClick: () => {} },
+          { label: "Physics and Measurement", onClick: () => {} },
+          { label: "Introduction to forces" },
+        ],
+      }),
+    );
+
+    expect(html).toContain('aria-label="Course breadcrumb"');
+    expect(html).toContain("Mechanics 1");
+    expect(html).toContain("Physics and Measurement");
+    expect(html).toContain("Introduction to forces");
+    expect(html).toContain('aria-current="page"');
+    expect(html.match(/<button/g)).toHaveLength(2);
+    expect(html).not.toContain("Back to My Learning");
+  });
+
+  it("rejects unknown topic or video URLs outside the authorized curriculum", () => {
+    const curriculum: CourseCurriculum = {
+      topics: [topic],
+      videos: [video],
+      quizzes: [],
+      questions: [],
+    };
+    expect(
+      resolveCourseNavigation(
+        curriculum,
+        new URLSearchParams("topic=" + topic.id + "&video=" + video.id),
+      ),
+    ).toEqual({ topicId: topic.id, videoId: video.id });
+    expect(
+      resolveCourseNavigation(
+        curriculum,
+        new URLSearchParams("topic=" + topic.id + "&video=unknown-video"),
+      ),
+    ).toEqual({ topicId: topic.id, videoId: null });
+    expect(
+      resolveCourseNavigation(
+        curriculum,
+        new URLSearchParams("topic=unknown-topic&video=" + video.id),
+      ),
+    ).toEqual({ topicId: null, videoId: null });
   });
 });
