@@ -13,6 +13,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { isLicenseApproved, isReviewedException } from "./license-policy.mjs";
+
 const nodeModules = path.resolve("node_modules");
 const errors = [];
 let checked = 0;
@@ -32,11 +33,12 @@ async function inspectPackage(directory) {
       return;
     }
 
-    if (!isLicenseApproved({ name: packageName, version: manifest.version, license })) {
+    const candidate = { name: packageName, version: manifest.version, license };
+    if (!isLicenseApproved(candidate)) {
       errors.push(
         `${packageName}@${manifest.version ?? "unknown"}: review license "${license}"`,
       );
-    } else if (isReviewedException({ name: packageName, version: manifest.version, license })) {
+    } else if (isReviewedException(candidate)) {
       reviewedCount += 1;
     }
   } catch (error) {
