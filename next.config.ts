@@ -23,6 +23,7 @@ const securityHeaders = [
 const coepProtectedRoutes = [
   "/about",
   "/contact",
+  "/search",
   "/students/login",
   "/students/register",
   "/students/privacy",
