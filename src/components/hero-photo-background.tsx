@@ -29,7 +29,9 @@ export function HeroPhotoBackground() {
             alt=""
             fill
             sizes="100vw"
-            quality={80}
+            // Hero images are already public static assets; avoid exposing the
+            // Next.js image optimizer to external path-manipulation probes.
+            unoptimized
             priority={index === 0}
             className="object-cover object-center"
           />
