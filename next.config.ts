@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { contentSecurityPolicy } from "./src/lib/risa-security-policy";
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
@@ -8,21 +10,11 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      "base-uri 'self'",
-      "object-src 'none'",
-      "frame-ancestors 'none'",
-      "form-action 'self'",
-      "frame-src 'self' https://www.youtube-nocookie.com",
-      "img-src 'self' data: https:",
-      "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline'",
-      "connect-src 'self'",
-    ].join("; "),
-  },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  // Strict fallback for metadata and static assets. HTML gets a request
+  // nonce from Proxy (rather than unsafe-inline) at render time.
+  { key: "Content-Security-Policy", value: contentSecurityPolicy() },
 ] as const;
 
 // COEP is enforced only on pages without third-party media or remote public
@@ -31,6 +23,7 @@ const securityHeaders = [
 const coepProtectedRoutes = [
   "/about",
   "/contact",
+  "/search",
   "/students/login",
   "/students/register",
   "/students/privacy",
@@ -39,6 +32,14 @@ const coepProtectedRoutes = [
 const coepHeader = {
   key: "Cross-Origin-Embedder-Policy",
   value: "require-corp",
+} as const;
+
+// Public catalogue pages display cookie-free Supabase images. Credentialless
+// allows those images without allowing cross-origin YouTube iframes on lessons.
+const coepPublicImageRoutes = ["/", "/programmes"] as const;
+const coepPublicImageHeader = {
+  key: "Cross-Origin-Embedder-Policy",
+  value: "credentialless",
 } as const;
 
 const nextConfig: NextConfig = {
@@ -62,6 +63,10 @@ const nextConfig: NextConfig = {
       ...coepProtectedRoutes.map((source) => ({
         source,
         headers: [coepHeader],
+      })),
+      ...coepPublicImageRoutes.map((source) => ({
+        source,
+        headers: [coepPublicImageHeader],
       })),
     ];
   },

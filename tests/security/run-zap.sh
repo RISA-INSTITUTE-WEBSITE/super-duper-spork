@@ -4,7 +4,8 @@
 # Keep fail-on-alert behavior; reports are copied back for CI artifacts.
 set -euo pipefail
 
-npm run start -- --hostname 0.0.0.0 --port 3000 > /tmp/risa-zap-next.log 2>&1 &
+# Avoid an orphaned Next.js child after the scanner exits (Playwright needs port 3000).
+./node_modules/.bin/next start --hostname 0.0.0.0 --port 3000 > /tmp/risa-zap-next.log 2>&1 &
 server_pid=$!
 
 # ZAP runs as a non-root user inside Docker; the GitHub checkout is not
@@ -13,7 +14,7 @@ server_pid=$!
 report_dir="$(mktemp -d)"
 chmod 0777 "$report_dir"
 cp tests/security/zap/rules.conf "$report_dir/rules.conf"
-trap 'kill "$server_pid" 2>/dev/null || true; rm -rf "$report_dir"' EXIT
+trap 'kill "$server_pid" 2>/dev/null || true; wait "$server_pid" 2>/dev/null || true; rm -rf "$report_dir"' EXIT
 
 ready=0
 for attempt in $(seq 1 45); do

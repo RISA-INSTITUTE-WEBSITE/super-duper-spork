@@ -123,6 +123,19 @@ jobs:
       - name: Phase 5 - OWASP ZAP isolated active DAST scan
         run: bash tests/security/run-zap.sh
 
+      # Regression: DAST must not leave a local Next.js server occupying port 3000.
+      - name: Phase 5 - Verify scanner server cleanup
+        run: |
+          for attempt in $(seq 1 10); do
+            if ! curl --fail --silent --max-time 2 http://127.0.0.1:3000/ > /dev/null; then
+              echo "Local Next.js scanner server was cleaned up."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error title=Orphaned local server::Port 3000 is still used after the ZAP scan."
+          exit 1
+
       # Provision the actual browser used for end-to-end acceptance.
       - name: Phase 5 - Install Chromium browser
         run: npx playwright install --with-deps chromium

@@ -303,7 +303,88 @@ Authenticated role and authorization testing remains necessary.
 
 Reference: [ZAP beta CSRF rule and ignore-list documentation](https://www.zaproxy.org/docs/desktop/addons/active-scan-rules-beta/).
 
-## 12. What the findings do **not** mean
+## 12. Remaining ZAP findings: implementation and compatibility review (21 Nov 2026)
+
+The [CI #678 ZAP JSON report](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44881221709)
+confirmed three remaining warning families. This follow-up targets the
+underlying causes, while retaining a strict scan and adding runtime tests.
+
+### CSP rule 10055 — three underlying directives
+
+The report specifically identifies `img-src https:`, `script-src
+'unsafe-inline'` and `style-src 'unsafe-inline'`, each repeated on four
+requests. The new [policy builder](../../../src/lib/risa-security-policy.ts)
+allows only RISA's own resources, YouTube's `i.ytimg.com` thumbnails,
+the specifically configured Supabase public-image origin, and required
+`data:`/`blob:` previews. Arbitrary HTTPS image origins are no longer
+permitted.
+
+[Next.js Proxy](../../../src/proxy.ts) creates a fresh random CSP nonce per
+HTML request and forwards that same policy to the server renderer and browser.
+[The root layout](../../../src/app/layout.tsx) opts into request-based
+rendering so Next.js can attach nonces to its hydration scripts and styles.
+The fallback CSP on static assets does not allow arbitrary inline script
+execution. **Existing CSS style attributes remain explicitly permitted**
+by `style-src-attr` because RISA has an animated hero using them; this
+is not a claim of a completely inline-style-free policy.
+
+**Tradeoff:** Nonce CSP requires dynamic rendering, adds server work and
+changes page caching. Verify homepage animations, learner authentication,
+admin workflows, actual Supabase thumbnails and embedded YouTube lessons
+before production rollout.
+
+### Rule 43 — Next.js image optimization false-positive review
+
+The only flagged request was `/_next/image?url=...devops.png&w=3840&q=75`
+where ZAP's parameter substitution produced differing error pages;
+the report included **no evidence of actual source code or secrets**.
+The four known, public static hero images are now requested directly via
+[the hero component](../../../src/components/hero-photo-background.tsx)
+instead of passing through the optimizer. This removes the specific
+scanner-facing image URL without changing any student-upload endpoints.
+
+The [HTTP regression test](../../../tests/security/assert-security-headers.mjs)
+checks that the static hero image serves as an image, the homepage does
+not emit an optimizer image URL, and malformed optimizer requests return
+an error without obvious sensitive content. **Unoptimized images may be
+larger to download.** The general-purpose Next.js image optimizer remains
+available for future legitimate uses and should still receive security review.
+
+### Rule 90004 — COEP, COOP and CORP
+
+[Security headers](../../../next.config.ts) now apply
+`Cross-Origin-Opener-Policy: same-origin` and
+`Cross-Origin-Resource-Policy: same-origin`, as well as existing strict
+COEP on informational and auth pages. Public homepage and
+`/programmes` use **`Cross-Origin-Embedder-Policy: credentialless`**
+so publicly accessible external Supabase course thumbnails can load
+without cookies. **Do not globally add `require-corp` to enrolled
+course pages with YouTube iframes**: it could break embedded lesson players.
+Browsers with different COEP implementations require compatibility tests.
+
+A first verification scan, [CI #682](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44901894511),
+cleared both **CSP 10055** and **File Inclusion 43**, leaving exactly
+one COEP 90004 warning on `/search?q`. Because search results render
+text links rather than external media, we extended the strict COEP
+route list to include `/search` and added a regression test for it.
+
+All three changes are covered by the same [live HTTP tests](../../../tests/security/assert-security-headers.mjs)
+and [unit tests](../../../tests/unit/risa-security-policy.test.ts).
+[CI #684](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44902456498)
+confirmed that **all three warning families now PASS**; the isolated
+active ZAP scan reported **143 PASS, zero WARN, and zero FAIL**. The full
+workflow then exposed an independent browser-test setup issue: Playwright
+could not start a server because the preceding test runner left port
+3000 occupied. The integration and DAST scripts now start the Next.js
+binary directly rather than leaving child processes behind an `npm`
+wrapper, and the workflow verifies port cleanup before Playwright.
+
+Browser compatibility with authenticated YouTube lessons and real
+Supabase thumbnails remains a separate acceptance check; scanner
+clearance is not a general security certification. No ZAP rules have
+been downgraded or disabled.
+
+## 13. What the findings do **not** mean
 
 - A red CI check **does not prove RISA was hacked**.
 - Zero scanner `FAIL` findings **does not certify the website as secure**.

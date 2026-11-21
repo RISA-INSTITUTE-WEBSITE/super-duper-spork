@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { isStudentAuthConfigured, refreshStudentSession } from "@/lib/student-auth-api";
+import { contentSecurityPolicy, newCspNonce } from "@/lib/risa-security-policy";
 import {
   isStudentCsrfToken,
   newStudentCsrfToken,
@@ -13,6 +14,17 @@ import {
   sessionCookieValues,
   studentCookieNames,
 } from "@/lib/student-session";
+
+/** The same nonce policy must reach Next.js rendering and the browser. */
+function cspResponse(request: NextRequest): NextResponse {
+  const forwarded = new Headers(request.headers);
+  const response = NextResponse.next({ request: { headers: forwarded } });
+  const policy = forwarded.get("Content-Security-Policy");
+  if (policy) {
+    response.headers.set("Content-Security-Policy", policy);
+  }
+  return response;
+}
 
 function needsRefresh(accessToken: string | undefined, expiresAt: number): boolean {
   return (
@@ -55,7 +67,7 @@ async function refreshStudentSessionIfNeeded(
   request.cookies.set(studentCookieNames.refresh, values.refresh);
   request.cookies.set(studentCookieNames.expires, values.expires);
 
-  const refreshedResponse = NextResponse.next({ request });
+  const refreshedResponse = cspResponse(request);
   if (csrfToken) {
     refreshedResponse.cookies.set(
       studentCsrfCookieName,
@@ -68,13 +80,19 @@ async function refreshStudentSessionIfNeeded(
 }
 
 export async function proxy(request: NextRequest) {
+  // The nonce is unique on each response and is forwarded to Next.js so
+  // framework hydration scripts and inline <style> blocks get trusted nonces.
+  const nonce = newCspNonce();
+  request.headers.set("x-nonce", nonce);
+  request.headers.set("Content-Security-Policy", contentSecurityPolicy(nonce));
+
   // Make the newly issued cookie visible to this server-rendered request.
   const csrfToken = needsAccountCsrfToken(request) ? newStudentCsrfToken() : null;
   if (csrfToken) {
     request.cookies.set(studentCsrfCookieName, csrfToken);
   }
 
-  const response = NextResponse.next({ request });
+  const response = cspResponse(request);
   if (csrfToken) {
     response.cookies.set(studentCsrfCookieName, csrfToken, studentCsrfCookieOptions);
   }
