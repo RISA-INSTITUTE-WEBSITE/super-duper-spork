@@ -12,7 +12,7 @@ and is the documentary basis for the **narrow** license-audit exceptions in
 - **Repository owner:** `@learnxul-lang` stated **“approved!”** on
   [issue #3](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/issues/3#issuecomment-6991988893),
   whose issue description listed the licence families requiring review. Issue #3
-  was closed on **18 November 2026**. This records an owner-level *inclusion*
+  was closed on **18 November 2026**. This records an owner-level _inclusion_
   decision for the dependencies identified there, **not independent legal
   certification** or a blanket approval of additional packages.
 - **Exact scope:** Only the names, versions and complete SPDX expressions
@@ -65,20 +65,20 @@ should record the following before a new commercial distribution or external
 release package:
 
 - [ ] Inspect the **exact upstream LICENSE and NOTICE files** for each shipped
-  version, together with any bundled native library or wasm source.
+      version, together with any bundled native library or wasm source.
 - [ ] Identify whether each component is present in browser bundles, server
-  deployment, CI-only tooling, or redistributed archives/containers.
+      deployment, CI-only tooling, or redistributed archives/containers.
 - [ ] Provide required copyright acknowledgements, licence copies, source
-  notices, and any LGPL/MPL compliance steps appropriate to that distribution.
+      notices, and any LGPL/MPL compliance steps appropriate to that distribution.
 - [ ] Record reviewer, decision date, evidence links and any required
-  follow-up; obtain fresh approval for version or licence-expression changes.
+      follow-up; obtain fresh approval for version or licence-expression changes.
 - [ ] Re-enable and verify the **blocking licence-audit CI gate** once the
-  reviewed code changes are merged.
+      reviewed code changes are merged.
 
 No upstream licence texts were copied into this register. The short GitHub
 comment cited above does not individually attest that the above checklist was
 completed. This checklist therefore remains open for release diligence even
-after the *engineering* issues #8 and #9 are closed.
+after the _engineering_ issues #8 and #9 are closed.
 
 ## How the technical control works
 
