@@ -46,6 +46,13 @@ jobs:
       - name: Phase 1 - Formatting without modifications
         run: npm run format:check
 
+      # Temporary diagnostic only: show the exact formatting patch in CI logs.
+      - name: Print licence review formatting patch
+        if: failure()
+        run: |
+          npx prettier --write docs/compliance/THIRD-PARTY-APPROVALS.md tests/security/assert-license-policy.mjs
+          git --no-pager diff -- docs/compliance/THIRD-PARTY-APPROVALS.md tests/security/assert-license-policy.mjs
+
       # QA-STATIC-02/03: enforce lint and strict TS typing before slower checks.
       - name: Phase 1 - ESLint, complexity and TypeScript
         run: |
