@@ -245,7 +245,58 @@ does not automatically address warning `10202` or the other ZAP alerts.
 Reference: [ZAP 20012](https://www.zaproxy.org/docs/alerts/20012/)
 and [Next.js Server Action security](https://nextjs.org/docs/app/guides/data-security).
 
-## 11. What the findings do **not** mean
+## 11. Reviewed ZAP 20012 false positives (21 November 2026)
+
+We examined the **actual JSON artifact** for [RISA CI #671](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44756777834).
+It recorded five detailed instances under the remaining **beta** rule
+`Anti-CSRF Tokens Check [20012]` (the terminal grouped these as `x6`):
+
+- Two instances on `/students/login` and two on `/students/register`
+  show the **desktop and mobile search forms**. They use
+  `GET /search?q=...` and only look up public pages and course titles;
+  they do not change account or learner data.
+- One instance on `/students/register` shows the **Next.js registration
+  Server Action**. It already has a random `csrf_token` hidden field,
+  a matching host-only cookie, and server-side token comparison before
+  any attempt to register a learner.
+
+**Why the scanner misread these forms:** This beta rule inspects HTML forms
+and compares hidden fields across repeated requests. Read-only GET search
+forms are not CSRF-sensitive, and a repeated Next.js Server Action request
+is not necessarily a fresh GET with the same form/cookie context. The rule
+does not independently prove that an attacker can register a learner
+without the required token.
+
+**Narrowly reviewed scanner exceptions:** The search forms now have
+`id="risa-desktop-search-form"` and
+`id="risa-mobile-search-form"`. Registration has
+`id="risa-student-registration-form"`. The ZAP invocation uses the
+official `rules.csrf.ignorelist` option for **exactly these three IDs**.
+Rule 20012 remains active for every other form, and all other ZAP
+policies remain unchanged.
+
+**Checks that make these exceptions defensible:**
+
+- The live [account-form smoke test](../../../tests/security/assert-account-csrf.mjs)
+  verifies that both search forms still submit **GET /search**, that the
+  protected registration form uses POST, and that login/registration
+  present matching random form/cookie tokens.
+- [Server Action tests](../../../tests/unit/student-account-actions-csrf.test.ts)
+  verify that missing or forged tokens do not reach Supabase and that
+  properly validated requests preserve normal authentication behaviour.
+- [The scanner runner](../../../tests/security/run-zap.sh) documents
+  the exact exceptions. If search becomes state-changing or registration
+  loses its CSRF guard, these exceptions **must be removed** and reviewed
+  again.
+
+This is an **evidence-based scanner exclusion**, not a new browser security
+header or proof that a vulnerability was exploited. A subsequent ZAP run
+must confirm that `20012` is no longer reported for these forms.
+Authenticated role and authorization testing remains necessary.
+
+Reference: [ZAP beta CSRF rule and ignore-list documentation](https://www.zaproxy.org/docs/desktop/addons/active-scan-rules-beta/).
+
+## 12. What the findings do **not** mean
 
 - A red CI check **does not prove RISA was hacked**.
 - Zero scanner `FAIL` findings **does not certify the website as secure**.
