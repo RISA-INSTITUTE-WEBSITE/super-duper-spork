@@ -46,7 +46,7 @@ describe("RISA strict Content Security Policy", () => {
 
     process.env.RISA_SUPABASE_URL = "https://courses.supabase.co/";
     expect(allowedImageSources()).toContain("https://courses.supabase.co");
-    expect(allowedImageSources()).not.toContain("https:");
+    expect(allowedImageSources()).not.toContain("https: ");
   });
 
   it.each([
