@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Outfit } from "next/font/google";
+import { headers } from "next/headers";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -24,7 +25,10 @@ export const metadata: Metadata = {
   icons: { icon: "/risa-logo.svg" },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  // Nonces are per-request; static HTML cannot receive matching script nonces.
+  await headers();
+
   return (
     <html lang="en">
       <body
