@@ -83,6 +83,12 @@ check(
   "Course catalogue must permit credentialless external public images",
 );
 
+const searchResults = await page("/search?q=physics");
+check(
+  searchResults.headers.get("cross-origin-embedder-policy") === "require-corp",
+  "Search results must retain strict COEP without external image embeds",
+);
+
 const login = await page("/students/login");
 check(
   login.headers.get("cross-origin-embedder-policy") === "require-corp",
