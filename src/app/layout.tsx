@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Outfit } from "next/font/google";
+import { Outfit, Sora } from "next/font/google";
 import { headers } from "next/headers";
 
 import { SiteFooter } from "@/components/site-footer";
@@ -13,6 +13,13 @@ const outfit = Outfit({
   weight: "600",
   display: "swap",
   variable: "--font-outfit",
+});
+
+const sora = Sora({
+  subsets: ["latin"],
+  weight: "800",
+  display: "swap",
+  variable: "--font-sora",
 });
 
 export const metadata: Metadata = {
@@ -34,7 +41,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} flex min-h-screen flex-col bg-slate-50 text-slate-900 antialiased`}
+        className={`${outfit.variable} ${sora.variable} flex min-h-screen flex-col bg-slate-50 text-slate-900 antialiased`}
       >
         <a className="skip-link" href="#main-content">
           Skip to content
