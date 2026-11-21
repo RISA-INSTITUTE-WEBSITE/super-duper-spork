@@ -36,7 +36,7 @@ curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
 curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
   grep --ignore-case --quiet '^content-security-policy:'
 # QA-HTTP-04: COEP is enforced on selected pages without third-party embeds.
-for route in /about /contact /students/login /students/register /students/privacy; do
+for route in /about /contact /search /students/login /students/register /students/privacy; do
   curl --fail --silent --show-error --head "http://127.0.0.1:3000$route" |
     grep --ignore-case --quiet '^cross-origin-embedder-policy: require-corp'
 done
