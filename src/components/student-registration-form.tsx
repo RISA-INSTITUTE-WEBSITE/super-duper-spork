@@ -22,7 +22,13 @@ function SubmitButton({ enabled }: { enabled: boolean }) {
   );
 }
 
-export function StudentRegistrationForm({ enabled }: { enabled: boolean }) {
+export function StudentRegistrationForm({
+  enabled,
+  csrfToken,
+}: {
+  enabled: boolean;
+  csrfToken: string;
+}) {
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
 
@@ -35,6 +41,7 @@ export function StudentRegistrationForm({ enabled }: { enabled: boolean }) {
 
   return (
     <form action={registerStudent} className="mt-8 space-y-5">
+      <input type="hidden" name="csrf_token" value={csrfToken} />
       <fieldset disabled={!enabled} className="space-y-5">
         <div>
           <label htmlFor="student-name" className="text-sm font-semibold text-slate-800">

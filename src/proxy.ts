@@ -2,6 +2,12 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { isStudentAuthConfigured, refreshStudentSession } from "@/lib/student-auth-api";
 import {
+  isStudentCsrfToken,
+  newStudentCsrfToken,
+  studentCsrfCookieName,
+  studentCsrfCookieOptions,
+} from "@/lib/student-csrf";
+import {
   clearStudentSessionOnResponse,
   saveStudentSessionOnResponse,
   sessionCookieValues,
@@ -14,7 +20,19 @@ function needsRefresh(accessToken: string | undefined, expiresAt: number): boole
   );
 }
 
-export async function proxy(request: NextRequest) {
+function needsAccountCsrfToken(request: NextRequest): boolean {
+  return (
+    request.method === "GET" &&
+    ["/students/login", "/students/register"].includes(request.nextUrl.pathname) &&
+    !isStudentCsrfToken(request.cookies.get(studentCsrfCookieName)?.value)
+  );
+}
+
+async function refreshStudentSessionIfNeeded(
+  request: NextRequest,
+  response: NextResponse,
+  csrfToken: string | null,
+): Promise<NextResponse> {
   const accessToken = request.cookies.get(studentCookieNames.access)?.value;
   const refreshToken = request.cookies.get(studentCookieNames.refresh)?.value;
   const expiresAt = Number(request.cookies.get(studentCookieNames.expires)?.value ?? 0);
@@ -23,12 +41,11 @@ export async function proxy(request: NextRequest) {
     !refreshToken ||
     !needsRefresh(accessToken, expiresAt)
   ) {
-    return NextResponse.next({ request });
+    return response;
   }
 
   const session = await refreshStudentSession(refreshToken);
   if (!session) {
-    const response = NextResponse.next({ request });
     clearStudentSessionOnResponse(response);
     return response;
   }
@@ -38,9 +55,30 @@ export async function proxy(request: NextRequest) {
   request.cookies.set(studentCookieNames.refresh, values.refresh);
   request.cookies.set(studentCookieNames.expires, values.expires);
 
+  const refreshedResponse = NextResponse.next({ request });
+  if (csrfToken) {
+    refreshedResponse.cookies.set(
+      studentCsrfCookieName,
+      csrfToken,
+      studentCsrfCookieOptions,
+    );
+  }
+  saveStudentSessionOnResponse(refreshedResponse, session);
+  return refreshedResponse;
+}
+
+export async function proxy(request: NextRequest) {
+  // Make the newly issued cookie visible to this server-rendered request.
+  const csrfToken = needsAccountCsrfToken(request) ? newStudentCsrfToken() : null;
+  if (csrfToken) {
+    request.cookies.set(studentCsrfCookieName, csrfToken);
+  }
+
   const response = NextResponse.next({ request });
-  saveStudentSessionOnResponse(response, session);
-  return response;
+  if (csrfToken) {
+    response.cookies.set(studentCsrfCookieName, csrfToken, studentCsrfCookieOptions);
+  }
+  return refreshStudentSessionIfNeeded(request, response, csrfToken);
 }
 
 // Keep the signed-in header accurate on public pages as well as protected pages.

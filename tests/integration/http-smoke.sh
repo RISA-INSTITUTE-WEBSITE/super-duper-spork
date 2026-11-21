@@ -48,4 +48,8 @@ if curl --fail --silent --show-error --head http://127.0.0.1:3000/ |
   echo "Unexpected global COEP enforcement: public thumbnails may break"
   exit 1
 fi
+# QA-HTTP-05: the login and registration HTML must receive a matching
+# unpredictable CSRF token and browser cookie before any authentication request.
+node tests/security/assert-account-csrf.mjs
+
 echo "QA-HTTP checks passed"
