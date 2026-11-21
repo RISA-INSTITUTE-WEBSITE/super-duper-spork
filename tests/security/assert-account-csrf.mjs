@@ -30,6 +30,12 @@ async function readForm(path, cookie) {
     );
   }
 
+  if (path === "/students/login") {
+    const signIn = forms.find((tag) => tag.includes('id="risa-student-login-form"'));
+    check(Boolean(signIn), "Missing documented student login form");
+    check(/\bmethod="post"/i.test(signIn), "Login must submit via POST");
+  }
+
   if (path === "/students/register") {
     const registration = forms.find((tag) =>
       tag.includes('id="risa-student-registration-form"'),
