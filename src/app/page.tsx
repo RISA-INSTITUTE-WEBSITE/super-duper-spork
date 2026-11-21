@@ -250,7 +250,7 @@ export default async function HomePage() {
           <div className="grid items-center gap-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-10">
             <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-[0_18px_45px_-22px_rgba(15,23,42,0.4)] ring-1 ring-slate-200/80 md:max-w-none">
               <Image
-                src="https://images.pexels.com/photos/5039250/pexels-photo-5039250.jpeg"
+                src="/images/risa-commitment-study.jpg"
                 alt="Student studying among open books and notes"
                 width={738}
                 height={750}
