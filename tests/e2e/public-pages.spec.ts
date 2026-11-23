@@ -13,16 +13,27 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
   );
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(
+    page.getByRole("navigation", { name: "Primary navigation" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Discover RISA" })).toHaveAttribute(
+    "href",
+    "/about",
+  );
+});
+
+test("vision, mission, and philosophy are on the About page", async ({ page }) => {
+  await page.goto("/about");
+  await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(
     page.getByRole("heading", { name: "Our Vision", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Our Mission" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Our Mission", exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Learn it. Understand it. Apply it. Test it. Improve it.",
     }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("navigation", { name: "Primary navigation" }),
   ).toBeVisible();
 });
 
@@ -30,14 +41,11 @@ test("course areas come directly after the four-photo hero", async ({ page }) =>
   await page.goto("/");
   const sections = page.locator("main > section");
 
+  await expect(sections).toHaveCount(3);
   await expect(sections.nth(0)).toHaveClass(/risa-hero/);
   await expect(sections.nth(0).locator(".risa-hero-photo")).toHaveCount(4);
   await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "courses-heading");
-  await expect(sections.nth(2)).toHaveAttribute(
-    "aria-labelledby",
-    "vision-mission-heading",
-  );
-  await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "philosophy-heading");
+  await expect(sections.nth(2)).toHaveAttribute("aria-labelledby", "next-heading");
   await expect(
     sections.nth(1).getByRole("heading", { name: "Explore our courses" }),
   ).toBeVisible();
