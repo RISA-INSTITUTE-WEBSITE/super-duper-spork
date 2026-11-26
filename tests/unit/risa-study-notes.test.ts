@@ -13,7 +13,11 @@ import {
   removeStudyNote,
   saveStudyNote,
 } from "@/lib/risa-study-notes";
-import { insertStudyNoteImage, readStudyNoteImage, validateStudyNoteImage } from "@/lib/risa-study-note-images";
+import {
+  insertStudyNoteImage,
+  readStudyNoteImage,
+  validateStudyNoteImage,
+} from "@/lib/risa-study-note-images";
 
 const topicId = "11111111-1111-4111-8111-111111111111";
 const noteId = "22222222-2222-4222-8222-222222222222";
@@ -41,12 +45,16 @@ afterEach(() => {
 
 describe("Edu-ca-te note formatting", () => {
   it("preserves dollar math and converts bracket LaTeX", () => {
-    expect(normalizeMathDelimiters(String.raw`\\(a=b\\) \\[F=ma\\]`)).toBe("$a=b$ \n$$\nF=ma\n$$\n");
+    expect(normalizeMathDelimiters(String.raw`\\(a=b\\) \\[F=ma\\]`)).toBe(
+      "$a=b$ \n$\nF=ma\n$\n",
+    );
     expect(normalizeMathDelimiters("$x$")).toBe("$x$");
   });
 
   it("tracks checklist text and position", () => {
-    const tasks = extractMarkdownChecklist("## Outcomes\n- [ ] Apply a law\n- [X] Explain it");
+    const tasks = extractMarkdownChecklist(
+      "## Outcomes\n- [ ] Apply a law\n- [X] Explain it",
+    );
     expect(tasks).toEqual([
       { line: 2, text: "Apply a law", defaultChecked: false },
       { line: 3, text: "Explain it", defaultChecked: true },
@@ -83,12 +91,14 @@ describe("private study notes API", () => {
 
   it("requests only topic identifiers for available notes", async () => {
     expect(await getTopicsWithStudyNotes("token", [])).toEqual([]);
-    fetchMock.mockResolvedValueOnce(Response.json([
-      { topic_id: topicId },
-      { topic_id: topicId },
-      { topic_id: noteId },
-      null,
-    ]));
+    fetchMock.mockResolvedValueOnce(
+      Response.json([
+        { topic_id: topicId },
+        { topic_id: topicId },
+        { topic_id: noteId },
+        null,
+      ]),
+    );
     expect(await getTopicsWithStudyNotes("token", [topicId])).toEqual([topicId]);
     expect(fetchMock.mock.calls[0][0]).toContain("select=topic_id");
     expect(fetchMock.mock.calls[0][0]).not.toContain("markdown");
@@ -130,8 +140,18 @@ describe("study note image protections", () => {
 
   it("accepts only bounded canonical raster data", () => {
     expect(validateStudyNoteImage("image/png", png)).not.toBeNull();
-    expect(validateStudyNoteImage("image/jpeg", Buffer.from([255, 216, 255]).toString("base64"))).not.toBeNull();
-    expect(validateStudyNoteImage("image/webp", Buffer.from("RIFF0000WEBP").toString("base64"))).not.toBeNull();
+    expect(
+      validateStudyNoteImage(
+        "image/jpeg",
+        Buffer.from([255, 216, 255]).toString("base64"),
+      ),
+    ).not.toBeNull();
+    expect(
+      validateStudyNoteImage(
+        "image/webp",
+        Buffer.from("RIFF0000WEBP").toString("base64"),
+      ),
+    ).not.toBeNull();
     expect(validateStudyNoteImage("image/svg+xml", png)).toBeNull();
     expect(validateStudyNoteImage("image/jpeg", png)).toBeNull();
     expect(validateStudyNoteImage("image/png", "!")).toBeNull();
@@ -141,11 +161,15 @@ describe("study note image protections", () => {
   it("uploads and reads private image records using authorization", async () => {
     expect(await insertStudyNoteImage("token", topicId, "image/svg+xml", png)).toBeNull();
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
-    expect(await insertStudyNoteImage("token", topicId, "image/png", png)).toMatch(/^\/students\/study-note-images\//);
+    expect(await insertStudyNoteImage("token", topicId, "image/png", png)).toMatch(
+      /^\/students\/study-note-images\//,
+    );
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
     expect(await insertStudyNoteImage("token", topicId, "image/png", png)).toBeNull();
     expect(await readStudyNoteImage("token", "bad")).toBeNull();
-    fetchMock.mockResolvedValueOnce(Response.json([{ mime_type: "image/png", image_data: png }]));
+    fetchMock.mockResolvedValueOnce(
+      Response.json([{ mime_type: "image/png", image_data: png }]),
+    );
     expect((await readStudyNoteImage("token", noteId))?.mime).toBe("image/png");
     fetchMock.mockResolvedValueOnce(Response.json([]));
     expect(await readStudyNoteImage("token", noteId)).toBeNull();
