@@ -21,12 +21,8 @@ async function authorizedTopic(
   if (!uuidPattern.test(courseId) || !uuidPattern.test(topicId)) {
     return null;
   }
-  const token = (await cookies()).get(studentCookieNames.access)?.value;
+  const token = await administratorToken();
   if (!token) {
-    return null;
-  }
-  const identity = await getStudentIdentity(token);
-  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
     return null;
   }
   const response = await requestStudentBackend(
@@ -73,9 +69,20 @@ export async function deleteStudyNoteAction(
 export async function insertStudyNoteImageAction(
   courseId: string,
   topicId: string,
-  mime: string,
-  data: string,
+  image: { mime: string; data: string },
 ) {
   const token = await authorizedTopic(courseId, topicId);
-  return token ? insertStudyNoteImage(token, topicId, mime, data) : null;
+  return token ? insertStudyNoteImage(token, topicId, image) : null;
+}
+
+async function administratorToken(): Promise<string | null> {
+  const token = (await cookies()).get(studentCookieNames.access)?.value;
+  if (!token) {
+    return null;
+  }
+  const identity = await getStudentIdentity(token);
+  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
+    return null;
+  }
+  return token;
 }
