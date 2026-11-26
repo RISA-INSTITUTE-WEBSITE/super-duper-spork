@@ -17,6 +17,7 @@ import {
   validateNewRisaCourse,
   type RisaCourse,
 } from "@/lib/risa-course-admin";
+import { createRisaProgramme, getRisaProgrammes, isProgrammeSlug } from "@/lib/risa-programmes";
 import { studentCookieNames } from "@/lib/student-session";
 
 export type CourseCreationState = {
@@ -63,7 +64,44 @@ function newCourseFromForm(formData: FormData): ReturnType<typeof validateNewRis
     description: String(formData.get("description") ?? ""),
     level: String(formData.get("level") ?? ""),
     isPublished: formData.get("isPublished") === "on",
+    programmeSlug: String(formData.get("programmeSlug") ?? ""),
   });
+}
+
+async function validModuleParent(
+  token: string,
+  input: NonNullable<ReturnType<typeof newCourseFromForm>>,
+): Promise<boolean> {
+  const programmes = await getRisaProgrammes(token);
+  const parent = programmes?.find((item) => item.slug === input.programme_slug);
+  return Boolean(parent && (!input.is_published || parent.is_published));
+}
+
+export async function createProgrammeAction(
+  _previous: CourseCreationState,
+  formData: FormData,
+): Promise<CourseCreationState> {
+  const token = await authorizedAdminToken();
+  if (!token) {
+    return error("Administrator access is required.");
+  }
+  const title = String(formData.get("title") ?? "").trim();
+  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const description = String(formData.get("description") ?? "").trim();
+  if (!isProgrammeSlug(slug)) {
+    return error("Enter a unique course slug using letters, digits and hyphens.");
+  }
+  const saved = await createRisaProgramme(token, {
+    title,
+    slug,
+    description,
+    is_published: formData.get("isPublished") === "on",
+  });
+  if (!saved) {
+    return error("Course creation failed. Check the title, slug and description.");
+  }
+  refreshCoursePages();
+  return { status: "success", message: "Course created successfully." };
 }
 
 export async function createCourseAction(
@@ -80,6 +118,10 @@ export async function createCourseAction(
     return error(
       "Enter a valid course code, title, academic level and overview (up to 1,200 characters).",
     );
+  }
+
+  if (!(await validModuleParent(token, input))) {
+    return error("Choose a valid parent course. Publish it before publishing modules.");
   }
 
   const thumbnail = formThumbnail(formData);
@@ -110,7 +152,7 @@ export async function createCourseAction(
   refreshCoursePages(courseId);
   return {
     status: "success",
-    message: "Course " + input.code + " created successfully.",
+    message: "Module " + input.code + " created successfully.",
   };
 }
 
