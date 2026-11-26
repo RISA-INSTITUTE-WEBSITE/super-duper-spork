@@ -8,11 +8,11 @@ import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
 import { StudentCourseContent } from "@/components/student-course-content";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { getRisaCourseById, type RisaCourse } from "@/lib/risa-course-admin";
+import { uuidPattern, type CourseCurriculum } from "@/lib/risa-course-curriculum";
 import {
-  uuidPattern,
-  type CourseCurriculum,
-} from "@/lib/risa-course-curriculum";
-import { getStructuredCurriculum, getStructuredPreview } from "@/lib/risa-module-sections";
+  getStructuredCurriculum,
+  getStructuredPreview,
+} from "@/lib/risa-module-sections";
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
 import { getLearnerLessonCompletions } from "@/lib/risa-lesson-progress";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
