@@ -48,8 +48,12 @@ export async function getTopicStudyNotes(
   }
   const response = await requestStudentBackend(
     token,
-    "/rest/v1/risa_study_notes?select=" + fields + "&topic_id=eq." + topicId +
-      (drafts ? "" : "&is_published=eq.true") + "&order=created_at.asc&limit=100",
+    "/rest/v1/risa_study_notes?select=" +
+      fields +
+      "&topic_id=eq." +
+      topicId +
+      (drafts ? "" : "&is_published=eq.true") +
+      "&order=created_at.asc&limit=100",
   );
   if (!response?.ok) {
     return null;
@@ -78,7 +82,8 @@ export async function getTopicsWithStudyNotes(
   const response = await requestStudentBackend(
     token,
     "/rest/v1/risa_study_notes?select=topic_id&is_published=eq.true&topic_id=in.(" +
-      ids.join(",") + ")",
+      ids.join(",") +
+      ")",
   );
   if (!response?.ok) {
     return [];
@@ -88,11 +93,15 @@ export async function getTopicsWithStudyNotes(
     if (!Array.isArray(rows)) {
       return [];
     }
-    return [...new Set(rows.flatMap((row) =>
-      typeof row?.topic_id === "string" && ids.includes(row.topic_id)
-        ? [row.topic_id as string]
-        : [],
-    ))];
+    return [
+      ...new Set(
+        rows.flatMap((row) =>
+          typeof row?.topic_id === "string" && ids.includes(row.topic_id)
+            ? [row.topic_id as string]
+            : [],
+        ),
+      ),
+    ];
   } catch {
     return [];
   }
@@ -106,7 +115,10 @@ export type StudyNoteDraft = {
   published: boolean;
 };
 
-export async function saveStudyNote(token: string, input: StudyNoteDraft): Promise<boolean> {
+export async function saveStudyNote(
+  token: string,
+  input: StudyNoteDraft,
+): Promise<boolean> {
   if (
     !uuidPattern.test(input.topicId) ||
     (input.noteId && !uuidPattern.test(input.noteId)) ||
@@ -117,17 +129,21 @@ export async function saveStudyNote(token: string, input: StudyNoteDraft): Promi
   const filter = input.noteId
     ? "?id=eq." + input.noteId + "&topic_id=eq." + input.topicId
     : "";
-  const response = await requestStudentBackend(token, "/rest/v1/risa_study_notes" + filter, {
-    method: input.noteId ? "PATCH" : "POST",
-    headers: { "Content-Type": "application/json", Prefer: "return=representation" },
-    body: JSON.stringify({
-      topic_id: input.topicId,
-      title: input.title.trim(),
-      markdown: input.markdown.trim(),
-      is_published: input.published,
-      updated_at: new Date().toISOString(),
-    }),
-  });
+  const response = await requestStudentBackend(
+    token,
+    "/rest/v1/risa_study_notes" + filter,
+    {
+      method: input.noteId ? "PATCH" : "POST",
+      headers: { "Content-Type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({
+        topic_id: input.topicId,
+        title: input.title.trim(),
+        markdown: input.markdown.trim(),
+        is_published: input.published,
+        updated_at: new Date().toISOString(),
+      }),
+    },
+  );
   return changedOne(response);
 }
 
