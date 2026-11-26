@@ -2,18 +2,12 @@ import {
   getCourseCurriculum,
   getCoursePreviewCurriculum,
   uuidPattern,
-  type CourseTopic,
 } from "./risa-course-curriculum";
 import { requestStudentBackend } from "./student-auth-api";
 
-export type ModuleSection = {
-  id: string;
-  course_id: string;
-  title: string;
-  sort_order: number;
-};
+import type { ModuleSection } from "./risa-module-outline";
 
-export type TopicGroup = { id: string; title: string; topics: CourseTopic[] };
+export { groupModuleTopics, type ModuleSection } from "./risa-module-outline";
 
 function parseSection(value: unknown): ModuleSection | null {
   if (!value || typeof value !== "object") {
@@ -29,25 +23,6 @@ function parseSection(value: unknown): ModuleSection | null {
     return null;
   }
   return { id: row.id, course_id: row.course_id, title: row.title, sort_order: row.sort_order };
-}
-
-export function groupModuleTopics(
-  sections: ModuleSection[],
-  topics: CourseTopic[],
-): TopicGroup[] {
-  const groups = [...sections]
-    .sort((a, b) => a.sort_order - b.sort_order || a.title.localeCompare(b.title))
-    .map((section) => ({
-      id: section.id,
-      title: section.title,
-      topics: topics.filter((topic) => topic.section_id === section.id),
-    }));
-  const assigned = new Set(groups.flatMap((group) => group.topics.map((topic) => topic.id)));
-  const remaining = topics.filter((topic) => !assigned.has(topic.id));
-  if (remaining.length) {
-    groups.push({ id: "general", title: "General topics", topics: remaining });
-  }
-  return groups;
 }
 
 export async function getModuleSections(
