@@ -1,6 +1,6 @@
 import { RisaTopicCard } from "@/components/risa-topic-card";
 import type { CoursePreviewCurriculum } from "@/lib/risa-course-curriculum";
-import { groupModuleTopics } from "@/lib/risa-module-sections";
+import { groupModuleTopics } from "@/lib/risa-module-outline";
 
 export function ModuleTopicGroups({
   curriculum,
