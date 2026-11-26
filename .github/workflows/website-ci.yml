@@ -44,12 +44,7 @@ jobs:
       # Phase 1 - fastest, read-only static checks.
       # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
       - name: Phase 1 - Formatting without modifications
-        run: |
-          npm run format:check || {
-            npx prettier src/components/computing-lab.tsx > /tmp/computing-lab-formatted.tsx
-            diff -u src/components/computing-lab.tsx /tmp/computing-lab-formatted.tsx || true
-            exit 1
-          }
+        run: npm run format:check
 
       # QA-STATIC-02/03: enforce lint and strict TS typing before slower checks.
       - name: Phase 1 - ESLint, complexity and TypeScript
