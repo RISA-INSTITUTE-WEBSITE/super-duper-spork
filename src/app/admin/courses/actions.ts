@@ -17,7 +17,11 @@ import {
   validateNewRisaCourse,
   type RisaCourse,
 } from "@/lib/risa-course-admin";
-import { createRisaProgramme, getRisaProgrammes, isProgrammeSlug } from "@/lib/risa-programmes";
+import {
+  createRisaProgramme,
+  getRisaProgrammes,
+  isProgrammeSlug,
+} from "@/lib/risa-programmes";
 import { studentCookieNames } from "@/lib/student-session";
 
 export type CourseCreationState = {
@@ -86,7 +90,9 @@ export async function createProgrammeAction(
     return error("Administrator access is required.");
   }
   const title = String(formData.get("title") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const slug = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase();
   const description = String(formData.get("description") ?? "").trim();
   if (!isProgrammeSlug(slug)) {
     return error("Enter a unique course slug using letters, digits and hyphens.");
