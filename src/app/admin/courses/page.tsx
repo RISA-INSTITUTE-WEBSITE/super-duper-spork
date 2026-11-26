@@ -202,7 +202,9 @@ export default async function ManageRisaCoursesPage() {
             {courses.some((module) => !module.programme_slug) && (
               <section className="mt-8">
                 <h3 className="text-xl font-bold">Unassigned modules</h3>
-                <CourseList courses={courses.filter((module) => !module.programme_slug)} />
+                <CourseList
+                  courses={courses.filter((module) => !module.programme_slug)}
+                />
               </section>
             )}
           </>
