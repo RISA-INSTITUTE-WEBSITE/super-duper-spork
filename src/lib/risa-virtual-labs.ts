@@ -51,7 +51,10 @@ export type PipelineStage = "Build" | "Test" | "Deploy";
 export type StageStatus = "passed" | "failed" | "blocked";
 export type PipelineResult = { stage: PipelineStage; status: StageStatus };
 
-export function simulatePipeline(buildPasses: boolean, testsPass: boolean): PipelineResult[] {
+export function simulatePipeline(
+  buildPasses: boolean,
+  testsPass: boolean,
+): PipelineResult[] {
   return [
     { stage: "Build", status: buildPasses ? "passed" : "failed" },
     { stage: "Test", status: testStatus(buildPasses, testsPass) },
