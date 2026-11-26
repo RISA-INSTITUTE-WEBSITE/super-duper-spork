@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { RisaCourseCatalogue } from "@/components/risa-course-catalogue";
-import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
+import { RisaProgrammeCards } from "@/components/risa-programme-cards";
+import { getPublicRisaCourses } from "@/lib/risa-course-admin";
+import { getRisaProgrammes } from "@/lib/risa-programmes";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default async function ProgrammesPage() {
-  const courses = await getPublicRisaCourses();
+  const [courses, modules] = await Promise.all([
+    getRisaProgrammes(),
+    getPublicRisaCourses(),
+  ]);
 
   return (
     <main id="main-content" className="risa-pathways-section flex-1">
@@ -35,8 +39,7 @@ export default async function ProgrammesPage() {
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
               Discover applied science programmes and find a course that matches your
-              learning goals. Browse by academic level, or search using a course name or
-              institutional code.
+              learning goals. Open a course to explore its individual modules.
             </p>
             <div className="mt-7 flex flex-wrap gap-2">
               <span className="rounded-full border border-[#bedaca] bg-white/80 px-4 py-2 text-xs font-bold text-[#286518]">
@@ -49,7 +52,7 @@ export default async function ProgrammesPage() {
           </div>
         </div>
 
-        {courses === null ? (
+        {courses === null || modules === null ? (
           <p
             role="status"
             className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-6 text-amber-900"
@@ -65,12 +68,7 @@ export default async function ProgrammesPage() {
             </p>
           </div>
         ) : (
-          <RisaCourseCatalogue
-            courses={courses.map((course) => ({
-              ...course,
-              thumbnailUrl: risaThumbnailUrl(course.thumbnail_path),
-            }))}
-          />
+          <RisaProgrammeCards programmes={courses} modules={modules} />
         )}
 
         <div className="mt-12 flex flex-col gap-4 rounded-2xl border border-[#dce8e6] bg-white/80 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
