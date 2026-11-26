@@ -11,6 +11,7 @@ import { getStudentIdentity } from "@/lib/student-auth-api";
 import { studentCookieNames } from "@/lib/student-session";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Study Notes Studio | RISA", robots: { index: false, follow: false } };
 
 export default async function StudyNotesStudioPage({
   params,
