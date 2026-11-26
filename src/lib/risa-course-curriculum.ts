@@ -1,4 +1,4 @@
-import type { ModuleSection } from "./risa-module-sections";
+import type { ModuleSection } from "./risa-module-outline";
 import { requestStudentBackend } from "./student-auth-api";
 
 export const uuidPattern =
