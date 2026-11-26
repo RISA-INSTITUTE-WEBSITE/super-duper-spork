@@ -7,10 +7,17 @@ import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import { uuidPattern } from "@/lib/risa-course-curriculum";
 import { getStudentIdentity, requestStudentBackend } from "@/lib/student-auth-api";
 import { insertStudyNoteImage } from "@/lib/risa-study-note-images";
-import { removeStudyNote, saveStudyNote, type StudyNoteDraft } from "@/lib/risa-study-notes";
+import {
+  removeStudyNote,
+  saveStudyNote,
+  type StudyNoteDraft,
+} from "@/lib/risa-study-notes";
 import { studentCookieNames } from "@/lib/student-session";
 
-async function authorizedTopic(courseId: string, topicId: string): Promise<string | null> {
+async function authorizedTopic(
+  courseId: string,
+  topicId: string,
+): Promise<string | null> {
   if (!uuidPattern.test(courseId) || !uuidPattern.test(topicId)) {
     return null;
   }
@@ -24,7 +31,10 @@ async function authorizedTopic(courseId: string, topicId: string): Promise<strin
   }
   const response = await requestStudentBackend(
     token,
-    "/rest/v1/risa_course_topics?select=id&id=eq." + topicId + "&course_id=eq." + courseId,
+    "/rest/v1/risa_course_topics?select=id&id=eq." +
+      topicId +
+      "&course_id=eq." +
+      courseId,
   );
   if (!response?.ok) {
     return null;
@@ -47,7 +57,11 @@ export async function saveStudyNoteAction(courseId: string, draft: StudyNoteDraf
   return saved;
 }
 
-export async function deleteStudyNoteAction(courseId: string, topicId: string, noteId: string) {
+export async function deleteStudyNoteAction(
+  courseId: string,
+  topicId: string,
+  noteId: string,
+) {
   const token = await authorizedTopic(courseId, topicId);
   const removed = token ? await removeStudyNote(token, topicId, noteId) : false;
   if (removed) {
@@ -56,7 +70,12 @@ export async function deleteStudyNoteAction(courseId: string, topicId: string, n
   return removed;
 }
 
-export async function insertStudyNoteImageAction(courseId: string, topicId: string, mime: string, data: string) {
+export async function insertStudyNoteImageAction(
+  courseId: string,
+  topicId: string,
+  mime: string,
+  data: string,
+) {
   const token = await authorizedTopic(courseId, topicId);
   return token ? insertStudyNoteImage(token, topicId, mime, data) : null;
 }
