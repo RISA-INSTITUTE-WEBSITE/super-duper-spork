@@ -1,3 +1,4 @@
+import type { ModuleSection } from "./risa-module-outline";
 import { requestStudentBackend } from "./student-auth-api";
 
 export const uuidPattern =
@@ -6,6 +7,9 @@ export const uuidPattern =
 export type CourseTopic = {
   id: string;
   course_id: string;
+  section_id?: string;
+  sort_order?: number;
+  practical_lab_slug?: string;
   title: string;
   description: string;
   is_published: boolean;
@@ -35,6 +39,7 @@ export type QuizQuestion = {
 };
 
 export type CourseCurriculum = {
+  sections?: ModuleSection[];
   topics: CourseTopic[];
   videos: TopicVideo[];
   quizzes: TopicQuiz[];
@@ -42,7 +47,10 @@ export type CourseCurriculum = {
 };
 
 /** Public-to-registered preview: no quiz questions or playable player data are rendered. */
-export type CoursePreviewCurriculum = Pick<CourseCurriculum, "topics" | "videos">;
+export type CoursePreviewCurriculum = Pick<
+  CourseCurriculum,
+  "topics" | "videos" | "sections"
+>;
 
 type JsonRow = Record<string, unknown>;
 function asRecord(item: unknown): JsonRow | null {
@@ -53,6 +61,16 @@ function asRecord(item: unknown): JsonRow | null {
 
 function published(value: unknown): value is boolean {
   return typeof value === "boolean";
+}
+
+function parseTopicPlacement(row: JsonRow) {
+  return {
+    ...(typeof row.section_id === "string" ? { section_id: row.section_id } : {}),
+    ...(typeof row.sort_order === "number" ? { sort_order: row.sort_order } : {}),
+    ...(typeof row.practical_lab_slug === "string"
+      ? { practical_lab_slug: row.practical_lab_slug }
+      : {}),
+  };
 }
 
 function parseTopic(item: unknown): CourseTopic | null {
@@ -70,6 +88,7 @@ function parseTopic(item: unknown): CourseTopic | null {
   return {
     id: row.id,
     course_id: row.course_id,
+    ...parseTopicPlacement(row),
     title: row.title,
     description: row.description,
     is_published: row.is_published,
@@ -177,7 +196,7 @@ async function getTopics(
 ): Promise<CourseTopic[] | null> {
   return fetchCollection(
     token,
-    "/rest/v1/risa_course_topics?select=id,course_id,title,description,is_published" +
+    "/rest/v1/risa_course_topics?select=id,course_id,title,description,is_published,section_id,sort_order,practical_lab_slug" +
       "&course_id=eq." +
       courseId +
       publishedFilter(drafts) +
