@@ -115,16 +115,21 @@ export default async function RisaAdminPage() {
           Live records from RISA&apos;s course system. A dash indicates that the backend
           count is unavailable, not that there are zero records.
         </p>
-        <div className="mt-6 grid gap-5 md:grid-cols-3">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <AdminMetric
             label="Courses"
             value={overview.courses}
-            description="Published and unpublished course records."
+            description="Published and unpublished parent courses."
+          />
+          <AdminMetric
+            label="Modules"
+            value={overview.modules}
+            description="Coded teaching modules across all courses."
           />
           <AdminMetric
             label="Enrolments"
             value={overview.enrolments}
-            description="Learner-to-course assignments."
+            description="Learner-to-module assignments."
           />
           <AdminMetric
             label="Course files"
@@ -140,9 +145,8 @@ export default async function RisaAdminPage() {
             Course administration
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Create courses with unique institutional codes, prepare draft curricula and
-            publish approved courses. Learner enrolment and content uploads remain
-            available to authorized project maintainers through Supabase.
+            Create parent courses, assign coded modules, prepare draft curricula and
+            publish approved content.
           </p>
           <Link
             href="/admin/courses"
