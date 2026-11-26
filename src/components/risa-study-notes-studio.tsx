@@ -13,8 +13,10 @@ import { prepareStudyNoteImage } from "@/lib/risa-note-image-preparation";
 import { studyNoteTemplate, validStudyNote } from "@/lib/risa-study-note-format";
 import type { StudyNote } from "@/lib/risa-study-notes";
 
-const primaryButton = "min-h-11 rounded-xl bg-[#286518] px-4 py-2 text-sm font-bold text-white hover:bg-[#1d4f11] disabled:opacity-50";
-const secondaryButton = "min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 disabled:opacity-50";
+const primaryButton =
+  "min-h-11 rounded-xl bg-[#286518] px-4 py-2 text-sm font-bold text-white hover:bg-[#1d4f11] disabled:opacity-50";
+const secondaryButton =
+  "min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 disabled:opacity-50";
 
 export function RisaStudyNotesStudio({
   courseId,
@@ -57,7 +59,10 @@ export function RisaStudyNotesStudio({
 
   function rememberCursor() {
     if (editor.current) {
-      cursor.current = { start: editor.current.selectionStart, end: editor.current.selectionEnd };
+      cursor.current = {
+        start: editor.current.selectionStart,
+        end: editor.current.selectionEnd,
+      };
     }
   }
 
@@ -144,13 +149,49 @@ export function RisaStudyNotesStudio({
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
         <label className="block text-sm font-bold">
           Note title
-          <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={140} disabled={busy} className="mt-2 w-full rounded-xl border border-slate-300 p-3" />
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            maxLength={140}
+            disabled={busy}
+            className="mt-2 w-full rounded-xl border border-slate-300 p-3"
+          />
         </label>
         <div className="my-4 flex flex-wrap items-center gap-2">
-          <button type="button" className={secondaryButton} aria-pressed={!preview} onClick={() => setPreview(false)}>Edit Markdown</button>
-          <button type="button" className={secondaryButton} aria-pressed={preview} onClick={() => setPreview(true)}>Preview</button>
-          <button type="button" className={secondaryButton} disabled={busy || preview} onClick={() => { rememberCursor(); imageInput.current?.click(); }}>Insert Image</button>
-          <input ref={imageInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden onChange={(event) => void insertImage(event.target.files?.[0])} />
+          <button
+            type="button"
+            className={secondaryButton}
+            aria-pressed={!preview}
+            onClick={() => setPreview(false)}
+          >
+            Edit Markdown
+          </button>
+          <button
+            type="button"
+            className={secondaryButton}
+            aria-pressed={preview}
+            onClick={() => setPreview(true)}
+          >
+            Preview
+          </button>
+          <button
+            type="button"
+            className={secondaryButton}
+            disabled={busy || preview}
+            onClick={() => {
+              rememberCursor();
+              imageInput.current?.click();
+            }}
+          >
+            Insert Image
+          </button>
+          <input
+            ref={imageInput}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            hidden
+            onChange={(event) => void insertImage(event.target.files?.[0])}
+          />
         </div>
         {preview ? (
           <div className="min-w-0 rounded-xl border border-slate-200 p-4">
@@ -166,7 +207,9 @@ export function RisaStudyNotesStudio({
               onSelect={rememberCursor}
               onBlur={rememberCursor}
               onPaste={(event) => {
-                const file = Array.from(event.clipboardData.files).find((item) => item.type.startsWith("image/"));
+                const file = Array.from(event.clipboardData.files).find((item) =>
+                  item.type.startsWith("image/"),
+                );
                 if (file) {
                   event.preventDefault();
                   void insertImage(file);
@@ -192,28 +235,84 @@ export function RisaStudyNotesStudio({
           dropped or inserted at the cursor.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
-          <button type="button" disabled={busy} onClick={() => void save(true)} className={primaryButton}>Save &amp; Publish</button>
-          <button type="button" disabled={busy} onClick={() => void save(false)} className={secondaryButton}>Save draft</button>
-          <button type="button" disabled={busy} onClick={startNew} className={secondaryButton}>New note</button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void save(true)}
+            className={primaryButton}
+          >
+            Save &amp; Publish
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void save(false)}
+            className={secondaryButton}
+          >
+            Save draft
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={startNew}
+            className={secondaryButton}
+          >
+            New note
+          </button>
         </div>
-        <p role="status" className="mt-4 text-sm font-semibold text-slate-700">{busy ? "Working…" : notice}</p>
+        <p role="status" className="mt-4 text-sm font-semibold text-slate-700">
+          {busy ? "Working…" : notice}
+        </p>
       </section>
       <section>
         <h2 className="text-xl font-bold">Existing notes</h2>
         <div className="mt-4 space-y-3">
           {notes.map((note) => (
-            <article key={note.id} className="rounded-xl border border-slate-200 bg-white p-4">
-              <p className="text-xs font-semibold text-[#286518]">{note.is_published ? "Published" : "Draft"}</p>
+            <article
+              key={note.id}
+              className="rounded-xl border border-slate-200 bg-white p-4"
+            >
+              <p className="text-xs font-semibold text-[#286518]">
+                {note.is_published ? "Published" : "Draft"}
+              </p>
               <h3 className="mt-2 font-bold">{note.title}</h3>
               <div className="mt-3 flex flex-wrap gap-2">
-                <button type="button" disabled={busy} className={secondaryButton} onClick={() => edit(note)}>Edit</button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  className={secondaryButton}
+                  onClick={() => edit(note)}
+                >
+                  Edit
+                </button>
                 {deleteId === note.id ? (
                   <>
-                    <button type="button" disabled={busy} className={secondaryButton} onClick={() => void remove(note.id)}>Confirm delete</button>
-                    <button type="button" disabled={busy} className={secondaryButton} onClick={() => setDeleteId(undefined)}>Cancel</button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className={secondaryButton}
+                      onClick={() => void remove(note.id)}
+                    >
+                      Confirm delete
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      className={secondaryButton}
+                      onClick={() => setDeleteId(undefined)}
+                    >
+                      Cancel
+                    </button>
                   </>
                 ) : (
-                  <button type="button" disabled={busy} className={secondaryButton} onClick={() => setDeleteId(note.id)}>Delete</button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    className={secondaryButton}
+                    onClick={() => setDeleteId(note.id)}
+                  >
+                    Delete
+                  </button>
                 )}
               </div>
             </article>
