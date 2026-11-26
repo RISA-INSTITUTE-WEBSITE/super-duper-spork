@@ -74,7 +74,11 @@ export async function createTopicAction(form: FormData): Promise<void> {
   const sectionId = inputText(form, "sectionId");
   const order = Number(inputText(form, "sortOrder"));
   const labSlug = inputText(form, "labSlug");
-  if (!(await validTopicSection(token, courseId, sectionId)) || !validSectionOrder(order) || !validPracticalLab(labSlug)) {
+  if (
+    !(await validTopicSection(token, courseId, sectionId)) ||
+    !validSectionOrder(order) ||
+    !validPracticalLab(labSlug)
+  ) {
     failed(courseId);
   }
   const ok = await createCourseContent(token, "risa_course_topics", {
