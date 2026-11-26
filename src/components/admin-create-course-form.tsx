@@ -195,8 +195,9 @@ export function AdminCreateCourseForm({ programmes }: { programmes: RisaProgramm
         />
         <span className="text-sm leading-6 text-slate-700">
           <strong className="block text-slate-950">Publish this module now</strong>
-          Leave unchecked to save as a draft. Published modules appear within their parent course in the public
-          catalogue; full lessons still require RISA enrolment approval.
+          Leave unchecked to save as a draft. Published modules appear within their parent
+          course in the public catalogue; full lessons still require RISA enrolment
+          approval.
         </span>
       </label>
 
