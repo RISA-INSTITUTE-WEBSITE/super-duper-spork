@@ -33,5 +33,6 @@ New topic authoring requires a section. Older topics without a section
 remain accessible under General topics. No lesson content, formal assessment
 or lab instructions have been invented or published by this migration.
 The section grouping does not make the currently public Labs private.
-Detailed section-specific lessons and topic-level lab assignments remain
-future authoring work.
+Administrators may optionally assign an existing RISA laboratory to a topic.
+Enrolled learners see a Practical activity link only when one is assigned.
+Detailed lesson content and graded practical assessments remain authoring work.
