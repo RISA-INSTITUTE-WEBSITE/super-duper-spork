@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { isWorkspaceActivity, runWorkspace, workspaceActivities } from "@/lib/risa-workspace";
+import {
+  isWorkspaceActivity,
+  runWorkspace,
+  workspaceActivities,
+} from "@/lib/risa-workspace";
 
 describe("restricted practical workspace", () => {
   it("runs all four starter exercises", () => {
@@ -23,15 +27,21 @@ describe("restricted practical workspace", () => {
   });
 
   it("uses fictional files and rejects unsupported commands", () => {
-    expect(runWorkspace("linux", "pwd\n\nls exercises\ncat exercises/task.txt\nhelp")).toContain("task.txt");
+    expect(
+      runWorkspace("linux", "pwd\n\nls exercises\ncat exercises/task.txt\nhelp"),
+    ).toContain("task.txt");
     expect(runWorkspace("linux", "cat /etc/passwd")).toContain("not supported");
     expect(runWorkspace("linux", "constructor")).toContain("not supported");
   });
 
   it("filters only fictional data", () => {
     expect(runWorkspace("sql", "SELECT * FROM students;")).toContain("3 rows");
-    expect(runWorkspace("sql", "SELECT * FROM students WHERE score >= 90;")).toContain("Cleo | 94");
-    expect(runWorkspace("sql", "SELECT * FROM students WHERE score >= 100;")).toContain("0 rows");
+    expect(runWorkspace("sql", "SELECT * FROM students WHERE score >= 90;")).toContain(
+      "Cleo | 94",
+    );
+    expect(runWorkspace("sql", "SELECT * FROM students WHERE score >= 100;")).toContain(
+      "0 rows",
+    );
     expect(runWorkspace("sql", "DROP TABLE students")).toContain("Supported:");
   });
 });

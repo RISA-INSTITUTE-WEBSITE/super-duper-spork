@@ -10,19 +10,27 @@ import { uuidPattern } from "@/lib/risa-course-curriculum";
 export async function reviewPracticalAction(form: FormData) {
   const { token, identity } = await requireLearningSession();
   const courseId = String(form.get("courseId") ?? "");
-  if (!uuidPattern.test(courseId)) notFound();
+  if (!uuidPattern.test(courseId)) {
+    notFound();
+  }
   const [assignments, admin] = await Promise.all([
     getLecturerAssignments(token, identity.id),
     isRisaAdministrator(token, identity.id),
   ]);
-  if (!admin && !assignments?.some((item) => item.course_id === courseId)) notFound();
-  const score = String(form.get("score") ?? "");
+  if (!admin && !assignments?.some((item) => item.course_id === courseId)) {
+    notFound();
+  }
   const saved = await reviewPractical(token, {
     id: String(form.get("id") ?? ""),
     courseId,
-    score: score.trim() === "" ? NaN : Number(score),
+    score: reviewScore(form),
     feedback: String(form.get("feedback") ?? ""),
   });
   revalidatePath("/lecturers/" + courseId);
   redirect("/lecturers/" + courseId + "?result=" + (saved ? "saved" : "failed"));
+}
+
+function reviewScore(form: FormData): number {
+  const score = String(form.get("score") ?? "");
+  return score.trim() === "" ? NaN : Number(score);
 }

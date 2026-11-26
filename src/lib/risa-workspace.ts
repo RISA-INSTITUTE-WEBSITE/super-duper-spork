@@ -1,8 +1,33 @@
 export const workspaceActivities = [
-  { id: "programming", label: "Programming", prompt: "Calculate the area of a rectangle using print(8 * 5). Change the dimensions and run again.", starter: "print(8 * 5)", expected: "40" },
-  { id: "linux", label: "Linux terminal", prompt: "Explore a fictional filesystem with pwd, ls and cat README.txt.", starter: "pwd\nls\ncat README.txt", expected: "RISA practice workspace" },
-  { id: "sql", label: "Database", prompt: "Select the records of fictional students whose score is at least 70.", starter: "SELECT * FROM students WHERE score >= 70;", expected: "Ada | 82" },
-  { id: "physics", label: "Physics", prompt: "Calculate acceleration using force divided by mass. Change the two values.", starter: "10 / 2", expected: "5" },
+  {
+    id: "programming",
+    label: "Programming",
+    prompt:
+      "Calculate the area of a rectangle using print(8 * 5). Change the dimensions and run again.",
+    starter: "print(8 * 5)",
+    expected: "40",
+  },
+  {
+    id: "linux",
+    label: "Linux terminal",
+    prompt: "Explore a fictional filesystem with pwd, ls and cat README.txt.",
+    starter: "pwd\nls\ncat README.txt",
+    expected: "RISA practice workspace",
+  },
+  {
+    id: "sql",
+    label: "Database",
+    prompt: "Select the records of fictional students whose score is at least 70.",
+    starter: "SELECT * FROM students WHERE score >= 70;",
+    expected: "Ada | 82",
+  },
+  {
+    id: "physics",
+    label: "Physics",
+    prompt: "Calculate acceleration using force divided by mass. Change the two values.",
+    starter: "10 / 2",
+    expected: "5",
+  },
 ] as const;
 
 export type WorkspaceActivity = (typeof workspaceActivities)[number]["id"];
@@ -43,14 +68,20 @@ const terminalCommands: Record<string, string> = {
 };
 
 function terminal(source: string): string {
-  return source.split("\n").slice(0, 30).map((line) => {
-    const command = line.trim();
-    if (!command) return "";
-    const output = Object.hasOwn(terminalCommands, command)
-      ? terminalCommands[command]
-      : "Command not supported in this simulated terminal.";
-    return "$ " + command + "\n" + output;
-  }).join("\n");
+  return source
+    .split("\n")
+    .slice(0, 30)
+    .map((line) => {
+      const command = line.trim();
+      if (!command) {
+        return "";
+      }
+      const output = Object.hasOwn(terminalCommands, command)
+        ? terminalCommands[command]
+        : "Command not supported in this simulated terminal.";
+      return "$ " + command + "\n" + output;
+    })
+    .join("\n");
 }
 
 const students = [
@@ -60,15 +91,28 @@ const students = [
 ];
 
 function database(source: string): string {
-  const match = /^SELECT\s+\*\s+FROM\s+students(?:\s+WHERE\s+score\s*>=\s*(\d{1,3}))?\s*;?$/i.exec(source.trim());
-  if (!match) return "Supported: SELECT * FROM students WHERE score >= 70;";
+  const match =
+    /^SELECT\s+\*\s+FROM\s+students(?:\s+WHERE\s+score\s*>=\s*(\d{1,3}))?\s*;?$/i.exec(
+      source.trim(),
+    );
+  if (!match) {
+    return "Supported: SELECT * FROM students WHERE score >= 70;";
+  }
   const minimum = match[1] ? Number(match[1]) : 0;
   const rows = students.filter((row) => row.score >= minimum);
-  return "name | score\n" + rows.map((row) => row.name + " | " + row.score).join("\n") + "\n" + rows.length + " rows";
+  return (
+    "name | score\n" +
+    rows.map((row) => row.name + " | " + row.score).join("\n") +
+    "\n" +
+    rows.length +
+    " rows"
+  );
 }
 
 export function runWorkspace(activity: WorkspaceActivity, source: string): string {
-  if (source.length > 2000) return "Input exceeds 2,000 characters.";
+  if (source.length > 2000) {
+    return "Input exceeds 2,000 characters.";
+  }
   const runners = { programming, linux: terminal, sql: database, physics: arithmetic };
   return runners[activity](source);
 }

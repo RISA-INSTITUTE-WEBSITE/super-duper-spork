@@ -7,10 +7,14 @@ import { changeLecturerAssignment } from "@/lib/risa-lecturers";
 
 export async function changeLecturerAction(form: FormData) {
   const { token } = await requireAdminSession();
-  const saved = await changeLecturerAssignment(token, {
-    lecturer_id: String(form.get("lecturerId") ?? "").trim(),
-    course_id: String(form.get("courseId") ?? ""),
-  }, form.get("operation") === "remove");
+  const saved = await changeLecturerAssignment(
+    token,
+    {
+      lecturer_id: String(form.get("lecturerId") ?? "").trim(),
+      course_id: String(form.get("courseId") ?? ""),
+    },
+    form.get("operation") === "remove",
+  );
   revalidatePath("/admin/lecturers");
   redirect("/admin/lecturers?result=" + (saved ? "saved" : "failed"));
 }

@@ -1,6 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { changeLecturerAssignment, getLecturerAssignments, getModuleLearnerCount, getPracticalSubmissions, reviewPractical, submitPractical, validReview } from "@/lib/risa-lecturers";
+import {
+  changeLecturerAssignment,
+  getLecturerAssignments,
+  getModuleLearnerCount,
+  getPracticalSubmissions,
+  reviewPractical,
+  submitPractical,
+  validReview,
+} from "@/lib/risa-lecturers";
 
 const student = "11111111-1111-4111-8111-111111111111";
 const course = "22222222-2222-4222-8222-222222222222";
@@ -28,7 +36,9 @@ describe("module scoped staff API", () => {
     expect(fetchMock.mock.calls[0][0]).toContain("lecturer_id=eq." + student);
     fetchMock.mockResolvedValueOnce(Response.json([]));
     expect(await getLecturerAssignments("token")).toEqual([]);
-    expect(await changeLecturerAssignment("token", { ...assignment, course_id: "bad" }, false)).toBe(false);
+    expect(
+      await changeLecturerAssignment("token", { ...assignment, course_id: "bad" }, false),
+    ).toBe(false);
     fetchMock.mockResolvedValueOnce(Response.json([assignment]));
     expect(await changeLecturerAssignment("token", assignment, false)).toBe(true);
     fetchMock.mockResolvedValueOnce(Response.json([assignment]));
@@ -46,21 +56,35 @@ describe("module scoped staff API", () => {
     expect(await getPracticalSubmissions("token", {})).toBeNull();
     expect(await getPracticalSubmissions("token", { courseId: "bad" })).toBeNull();
     fetchMock.mockResolvedValueOnce(Response.json([]));
-    expect(await getPracticalSubmissions("token", { studentId: student, courseId: course })).toEqual([]);
+    expect(
+      await getPracticalSubmissions("token", { studentId: student, courseId: course }),
+    ).toEqual([]);
     expect(fetchMock.mock.calls[0][0]).toContain("course_id=eq." + course);
     fetchMock.mockResolvedValueOnce(Response.json([]));
     expect(await getPracticalSubmissions("token", { courseId: course })).toEqual([]);
   });
 
   it("validates evidence and reviews", async () => {
-    const draft = { student_id: student, course_id: course, activity: "physics", evidence: "Force divided by mass." };
-    for (const input of [{ ...draft, student_id: "bad" }, { ...draft, activity: "bad" }, { ...draft, evidence: "" }, { ...draft, evidence: "x".repeat(6001) }]) {
+    const draft = {
+      student_id: student,
+      course_id: course,
+      activity: "physics",
+      evidence: "Force divided by mass.",
+    };
+    for (const input of [
+      { ...draft, student_id: "bad" },
+      { ...draft, activity: "bad" },
+      { ...draft, evidence: "" },
+      { ...draft, evidence: "x".repeat(6001) },
+    ]) {
       expect(await submitPractical("token", input)).toBe(false);
     }
     fetchMock.mockResolvedValueOnce(Response.json([draft]));
     expect(await submitPractical("token", draft)).toBe(true);
     const review = { id, courseId: course, score: 75, feedback: "Good explanation" };
-    for (const score of [-1, 101, 1.5, NaN]) expect(validReview(score, "Good")).toBe(false);
+    for (const score of [-1, 101, 1.5, NaN]) {
+      expect(validReview(score, "Good")).toBe(false);
+    }
     expect(validReview(0, "")).toBe(false);
     expect(validReview(100, "x".repeat(2001))).toBe(false);
     expect(await reviewPractical("token", { ...review, id: "bad" })).toBe(false);
@@ -76,7 +100,9 @@ describe("module scoped staff API", () => {
 
   it("counts only active and completed enrolments", async () => {
     expect(await getModuleLearnerCount("token", "bad")).toBeNull();
-    fetchMock.mockResolvedValueOnce(new Response(null, { headers: { "content-range": "*/7" } }));
+    fetchMock.mockResolvedValueOnce(
+      new Response(null, { headers: { "content-range": "*/7" } }),
+    );
     expect(await getModuleLearnerCount("token", course)).toBe(7);
     expect(fetchMock.mock.calls[0][0]).toContain("status=in.(active,completed)");
     fetchMock.mockResolvedValueOnce(new Response(null));
