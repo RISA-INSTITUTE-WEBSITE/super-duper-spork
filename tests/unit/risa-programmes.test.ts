@@ -70,7 +70,9 @@ describe("programme backend access", () => {
     fetchMock.mockResolvedValueOnce(Response.json([programme, null]));
     expect(await getRisaProgrammes()).toEqual([programme]);
     expect(fetchMock.mock.calls[0][0]).toContain("is_published=eq.true");
-    fetchMock.mockResolvedValueOnce(Response.json([{ ...programme, is_published: false }]));
+    fetchMock.mockResolvedValueOnce(
+      Response.json([{ ...programme, is_published: false }]),
+    );
     expect(await getRisaProgrammes("admin-token")).toEqual([
       { ...programme, is_published: false },
     ]);
