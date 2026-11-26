@@ -6,6 +6,7 @@ import {
 import { requestStudentBackend } from "./student-auth-api";
 
 import type { ModuleSection } from "./risa-module-outline";
+import { labDomains } from "./risa-virtual-labs";
 
 export { groupModuleTopics, type ModuleSection } from "./risa-module-outline";
 
@@ -96,13 +97,17 @@ export async function createModuleSection(
   return response?.ok === true;
 }
 
+export function validPracticalLab(slug: string): boolean {
+  return slug === "" || labDomains.some((lab) => lab.slug === slug);
+}
+
 export async function moveModuleTopic(
   token: string,
   courseId: string,
-  input: { topicId: string; sectionId: string; order: number },
+  input: { topicId: string; sectionId: string; order: number; labSlug?: string },
 ): Promise<boolean> {
   if (![courseId, input.topicId, input.sectionId].every((id) => uuidPattern.test(id)) ||
-      !validSectionOrder(input.order)) {
+      !validSectionOrder(input.order) || !validPracticalLab(input.labSlug ?? "")) {
     return false;
   }
   const response = await requestStudentBackend(
@@ -111,7 +116,11 @@ export async function moveModuleTopic(
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Prefer: "return=representation" },
-      body: JSON.stringify({ section_id: input.sectionId, sort_order: input.order }),
+      body: JSON.stringify({
+        section_id: input.sectionId,
+        sort_order: input.order,
+        ...(input.labSlug !== undefined ? { practical_lab_slug: input.labSlug || null } : {}),
+      }),
     },
   );
   if (!response?.ok) {
