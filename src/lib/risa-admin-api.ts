@@ -47,7 +47,8 @@ export type RisaAdminOverview = {
 
 async function countAdminRecords(
   token: string,
-  resource: "risa_programmes" | "risa_courses" | "risa_enrollments" | "risa_course_materials",
+  resource:
+    "risa_programmes" | "risa_courses" | "risa_enrollments" | "risa_course_materials",
   column: "id" | "student_id" | "slug",
 ): Promise<number | null> {
   const response = await requestStudentBackend(
