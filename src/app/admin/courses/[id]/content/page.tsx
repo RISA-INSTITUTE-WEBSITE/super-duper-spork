@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import {
+  createSectionAction,
+  moveTopicAction,
   createQuestionAction,
   createQuizAction,
   createTopicAction,
@@ -13,11 +15,11 @@ import { AdminTopicVideoPreviews } from "@/components/admin-topic-video-previews
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
-  getCourseCurriculum,
   type CourseCurriculum,
   type CourseTopic,
   type TopicQuiz,
 } from "@/lib/risa-course-curriculum";
+import { getStructuredCurriculum, groupModuleTopics, type ModuleSection } from "@/lib/risa-module-sections";
 import { getRisaCourseById } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -38,6 +40,8 @@ function StatusNotice({ status }: { status?: string }) {
     return null;
   }
   const messages: Record<string, string> = {
+    section: "Section created successfully.",
+    moved: "Topic placement updated.",
     topic: "Topic created successfully.",
     video: "YouTube lesson saved.",
     quiz: "Quiz created. You can now add its questions.",
@@ -79,7 +83,7 @@ function VisibilityCheckbox() {
   );
 }
 
-function AddTopicForm({ courseId }: { courseId: string }) {
+function AddTopicForm({ courseId, sections }: { courseId: string; sections: ModuleSection[] }) {
   return (
     <form
       action={createTopicAction}
@@ -90,6 +94,7 @@ function AddTopicForm({ courseId }: { courseId: string }) {
       <p className="mt-2 text-sm text-slate-600">
         Organize lessons, exercises and quizzes under a course topic.
       </p>
+      <SectionFields sections={sections} />
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <label className="block text-sm font-semibold text-slate-800">
           Topic title
@@ -116,7 +121,7 @@ function AddTopicForm({ courseId }: { courseId: string }) {
       <div className="mt-4">
         <VisibilityCheckbox />
       </div>
-      <button type="submit" className={button}>
+      <button type="submit" disabled={sections.length === 0} className={button + " disabled:opacity-50"}>
         Create topic
       </button>
     </form>
@@ -327,6 +332,12 @@ function TopicCard({
       {topic.description && (
         <p className="mt-3 text-sm text-slate-600">{topic.description}</p>
       )}
+      <form action={moveTopicAction} className="mt-4 rounded-xl bg-white p-4">
+        <input type="hidden" name="courseId" value={courseId} />
+        <input type="hidden" name="topicId" value={topic.id} />
+        <SectionFields sections={curriculum.sections ?? []} topic={topic} />
+        <button type="submit" className={button}>Update topic placement</button>
+      </form>
       {videos.length > 0 && <AdminTopicVideoPreviews videos={videos} />}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <AddVideoForm courseId={courseId} topicId={topic.id} />
@@ -347,6 +358,69 @@ function TopicCard({
         </div>
       )}
     </section>
+  );
+}
+
+function SectionFields({
+  sections,
+  topic,
+}: {
+  sections: ModuleSection[];
+  topic?: CourseTopic;
+}) {
+  return (
+    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+      <label className="block text-sm font-semibold">
+        Section
+        <select name="sectionId" className={field} required defaultValue={topic?.section_id ?? ""}>
+          <option value="" disabled>Select a section</option>
+          {sections.map((section) => (
+            <option key={section.id} value={section.id}>{section.title}</option>
+          ))}
+        </select>
+      </label>
+      <label className="block text-sm font-semibold">
+        Teaching order
+        <input type="number" name="sortOrder" min={1} max={9999} required
+          defaultValue={topic?.sort_order ?? 1} className={field} />
+      </label>
+    </div>
+  );
+}
+
+function AddSectionForm({ courseId }: { courseId: string }) {
+  return (
+    <form action={createSectionAction} className="risa-science-glass rounded-[1.6rem] p-6 sm:p-8">
+      <input type="hidden" name="courseId" value={courseId} />
+      <h2 className="font-heading text-xl font-bold">Add a teaching section</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <label className="block text-sm font-semibold">
+          Section title
+          <input name="title" className={field} required minLength={2} maxLength={140} />
+        </label>
+        <label className="block text-sm font-semibold">
+          Teaching order
+          <input name="sortOrder" type="number" min={1} max={9999} defaultValue={1} required className={field} />
+        </label>
+      </div>
+      <button type="submit" className={button}>Create section</button>
+    </form>
+  );
+}
+
+function AdminSectionGroups({ curriculum, courseId }: { curriculum: CourseCurriculum; courseId: string }) {
+  return (
+    <div className="mt-6 space-y-8">
+      {groupModuleTopics(curriculum.sections ?? [], curriculum.topics).map((group) => (
+        <section key={group.id} className="space-y-4 rounded-2xl border border-slate-200 bg-white/60 p-5">
+          <h3 className="text-xl font-bold">{group.title}</h3>
+          {group.topics.length === 0 && <p className="text-sm text-slate-600">No topics assigned yet.</p>}
+          {group.topics.map((topic) => (
+            <TopicCard key={topic.id} topic={topic} courseId={courseId} curriculum={curriculum} />
+          ))}
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -378,7 +452,7 @@ export default async function AdminCourseContentPage({
   if (!course) {
     notFound();
   }
-  const curriculum = await getCourseCurriculum(token, course.id, true);
+  const curriculum = await getStructuredCurriculum(token, course.id, true);
   const { result } = await searchParams;
 
   return (
@@ -413,13 +487,16 @@ export default async function AdminCourseContentPage({
         </p>
       </div>
       <StatusNotice status={result} />
-      <AddTopicForm courseId={course.id} />
+      <AddSectionForm courseId={course.id} />
+      <div className="mt-6">
+        <AddTopicForm courseId={course.id} sections={curriculum?.sections ?? []} />
+      </div>
       <section aria-labelledby="topics-heading" className="mt-12">
         <h2
           id="topics-heading"
           className="font-heading text-2xl font-bold text-slate-950"
         >
-          Course topics
+          Module sections and topics
         </h2>
         {!curriculum ? (
           <p
@@ -428,21 +505,8 @@ export default async function AdminCourseContentPage({
           >
             Course content could not be loaded. Please try again.
           </p>
-        ) : curriculum.topics.length === 0 ? (
-          <p className="risa-science-glass mt-5 rounded-xl p-6 text-sm text-slate-600">
-            No topics yet. Create a topic above to start adding lessons and quizzes.
-          </p>
         ) : (
-          <div className="mt-6 space-y-6">
-            {curriculum.topics.map((topic) => (
-              <TopicCard
-                key={topic.id}
-                topic={topic}
-                courseId={course.id}
-                curriculum={curriculum}
-              />
-            ))}
-          </div>
+          <AdminSectionGroups curriculum={curriculum} courseId={course.id} />
         )}
       </section>
     </main>
