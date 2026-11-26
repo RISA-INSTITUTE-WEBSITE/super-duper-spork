@@ -19,21 +19,17 @@ export const gates = ["AND", "OR", "NOT", "NAND", "NOR", "XOR"] as const;
 export type Gate = (typeof gates)[number];
 export type Bit = 0 | 1;
 
+const gateOperations: Record<Gate, (a: Bit, b: Bit) => Bit> = {
+  AND: (a, b) => a && b,
+  OR: (a, b) => a || b,
+  NOT: (a) => (a === 0 ? 1 : 0),
+  NAND: (a, b) => (a && b ? 0 : 1),
+  NOR: (a, b) => (a || b ? 0 : 1),
+  XOR: (a, b) => (a === b ? 0 : 1),
+};
+
 export function gateOutput(gate: Gate, a: Bit, b: Bit): Bit {
-  switch (gate) {
-    case "AND":
-      return a && b;
-    case "OR":
-      return a || b;
-    case "NOT":
-      return a === 0 ? 1 : 0;
-    case "NAND":
-      return a && b ? 0 : 1;
-    case "NOR":
-      return a || b ? 0 : 1;
-    case "XOR":
-      return a === b ? 0 : 1;
-  }
+  return gateOperations[gate](a, b);
 }
 
 export function truthTable(gate: Gate) {
