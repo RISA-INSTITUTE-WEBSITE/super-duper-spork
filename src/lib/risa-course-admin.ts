@@ -104,6 +104,7 @@ export async function createRisaCourse(
     description: course.description,
     level: course.level,
     isPublished: course.is_published,
+    programmeSlug: course.programme_slug,
   });
   if (!validated || (thumbnail && !validInitialThumbnail(thumbnail))) {
     return "unavailable";
