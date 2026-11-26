@@ -5,7 +5,7 @@ import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { setLessonCompletedAction } from "@/app/students/courses/[id]/lesson-progress-actions";
 import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
 import { RisaLessonCompletionControl } from "@/components/risa-lesson-completion-control";
-import { RisaTopicCard } from "@/components/risa-topic-card";
+import { ModuleTopicGroups } from "@/components/risa-module-topic-groups";
 import {
   InlineYouTubePlayer,
   YouTubeLessonThumbnail,
@@ -466,20 +466,7 @@ export function StudentCourseContent({
                   : `${completedVideoIds.length} of ${curriculum.videos.length} lessons completed`}
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {curriculum.topics.map((topic, index) => (
-                <RisaTopicCard
-                  key={topic.id}
-                  topic={topic}
-                  order={index + 1}
-                  videos={topicVideos(curriculum, topic.id)}
-                  quizCount={
-                    curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id).length
-                  }
-                  onSelect={() => showTopic(topic.id)}
-                />
-              ))}
-            </div>
+            <ModuleTopicGroups curriculum={curriculum} onSelect={showTopic} />
           </>
         )}
       </section>
