@@ -54,7 +54,11 @@ export function truthTable(gate: Gate) {
 
 export const binaryQuestions = [
   { prompt: "What is 00001101 in decimal?", options: ["11", "13", "15"], answer: 1 },
-  { prompt: "Which binary number represents 42?", options: ["00101010", "00100110", "00101100"], answer: 0 },
+  {
+    prompt: "Which binary number represents 42?",
+    options: ["00101010", "00100110", "00101100"],
+    answer: 0,
+  },
   { prompt: "What is 11111111 in hexadecimal?", options: ["F0", "0F", "FF"], answer: 2 },
 ] as const;
 
