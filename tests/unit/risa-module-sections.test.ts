@@ -8,6 +8,7 @@ import {
   groupModuleTopics,
   moveModuleTopic,
   validSectionOrder,
+  validPracticalLab,
   type ModuleSection,
 } from "@/lib/risa-module-sections";
 import type { CourseTopic } from "@/lib/risa-course-curriculum";
@@ -102,6 +103,12 @@ describe("module sections", () => {
     expect(await createModuleSection("token", course, { title: "Section A", order: 1 })).toBe(false);
   });
 
+  it("allows only existing laboratory links", () => {
+    expect(validPracticalLab("")).toBe(true);
+    expect(validPracticalLab("physics")).toBe(true);
+    expect(validPracticalLab("https://example.com")).toBe(false);
+  });
+
   it("moves an existing topic without replacing its ID or content", async () => {
     const input = { topicId, sectionId: b, order: 3 };
     expect(await moveModuleTopic("token", course, { ...input, sectionId: "bad" })).toBe(false);
@@ -110,6 +117,10 @@ describe("module sections", () => {
     expect(await moveModuleTopic("token", course, input)).toBe(true);
     expect(fetchMock.mock.calls[0][0]).toContain("&course_id=eq." + course);
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ section_id: b, sort_order: 3 });
+    fetchMock.mockResolvedValueOnce(Response.json([topic]));
+    expect(await moveModuleTopic("token", course, { ...input, labSlug: "physics" })).toBe(true);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body).practical_lab_slug).toBe("physics");
+    expect(await moveModuleTopic("token", course, { ...input, labSlug: "invalid" })).toBe(false);
     fetchMock.mockResolvedValueOnce(Response.json([]));
     expect(await moveModuleTopic("token", course, input)).toBe(false);
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
