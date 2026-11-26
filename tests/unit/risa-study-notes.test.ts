@@ -159,13 +159,17 @@ describe("study note image protections", () => {
   });
 
   it("uploads and reads private image records using authorization", async () => {
-    expect(await insertStudyNoteImage("token", topicId, { mime: "image/svg+xml", data: png })).toBeNull();
+    expect(
+      await insertStudyNoteImage("token", topicId, { mime: "image/svg+xml", data: png }),
+    ).toBeNull();
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
-    expect(await insertStudyNoteImage("token", topicId, { mime: "image/png", data: png })).toMatch(
-      /^\/students\/study-note-images\//,
-    );
+    expect(
+      await insertStudyNoteImage("token", topicId, { mime: "image/png", data: png }),
+    ).toMatch(/^\/students\/study-note-images\//);
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
-    expect(await insertStudyNoteImage("token", topicId, { mime: "image/png", data: png })).toBeNull();
+    expect(
+      await insertStudyNoteImage("token", topicId, { mime: "image/png", data: png }),
+    ).toBeNull();
     expect(await readStudyNoteImage("token", "bad")).toBeNull();
     fetchMock.mockResolvedValueOnce(
       Response.json([{ mime_type: "image/png", image_data: png }]),
