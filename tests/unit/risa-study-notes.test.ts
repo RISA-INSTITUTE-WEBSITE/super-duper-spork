@@ -45,8 +45,8 @@ afterEach(() => {
 
 describe("Edu-ca-te note formatting", () => {
   it("preserves dollar math and converts bracket LaTeX", () => {
-    expect(normalizeMathDelimiters(String.raw`\\(a=b\\) \\[F=ma\\]`)).toBe(
-      "$a=b$ \n$\nF=ma\n$\n",
+    expect(normalizeMathDelimiters(String.raw`\(a=b\) \[F=ma\]`)).toBe(
+      "$a=b$ \n$$\nF=ma\n$$\n",
     );
     expect(normalizeMathDelimiters("$x$")).toBe("$x$");
   });
@@ -159,13 +159,13 @@ describe("study note image protections", () => {
   });
 
   it("uploads and reads private image records using authorization", async () => {
-    expect(await insertStudyNoteImage("token", topicId, "image/svg+xml", png)).toBeNull();
+    expect(await insertStudyNoteImage("token", topicId, { mime: "image/svg+xml", data: png })).toBeNull();
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
-    expect(await insertStudyNoteImage("token", topicId, "image/png", png)).toMatch(
+    expect(await insertStudyNoteImage("token", topicId, { mime: "image/png", data: png })).toMatch(
       /^\/students\/study-note-images\//,
     );
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 403 }));
-    expect(await insertStudyNoteImage("token", topicId, "image/png", png)).toBeNull();
+    expect(await insertStudyNoteImage("token", topicId, { mime: "image/png", data: png })).toBeNull();
     expect(await readStudyNoteImage("token", "bad")).toBeNull();
     fetchMock.mockResolvedValueOnce(
       Response.json([{ mime_type: "image/png", image_data: png }]),
