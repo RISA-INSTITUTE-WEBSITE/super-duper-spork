@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
+import { AdminCreateProgrammeForm } from "@/components/admin-create-programme-form";
+import { getRisaProgrammes, modulesForProgramme } from "@/lib/risa-programmes";
 import { AdminCreateCourseForm } from "@/components/admin-create-course-form";
 import { AdminEditCourseForm } from "@/components/admin-edit-course-form";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
@@ -39,11 +41,10 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
     return (
       <div className="risa-science-glass mt-6 rounded-[1.6rem] p-7">
         <h3 className="font-heading text-lg font-bold text-slate-950">
-          No courses created yet
+          No modules created yet
         </h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Create your first course using the form above. It will appear here with its
-          unique course code.
+          Create a module using the form above and select its parent course.
         </p>
       </div>
     );
@@ -100,12 +101,12 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
             href={"/admin/courses/" + course.id + "/content"}
             className="mt-6 inline-flex min-h-11 w-fit items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1d4f11]"
           >
-            Manage topics, videos &amp; quizzes →
+            Manage module topics, videos &amp; quizzes →
           </Link>
           <AdminEditCourseForm courseId={course.id} initialLevel={course.level} />
           <p className="mt-5 border-t border-white pt-4 text-xs text-slate-500">
             {course.is_published
-              ? "Visible to enrolled learners"
+              ? "Published module"
               : "Unpublished — hidden from learners"}
           </p>
         </article>
@@ -133,7 +134,10 @@ export default async function ManageRisaCoursesPage() {
     notFound();
   }
 
-  const courses = await getRisaAdminCourses(token);
+  const [courses, programmes] = await Promise.all([
+    getRisaAdminCourses(token),
+    getRisaProgrammes(token),
+  ]);
 
   return (
     <main
@@ -154,12 +158,15 @@ export default async function ManageRisaCoursesPage() {
           Course management
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
-          Create courses with unique identifiers such as DVE101 and PHY-101. Keep drafts
-          private while preparing content for learners.
+          Create courses such as Computer Science, then add coded modules such as CS101.
+          Keep drafts private while preparing content for learners.
         </p>
       </div>
 
-      <AdminCreateCourseForm />
+      <AdminCreateProgrammeForm />
+      <div className="mt-6">
+        <AdminCreateCourseForm programmes={programmes ?? []} />
+      </div>
 
       <section aria-labelledby="created-courses-heading" className="mt-12">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -171,16 +178,39 @@ export default async function ManageRisaCoursesPage() {
               Created courses
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Each course code is unique and stored in RISA&apos;s curriculum database.
+              Each course contains its own modules and learning content.
             </p>
           </div>
-          {courses && (
+          {programmes && (
             <span className="rounded-full bg-[#eefce5] px-4 py-2 text-sm font-bold text-[#286518]">
-              {courses.length} {courses.length === 1 ? "course" : "courses"}
+              {programmes.length} {programmes.length === 1 ? "course" : "courses"}
             </span>
           )}
         </div>
-        <CourseList courses={courses} />
+        {programmes && courses ? (
+          <>
+            {programmes.map((programme) => (
+              <section key={programme.slug} className="mt-8 rounded-2xl bg-white/60 p-5">
+                <h3 className="text-xl font-bold">{programme.title}</h3>
+                <p className="mt-2 text-sm text-slate-600">
+                  {programme.is_published ? "Published" : "Draft"} ·{" "}
+                  {modulesForProgramme(courses, programme.slug).length} modules
+                </p>
+                <CourseList courses={modulesForProgramme(courses, programme.slug)} />
+              </section>
+            ))}
+            {courses.some((module) => !module.programme_slug) && (
+              <section className="mt-8">
+                <h3 className="text-xl font-bold">Unassigned modules</h3>
+                <CourseList courses={courses.filter((module) => !module.programme_slug)} />
+              </section>
+            )}
+          </>
+        ) : (
+          <p role="status" className="mt-6 text-slate-600">
+            Curriculum information is temporarily unavailable.
+          </p>
+        )}
       </section>
     </main>
   );
