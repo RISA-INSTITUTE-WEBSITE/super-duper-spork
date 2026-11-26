@@ -94,7 +94,10 @@ export function RisaStudyNoteMarkdown({
   const [checkedMap, setCheckedMap] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    setCheckedMap(loadChecks(checklistStorageKey));
+    const frame = requestAnimationFrame(() => {
+      setCheckedMap(loadChecks(checklistStorageKey));
+    });
+    return () => cancelAnimationFrame(frame);
   }, [checklistStorageKey]);
 
   const done = tasks.filter(
