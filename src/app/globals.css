@@ -365,23 +365,37 @@ body {
   font-size: 12pt;
   line-height: 1.65;
 }
-.edu-study-note-markdown > p { margin-block: 0.75em; }
+.edu-study-note-markdown > p {
+  margin-block: 0.75em;
+}
 .edu-study-note-markdown > :is(h1, h2, h3, h4, h5, h6) {
   font-family: Arial, "Liberation Sans", sans-serif;
   font-weight: 700;
   font-style: normal;
   letter-spacing: normal;
-  color: #0A0F1D;
+  color: #0a0f1d;
   line-height: 1.3;
   margin-block: 1em 0.45em;
   overflow-wrap: anywhere;
 }
-.edu-study-note-markdown > h1 { font-size: 24pt; }
-.edu-study-note-markdown > h2 { font-size: 20pt; }
-.edu-study-note-markdown > h3 { font-size: 16pt; }
-.edu-study-note-markdown > h4 { font-size: 14pt; }
-.edu-study-note-markdown > h5 { font-size: 13pt; }
-.edu-study-note-markdown > h6 { font-size: 12pt; }
+.edu-study-note-markdown > h1 {
+  font-size: 24pt;
+}
+.edu-study-note-markdown > h2 {
+  font-size: 20pt;
+}
+.edu-study-note-markdown > h3 {
+  font-size: 16pt;
+}
+.edu-study-note-markdown > h4 {
+  font-size: 14pt;
+}
+.edu-study-note-markdown > h5 {
+  font-size: 13pt;
+}
+.edu-study-note-markdown > h6 {
+  font-size: 12pt;
+}
 .edu-study-note-markdown .edu-study-note-table {
   font-family: Arial, "Liberation Sans", sans-serif;
   font-size: 12pt;
@@ -389,7 +403,15 @@ body {
   color: #171717;
 }
 .edu-study-note-table th,
-.edu-study-note-table td { border: 1px solid #bfbfbf; }
-.edu-markdown-table thead th { background: #d4d4d4; color: #171717; }
+.edu-study-note-table td {
+  border: 1px solid #bfbfbf;
+}
+.edu-markdown-table thead th {
+  background: #d4d4d4;
+  color: #171717;
+}
 .edu-markdown-table tbody td,
-.edu-markdown-table tbody th { background: #ffffff; color: #171717; }
+.edu-markdown-table tbody th {
+  background: #ffffff;
+  color: #171717;
+}
