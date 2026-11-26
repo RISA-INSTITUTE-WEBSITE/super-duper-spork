@@ -20,6 +20,7 @@ import {
   type TopicQuiz,
 } from "@/lib/risa-course-curriculum";
 import { getStructuredCurriculum, groupModuleTopics, type ModuleSection } from "@/lib/risa-module-sections";
+import { labDomains } from "@/lib/risa-virtual-labs";
 import { getRisaCourseById } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -383,6 +384,15 @@ function SectionFields({
         Teaching order
         <input type="number" name="sortOrder" min={1} max={9999} required
           defaultValue={topic?.sort_order ?? 1} className={field} />
+      </label>
+      <label className="block text-sm font-semibold sm:col-span-2">
+        Practical activity (optional)
+        <select name="labSlug" className={field} defaultValue={topic?.practical_lab_slug ?? ""}>
+          <option value="">No laboratory assigned</option>
+          {labDomains.map((lab) => (
+            <option key={lab.slug} value={lab.slug}>{lab.title}</option>
+          ))}
+        </select>
       </label>
     </div>
   );
