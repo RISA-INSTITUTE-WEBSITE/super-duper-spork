@@ -24,6 +24,11 @@ export default function LabsPage() {
             browser-based activities complement your course modules.
           </p>
         </header>
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
+          <h2 className="text-2xl font-bold">Practical Workspace</h2>
+          <p className="mt-2 text-sm text-slate-600">Programming, Linux, SQL and physics exercises with output and optional lecturer review.</p>
+          <Link href="/workspace" className="mt-4 inline-flex font-bold text-[#286518]">Open Practical Workspace →</Link>
+        </div>
         <div className="mt-9 grid gap-5 sm:grid-cols-2">
           {labDomains.map((lab) => (
             <article
