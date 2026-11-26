@@ -11,12 +11,13 @@ export function validateStudyNoteImage(mime: string, data: string): Uint8Array |
   if (bytes.length > maxBytes || bytes.toString("base64") !== data) {
     return null;
   }
-  const valid = {
+  const validators: Record<string, () => boolean> = {
     "image/jpeg": () => bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255,
     "image/png": () => bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
     "image/webp": () => bytes.toString("ascii", 0, 4) === "RIFF" && bytes.toString("ascii", 8, 12) === "WEBP",
-  }[mime];
-  return valid?.() ? new Uint8Array(bytes) : null;
+  };
+  const valid = Object.hasOwn(validators, mime) && validators[mime]();
+  return valid ? new Uint8Array(bytes) : null;
 }
 
 export async function insertStudyNoteImage(
