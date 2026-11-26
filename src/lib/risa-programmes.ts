@@ -56,10 +56,9 @@ export async function getRisaProgrammes(token?: string): Promise<RisaProgramme[]
   }
 }
 
-export function modulesForProgramme<T extends Pick<RisaCourse, "programme_slug" | "code">>(
-  modules: readonly T[],
-  slug: string,
-): T[] {
+export function modulesForProgramme<
+  T extends Pick<RisaCourse, "programme_slug" | "code">,
+>(modules: readonly T[], slug: string): T[] {
   return modules
     .filter((module) => module.programme_slug === slug)
     .sort((a, b) => a.code.localeCompare(b.code, "en", { numeric: true }));
