@@ -408,3 +408,37 @@ test("institutional footer preserves navigation and stacks correctly on mobile",
   await navigation.getByRole("link", { name: "Contact" }).click();
   await expect(page).toHaveURL(/\/contact\/?$/);
 });
+
+test("the homepage loads with one gentle zoom-out for the first photo, text and navbar", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const firstPhoto = page.locator(".risa-hero-photo").first();
+  const firstImage = firstPhoto.locator("img");
+  const otherImage = page.locator(".risa-hero-photo").nth(1).locator("img");
+  const copy = page.locator(".risa-hero-content");
+  const header = page.locator("header.risa-navbar");
+
+  await expect(page.locator(".risa-hero-photo")).toHaveCount(4);
+  await expect(firstImage).toHaveCSS("animation-name", "risa-home-opening-photo");
+  await expect(copy).toHaveCSS("animation-name", "risa-home-opening-content");
+  await expect(header).toHaveCSS("animation-name", "risa-home-opening-content");
+  await expect(firstImage).toHaveCSS("animation-iteration-count", "1");
+  await expect(firstPhoto).toHaveCSS("animation-name", "risa-hero-photo-cycle");
+  await expect(firstPhoto).toHaveCSS("animation-iteration-count", "infinite");
+  await expect(otherImage).toHaveCSS("animation-name", "none");
+});
+
+test("homepage entrance respects reduced-motion preferences", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  await expect(page.locator(".risa-hero-photo").first().locator("img")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  await expect(page.locator(".risa-hero-content")).toHaveCSS("animation-name", "none");
+  await expect(page.locator("header.risa-navbar")).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".risa-hero-photo").first()).toHaveCSS("opacity", "1");
+});
