@@ -26,9 +26,9 @@ export function validateStudyNoteImage(mime: string, data: string): Uint8Array |
 export async function insertStudyNoteImage(
   token: string,
   topicId: string,
-  mime: string,
-  data: string,
+  image: { mime: string; data: string },
 ): Promise<string | null> {
+  const { mime, data } = image;
   if (!uuidPattern.test(topicId) || !validateStudyNoteImage(mime, data)) {
     return null;
   }
@@ -59,13 +59,17 @@ export async function readStudyNoteImage(token: string, id: string) {
     if (!Array.isArray(rows) || rows.length !== 1) {
       return null;
     }
-    const row = rows[0];
-    if (typeof row?.mime_type !== "string" || typeof row?.image_data !== "string") {
-      return null;
-    }
-    const bytes = validateStudyNoteImage(row.mime_type, row.image_data);
-    return bytes ? { mime: row.mime_type as string, bytes } : null;
+    return parseImageRow(rows[0]);
   } catch {
     return null;
   }
+}
+
+function parseImageRow(value: unknown) {
+  const row = value as { mime_type?: unknown; image_data?: unknown } | null;
+  if (typeof row?.mime_type !== "string" || typeof row?.image_data !== "string") {
+    return null;
+  }
+  const bytes = validateStudyNoteImage(row.mime_type, row.image_data);
+  return bytes ? { mime: row.mime_type, bytes } : null;
 }
