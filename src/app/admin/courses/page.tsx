@@ -5,7 +5,11 @@ import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
 import { AdminCreateProgrammeForm } from "@/components/admin-create-programme-form";
-import { getRisaProgrammes, modulesForProgramme } from "@/lib/risa-programmes";
+import {
+  getRisaProgrammes,
+  modulesForProgramme,
+  type RisaProgramme,
+} from "@/lib/risa-programmes";
 import { AdminCreateCourseForm } from "@/components/admin-create-course-form";
 import { AdminEditCourseForm } from "@/components/admin-edit-course-form";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
@@ -115,6 +119,43 @@ function CourseList({ courses }: { courses: RisaCourse[] | null }) {
   );
 }
 
+function GroupedModules({
+  programmes,
+  courses,
+}: {
+  programmes: RisaProgramme[] | null;
+  courses: RisaCourse[] | null;
+}) {
+  if (!programmes || !courses) {
+    return (
+      <p role="status" className="mt-6 text-slate-600">
+        Curriculum information is temporarily unavailable.
+      </p>
+    );
+  }
+  const unassigned = courses.filter((module) => !module.programme_slug);
+  return (
+    <>
+      {programmes.map((programme) => (
+        <section key={programme.slug} className="mt-8 rounded-2xl bg-white/60 p-5">
+          <h3 className="text-xl font-bold">{programme.title}</h3>
+          <p className="mt-2 text-sm text-slate-600">
+            {programme.is_published ? "Published" : "Draft"} ·{" "}
+            {modulesForProgramme(courses, programme.slug).length} modules
+          </p>
+          <CourseList courses={modulesForProgramme(courses, programme.slug)} />
+        </section>
+      ))}
+      {unassigned.length > 0 && (
+        <section className="mt-8">
+          <h3 className="text-xl font-bold">Unassigned modules</h3>
+          <CourseList courses={unassigned} />
+        </section>
+      )}
+    </>
+  );
+}
+
 export default async function ManageRisaCoursesPage() {
   if (!isStudentAuthConfigured()) {
     redirect("/students/login");
@@ -187,32 +228,7 @@ export default async function ManageRisaCoursesPage() {
             </span>
           )}
         </div>
-        {programmes && courses ? (
-          <>
-            {programmes.map((programme) => (
-              <section key={programme.slug} className="mt-8 rounded-2xl bg-white/60 p-5">
-                <h3 className="text-xl font-bold">{programme.title}</h3>
-                <p className="mt-2 text-sm text-slate-600">
-                  {programme.is_published ? "Published" : "Draft"} ·{" "}
-                  {modulesForProgramme(courses, programme.slug).length} modules
-                </p>
-                <CourseList courses={modulesForProgramme(courses, programme.slug)} />
-              </section>
-            ))}
-            {courses.some((module) => !module.programme_slug) && (
-              <section className="mt-8">
-                <h3 className="text-xl font-bold">Unassigned modules</h3>
-                <CourseList
-                  courses={courses.filter((module) => !module.programme_slug)}
-                />
-              </section>
-            )}
-          </>
-        ) : (
-          <p role="status" className="mt-6 text-slate-600">
-            Curriculum information is temporarily unavailable.
-          </p>
-        )}
+        <GroupedModules programmes={programmes} courses={courses} />
       </section>
     </main>
   );
