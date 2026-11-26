@@ -195,7 +195,10 @@ function TopicPracticalActivity({ slug }: { slug?: string }) {
     <section className="rounded-2xl border border-slate-200 bg-white p-5">
       <h3 className="text-xl font-bold">Practical activity</h3>
       <p className="mt-2 text-sm text-slate-600">{lab.description}</p>
-      <Link href={lab.href} className="mt-4 inline-flex rounded-xl bg-[#286518] px-4 py-3 font-bold text-white">
+      <Link
+        href={lab.href}
+        className="mt-4 inline-flex rounded-xl bg-[#286518] px-4 py-3 font-bold text-white"
+      >
         Open {lab.title} →
       </Link>
     </section>
