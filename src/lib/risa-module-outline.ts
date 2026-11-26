@@ -20,11 +20,12 @@ export function groupModuleTopics(
       title: section.title,
       topics: topics.filter((topic) => topic.section_id === section.id),
     }));
-  const assigned = new Set(groups.flatMap((group) => group.topics.map((topic) => topic.id)));
+  const assigned = new Set(
+    groups.flatMap((group) => group.topics.map((topic) => topic.id)),
+  );
   const remaining = topics.filter((topic) => !assigned.has(topic.id));
   if (remaining.length) {
     groups.push({ id: "general", title: "General topics", topics: remaining });
   }
   return groups;
 }
-
