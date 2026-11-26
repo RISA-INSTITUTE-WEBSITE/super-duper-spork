@@ -2,12 +2,15 @@ import { expect, test } from "@playwright/test";
 
 test("Labs navigation opens four working domain laboratories", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("navigation", { name: "Primary navigation" })
+  await page
+    .getByRole("navigation", { name: "Primary navigation" })
     .getByRole("link", { name: "Labs", exact: true })
     .click();
   await expect(page).toHaveURL(/\/labs$/);
   for (const title of ["Computing", "Physics", "Cloud & DevOps", "Ethical Hacking"]) {
-    await expect(page.getByRole("link", { name: "Open " + title + " Lab" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "Open " + title + " Lab" }),
+    ).toBeVisible();
   }
 });
 
