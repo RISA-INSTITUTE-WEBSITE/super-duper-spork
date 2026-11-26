@@ -25,14 +25,7 @@ export default async function StudyNotesStudioPage({
   if (!uuidPattern.test(id) || !uuidPattern.test(topicId)) {
     notFound();
   }
-  const token = (await cookies()).get(studentCookieNames.access)?.value;
-  if (!token) {
-    redirect("/students/login");
-  }
-  const identity = await getStudentIdentity(token);
-  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
-    notFound();
-  }
+  const token = await requireAdministrator();
   const [course, curriculum, notes] = await Promise.all([
     getRisaCourseById(token, id),
     getCourseCurriculum(token, id, true),
@@ -61,4 +54,16 @@ export default async function StudyNotesStudioPage({
       />
     </main>
   );
+}
+
+async function requireAdministrator(): Promise<string> {
+  const token = (await cookies()).get(studentCookieNames.access)?.value;
+  if (!token) {
+    redirect("/students/login");
+  }
+  const identity = await getStudentIdentity(token);
+  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
+    notFound();
+  }
+  return token;
 }
