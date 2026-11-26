@@ -331,6 +331,12 @@ export function TopicDetails({
   );
 }
 
+function studyNotesLink(courseId: string, topicId: string, availableIds: string[]) {
+  return availableIds.includes(topicId)
+    ? "/students/courses/" + courseId + "/study-notes/" + topicId
+    : undefined;
+}
+
 export function StudentCourseContent({
   curriculum,
   courseId,
@@ -467,11 +473,7 @@ export function StudentCourseContent({
             progressError={progressError}
             onSelectVideo={selectVideo}
             onToggleComplete={toggleCompleted}
-            studyNotesHref={
-              studyNoteTopicIds.includes(selectedTopic.id)
-                ? "/students/courses/" + courseId + "/study-notes/" + selectedTopic.id
-                : undefined
-            }
+            studyNotesHref={studyNotesLink(courseId, selectedTopic.id, studyNoteTopicIds)}
           />
         ) : (
           <>
