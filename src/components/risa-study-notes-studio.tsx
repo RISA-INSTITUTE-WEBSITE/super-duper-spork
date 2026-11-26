@@ -108,7 +108,7 @@ export function RisaStudyNotesStudio({
     const point = cursor.current;
     await run(async () => {
       const { mime, data } = await prepareStudyNoteImage(file);
-      const url = await insertStudyNoteImageAction(courseId, topicId, mime, data);
+      const url = await insertStudyNoteImageAction(courseId, topicId, { mime, data });
       if (!url) {
         throw new Error("Image upload failed.");
       }
