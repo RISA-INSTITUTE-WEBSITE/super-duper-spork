@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { getPublicRisaCourses } from "@/lib/risa-course-admin";
+import { getRisaProgrammes } from "@/lib/risa-programmes";
 
 export const dynamic = "force-dynamic";
 
@@ -50,15 +51,25 @@ export default async function SearchPage({
   const value = typeof params.q === "string" ? params.q : "";
   const query = value.trim().slice(0, 100);
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const courses = await getPublicRisaCourses();
+  const [programmes, courses] = await Promise.all([
+    getRisaProgrammes(),
+    getPublicRisaCourses(),
+  ]);
   const entries = [
     ...pages,
+    ...(programmes ?? []).map((programme) => ({
+      href: "/programmes/" + programme.slug,
+      title: programme.title,
+      description: programme.description,
+      keywords: "course " + programme.title,
+      category: "Course",
+    })),
     ...(courses ?? []).map((course) => ({
-      href: "/programmes#" + course.slug,
+      href: "/students/courses/" + course.id,
       title: course.code + " — " + course.title,
       description: course.description,
-      keywords: "course " + course.code + " " + course.level,
-      category: "Course",
+      keywords: "module " + course.code + " " + course.level,
+      category: "Module",
     })),
   ];
   const results = entries.filter((entry) => {

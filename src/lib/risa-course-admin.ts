@@ -25,6 +25,7 @@ export type NewRisaCourse = {
   description: string;
   level: string;
   is_published: boolean;
+  programme_slug?: string;
 };
 
 export type RisaCourse = NewRisaCourse & {
@@ -47,11 +48,16 @@ export function validateNewRisaCourse(input: {
   description: string;
   isPublished: boolean;
   level?: string;
+  programmeSlug?: string;
 }): NewRisaCourse | null {
   const code = input.code.trim().toUpperCase();
   const title = input.title.trim().replace(/\s+/g, " ");
   const description = input.description.trim();
   const level = validateCourseLevel(input.level ?? "1st Year Level");
+  const programme = input.programmeSlug;
+  if (programme !== undefined && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(programme)) {
+    return null;
+  }
 
   if (
     !courseCodePattern.test(code) ||
@@ -70,6 +76,7 @@ export function validateNewRisaCourse(input: {
     description,
     level,
     is_published: input.isPublished,
+    ...(programme ? { programme_slug: programme } : {}),
   };
 }
 
@@ -158,11 +165,14 @@ function parseRisaCourse(entry: unknown): RisaCourse | null {
     is_published: row.is_published as boolean,
     created_at: row.created_at as string,
     thumbnail_path: thumbnail,
+    ...(typeof row.programme_slug === "string"
+      ? { programme_slug: row.programme_slug }
+      : {}),
   };
 }
 
 const courseFields =
-  "id,code,slug,title,description,level,thumbnail_path,is_published,created_at";
+  "id,code,slug,title,description,level,thumbnail_path,is_published,created_at,programme_slug";
 
 async function readCourses(response: Response | null): Promise<RisaCourse[] | null> {
   if (!response?.ok) {

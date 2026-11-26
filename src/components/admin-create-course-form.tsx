@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 
 import { courseLevels } from "@/lib/risa-course-admin";
+import type { RisaProgramme } from "@/lib/risa-programmes";
 
 import {
   createCourseAction,
@@ -17,7 +18,7 @@ const initialCourseCreationState: CourseCreationState = {
 const fieldClass =
   "mt-2 min-h-12 w-full rounded-xl border border-white bg-white/85 px-4 py-3 text-base text-slate-950 outline-none transition placeholder:text-slate-400 focus-visible:border-[#286518] focus-visible:ring-2 focus-visible:ring-[#78eb29]/30";
 
-export function AdminCreateCourseForm() {
+export function AdminCreateCourseForm({ programmes }: { programmes: RisaProgramme[] }) {
   const [state, formAction, pending] = useActionState(
     createCourseAction,
     initialCourseCreationState,
@@ -30,10 +31,10 @@ export function AdminCreateCourseForm() {
             Curriculum management
           </p>
           <h2 className="mt-2 font-heading text-2xl font-bold text-slate-950">
-            Create a course
+            Create a module
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
-            Set the course code, academic level and thumbnail when creating a course.
+            Select a parent course and set the module code, level and thumbnail.
           </p>
         </div>
         <span className="rounded-full bg-white px-4 py-2 text-xs font-bold text-[#286518]">
@@ -55,10 +56,31 @@ export function AdminCreateCourseForm() {
         </p>
       )}
 
+      <div className="mb-6">
+        <label htmlFor="programme-slug" className="text-sm font-bold text-slate-900">
+          Parent course
+        </label>
+        <select
+          id="programme-slug"
+          name="programmeSlug"
+          required
+          defaultValue=""
+          className={fieldClass}
+        >
+          <option value="" disabled>
+            Select a course
+          </option>
+          {programmes.map((programme) => (
+            <option key={programme.slug} value={programme.slug}>
+              {programme.title}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="risa-course-code" className="text-sm font-bold text-slate-900">
-            Course code <span className="text-red-600">*</span>
+            Module code <span className="text-red-600">*</span>
           </label>
           <input
             id="risa-course-code"
@@ -82,7 +104,7 @@ export function AdminCreateCourseForm() {
         </div>
         <div>
           <label htmlFor="risa-course-name" className="text-sm font-bold text-slate-900">
-            Course title <span className="text-red-600">*</span>
+            Module title <span className="text-red-600">*</span>
           </label>
           <input
             id="risa-course-name"
@@ -127,7 +149,7 @@ export function AdminCreateCourseForm() {
             htmlFor="risa-course-thumbnail"
             className="text-sm font-bold text-slate-900"
           >
-            Course thumbnail <span className="text-red-600">*</span>
+            Module thumbnail <span className="text-red-600">*</span>
           </label>
           <input
             id="risa-course-thumbnail"
@@ -153,7 +175,7 @@ export function AdminCreateCourseForm() {
           htmlFor="risa-course-description"
           className="text-sm font-bold text-slate-900"
         >
-          Course overview
+          Module overview
         </label>
         <textarea
           id="risa-course-description"
@@ -172,15 +194,16 @@ export function AdminCreateCourseForm() {
           className="mt-1 size-5 accent-[#286518]"
         />
         <span className="text-sm leading-6 text-slate-700">
-          <strong className="block text-slate-950">Publish this course now</strong>
-          Leave unchecked to save as a draft. Published courses appear in the public
-          catalogue; full lessons still require RISA enrolment approval.
+          <strong className="block text-slate-950">Publish this module now</strong>
+          Leave unchecked to save as a draft. Published modules appear within their parent
+          course in the public catalogue; full lessons still require RISA enrolment
+          approval.
         </span>
       </label>
 
       <div className="mt-7 flex flex-wrap items-center justify-between gap-4 border-t border-white pt-6">
         <p className="text-sm text-slate-600">
-          Codes are unique. A new course starts as a draft unless you publish it.
+          Codes are unique. A new module starts as a draft unless you publish it.
         </p>
         <button
           type="submit"
@@ -188,7 +211,7 @@ export function AdminCreateCourseForm() {
           aria-busy={pending}
           className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#286518] px-7 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518] disabled:cursor-wait disabled:opacity-60"
         >
-          {pending ? "Creating course..." : "Create course"}
+          {pending ? "Creating module..." : "Create module"}
         </button>
       </div>
     </form>

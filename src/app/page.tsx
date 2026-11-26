@@ -2,8 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
-import { RisaAcademyCourseCard } from "@/components/risa-academy-course-card";
-import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
+import { RisaProgrammeCards } from "@/components/risa-programme-cards";
+import { getPublicRisaCourses } from "@/lib/risa-course-admin";
+import { getRisaProgrammes } from "@/lib/risa-programmes";
 
 function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   return (
@@ -25,7 +26,10 @@ function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const courses = await getPublicRisaCourses();
+  const [courses, modules] = await Promise.all([
+    getRisaProgrammes(),
+    getPublicRisaCourses(),
+  ]);
 
   return (
     <main id="main-content" className="flex-1">
@@ -106,7 +110,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {courses === null ? (
+          {courses === null || modules === null ? (
             <p
               role="status"
               className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
@@ -119,17 +123,7 @@ export default async function HomePage() {
               published by RISA administration.
             </p>
           ) : (
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
-              {courses.map((course) => (
-                <RisaAcademyCourseCard
-                  key={course.id}
-                  course={{
-                    ...course,
-                    thumbnailUrl: risaThumbnailUrl(course.thumbnail_path),
-                  }}
-                />
-              ))}
-            </div>
+            <RisaProgrammeCards programmes={courses} modules={modules} />
           )}
         </div>
       </section>
