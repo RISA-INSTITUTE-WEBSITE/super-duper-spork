@@ -13,8 +13,11 @@ export function validateStudyNoteImage(mime: string, data: string): Uint8Array |
   }
   const validators: Record<string, () => boolean> = {
     "image/jpeg": () => bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255,
-    "image/png": () => bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
-    "image/webp": () => bytes.toString("ascii", 0, 4) === "RIFF" && bytes.toString("ascii", 8, 12) === "WEBP",
+    "image/png": () =>
+      bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])),
+    "image/webp": () =>
+      bytes.toString("ascii", 0, 4) === "RIFF" &&
+      bytes.toString("ascii", 8, 12) === "WEBP",
   };
   const valid = Object.hasOwn(validators, mime) && validators[mime]();
   return valid ? new Uint8Array(bytes) : null;
@@ -44,7 +47,9 @@ export async function readStudyNoteImage(token: string, id: string) {
   }
   const response = await requestStudentBackend(
     token,
-    "/rest/v1/risa_study_note_images?select=mime_type,image_data&id=eq." + id + "&limit=1",
+    "/rest/v1/risa_study_note_images?select=mime_type,image_data&id=eq." +
+      id +
+      "&limit=1",
   );
   if (!response?.ok) {
     return null;
