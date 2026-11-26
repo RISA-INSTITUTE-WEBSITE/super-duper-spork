@@ -1,7 +1,8 @@
 export function normalizeMathDelimiters(text: string): string {
   return text
-    .replace(/\\\[([\s\S]*?)\\\]/g, (_match, equation: string) =>
-      "\n$$\n" + equation.trim() + "\n$$\n",
+    .replace(
+      /\\\[([\s\S]*?)\\\]/g,
+      (_match, equation: string) => "\n$\n" + equation.trim() + "\n$\n",
     )
     .replace(/\\\(([\s\S]*?)\\\)/g, (_match, equation: string) => "$" + equation + "$");
 }
@@ -16,7 +17,13 @@ export function extractMarkdownChecklist(text: string): ChecklistEntry[] {
   return text.split("\n").flatMap((line, index) => {
     const match = /^\s*[-*+]\s+\[([ xX])\]\s+(.+)$/.exec(line);
     return match
-      ? [{ line: index + 1, text: match[2].trim(), defaultChecked: match[1].toLowerCase() === "x" }]
+      ? [
+          {
+            line: index + 1,
+            text: match[2].trim(),
+            defaultChecked: match[1].toLowerCase() === "x",
+          },
+        ]
       : [];
   });
 }
