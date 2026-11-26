@@ -80,12 +80,20 @@ function PhysicsLab() {
               <circle cx="5" cy="60" r="5" fill="#334155" />
               <circle cx="19" cy="60" r="5" fill="#334155" />
             </g>
-            <text x="20" y="82" fontSize="10">0 m</text>
-            <text x="290" y="82" fontSize="10">600 m</text>
+            <text x="20" y="82" fontSize="10">
+              0 m
+            </text>
+            <text x="290" y="82" fontSize="10">
+              600 m
+            </text>
           </svg>
           <div aria-live="polite" className="mt-3 grid gap-3 sm:grid-cols-2">
-            <p>Distance: <strong>{motion.distance.toFixed(1)} m</strong></p>
-            <p>Velocity: <strong>{motion.velocity.toFixed(1)} m/s</strong></p>
+            <p>
+              Distance: <strong>{motion.distance.toFixed(1)} m</strong>
+            </p>
+            <p>
+              Velocity: <strong>{motion.velocity.toFixed(1)} m/s</strong>
+            </p>
           </div>
         </div>
         <p className="mt-4 text-sm text-slate-600">
