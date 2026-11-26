@@ -8,12 +8,11 @@ import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
 import { StudentCourseContent } from "@/components/student-course-content";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { getRisaCourseById, type RisaCourse } from "@/lib/risa-course-admin";
+import { uuidPattern, type CourseCurriculum } from "@/lib/risa-course-curriculum";
 import {
-  getCourseCurriculum,
-  getCoursePreviewCurriculum,
-  uuidPattern,
-  type CourseCurriculum,
-} from "@/lib/risa-course-curriculum";
+  getStructuredCurriculum,
+  getStructuredPreview,
+} from "@/lib/risa-module-sections";
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
 import { getLearnerLessonCompletions } from "@/lib/risa-lesson-progress";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
@@ -73,7 +72,7 @@ function EnrolledTopics({
       </>
     );
   }
-  if (curriculum.topics.length === 0) {
+  if (curriculum.topics.length === 0 && !curriculum.sections?.length) {
     return (
       <>
         <CourseIntroduction course={course} isEnrolled />
@@ -121,7 +120,7 @@ async function CourseAccess({
     );
   }
   if (isEnrolled) {
-    const curriculum = await getCourseCurriculum(token, course.id);
+    const curriculum = await getStructuredCurriculum(token, course.id);
     const completedVideoIds = curriculum
       ? await getLearnerLessonCompletions(
           token,
@@ -139,7 +138,7 @@ async function CourseAccess({
   }
 
   const [preview, request] = await Promise.all([
-    getCoursePreviewCurriculum(token, course.id),
+    getStructuredPreview(token, course.id),
     getCourseEnrolmentRequest(token, course.id, studentId),
   ]);
   if (!preview || request === undefined) {
