@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
 
 import { setLessonCompletedAction } from "@/app/students/courses/[id]/lesson-progress-actions";
@@ -193,6 +194,7 @@ export function TopicDetails({
   progressError,
   onSelectVideo,
   onToggleComplete,
+  studyNotesHref,
 }: {
   topic: CourseTopic;
   curriculum: CourseCurriculum;
@@ -202,6 +204,7 @@ export function TopicDetails({
   progressError: string | null;
   onSelectVideo: (videoId: string) => void;
   onToggleComplete: (videoId: string, complete: boolean) => void;
+  studyNotesHref?: string;
 }) {
   const videos = topicVideos(curriculum, topic.id);
   const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
@@ -255,6 +258,15 @@ export function TopicDetails({
         quizCount={quizzes.length}
         completedCount={completedCount}
       />
+
+      {studyNotesHref && (
+        <Link
+          href={studyNotesHref}
+          className="inline-flex rounded-xl border border-[#DCE9F6] bg-white px-5 py-3 font-bold text-[#286518] shadow-sm hover:bg-[#eefce5]"
+        >
+          Study notes →
+        </Link>
+      )}
 
       <section aria-labelledby="risa-topic-playlist-heading" className="space-y-4">
         <div className="flex items-center gap-3">
@@ -325,12 +337,14 @@ export function StudentCourseContent({
   courseName,
   courseBanner,
   initialCompletedVideoIds,
+  studyNoteTopicIds = [],
 }: {
   curriculum: CourseCurriculum;
   courseId: string;
   courseName: string;
   courseBanner: ReactNode;
   initialCompletedVideoIds: string[] | null;
+  studyNoteTopicIds?: string[];
 }) {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
@@ -453,6 +467,11 @@ export function StudentCourseContent({
             progressError={progressError}
             onSelectVideo={selectVideo}
             onToggleComplete={toggleCompleted}
+            studyNotesHref={
+              studyNoteTopicIds.includes(selectedTopic.id)
+                ? "/students/courses/" + courseId + "/study-notes/" + selectedTopic.id
+                : undefined
+            }
           />
         ) : (
           <>
