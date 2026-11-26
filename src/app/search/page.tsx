@@ -27,6 +27,13 @@ const pages = [
     category: "Page",
   },
   {
+    href: "/labs",
+    title: "RISA Virtual Laboratories",
+    description: "Interactive computing, physics, DevOps and security practice.",
+    keywords: "labs experiments simulation practical activities",
+    category: "Page",
+  },
+  {
     href: "/about",
     title: "About RISA",
     description: "Learn about RISA's vision for practical education.",
