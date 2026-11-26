@@ -9,6 +9,7 @@ import { HeaderProfileLink, type HeaderUser } from "@/components/header-profile-
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/programmes", label: "Programmes" },
+  { href: "/labs", label: "Labs" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -169,6 +170,7 @@ export function MobileNavigation({ user }: { user: HeaderUser | null }) {
         className="absolute inset-x-0 top-full z-30 border-b border-[#78eb29] bg-white px-5 py-4 shadow-lg sm:px-8"
       >
         <form
+          id="risa-mobile-search-form"
           role="search"
           action="/search"
           method="get"

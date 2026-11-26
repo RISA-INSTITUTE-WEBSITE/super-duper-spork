@@ -1,31 +1,46 @@
 import type { NextConfig } from "next";
 
+import { contentSecurityPolicy } from "./src/lib/risa-security-policy";
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
-  // Keep RISA-hosted pages and static assets from being embedded as cross-origin resources.
-  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      "base-uri 'self'",
-      "object-src 'none'",
-      "frame-ancestors 'none'",
-      "form-action 'self'",
-      "frame-src 'self' https://www.youtube-nocookie.com",
-      "img-src 'self' data: https:",
-      "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline'",
-      "connect-src 'self'",
-    ].join("; "),
-  },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+  // Strict fallback for metadata and static assets. HTML gets a request
+  // nonce from Proxy (rather than unsafe-inline) at render time.
+  { key: "Content-Security-Policy", value: contentSecurityPolicy() },
 ] as const;
+
+// COEP is enforced only on pages without third-party media or remote public
+// course thumbnails. A global require-corp policy can block YouTube iframes and
+// Supabase images, so expand this list only after browser compatibility tests.
+const coepProtectedRoutes = [
+  "/about",
+  "/contact",
+  "/search",
+  "/students/login",
+  "/students/register",
+  "/students/privacy",
+] as const;
+
+const coepHeader = {
+  key: "Cross-Origin-Embedder-Policy",
+  value: "require-corp",
+} as const;
+
+// Public catalogue pages display cookie-free Supabase images. Credentialless
+// allows those images without allowing cross-origin YouTube iframes on lessons.
+const coepPublicImageRoutes = ["/", "/programmes"] as const;
+const coepPublicImageHeader = {
+  key: "Cross-Origin-Embedder-Policy",
+  value: "credentialless",
+} as const;
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -45,6 +60,14 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [...securityHeaders],
       },
+      ...coepProtectedRoutes.map((source) => ({
+        source,
+        headers: [coepHeader],
+      })),
+      ...coepPublicImageRoutes.map((source) => ({
+        source,
+        headers: [coepPublicImageHeader],
+      })),
     ];
   },
 };

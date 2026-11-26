@@ -12,6 +12,7 @@ import {
   updateStudentAuthMetadata,
 } from "@/lib/student-auth-api";
 import { uploadStudentAvatar } from "@/lib/student-learning-api";
+import { studentCsrfCookieName, verifyStudentCsrfToken } from "@/lib/student-csrf";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
   clearStudentSession,
@@ -20,10 +21,18 @@ import {
 } from "@/lib/student-session";
 import { validateLogin, validateRegistration } from "@/lib/student-validation";
 
-export async function registerStudent(formData: FormData): Promise<void> {
+async function requireValidAccountForm(formData: FormData, path: string): Promise<void> {
   if (!isStudentAuthConfigured()) {
-    redirect("/students/register?error=setup");
+    redirect(path + "?error=setup");
   }
+  const cookie = (await cookies()).get(studentCsrfCookieName)?.value;
+  if (!verifyStudentCsrfToken(cookie, formData.get("csrf_token"))) {
+    redirect(path + "?error=csrf");
+  }
+}
+
+export async function registerStudent(formData: FormData): Promise<void> {
+  await requireValidAccountForm(formData, "/students/register");
 
   const fullName = String(formData.get("fullName") ?? "").trim();
   const email = String(formData.get("email") ?? "")
@@ -64,9 +73,7 @@ export async function registerStudent(formData: FormData): Promise<void> {
 }
 
 export async function signInStudent(formData: FormData): Promise<void> {
-  if (!isStudentAuthConfigured()) {
-    redirect("/students/login?error=setup");
-  }
+  await requireValidAccountForm(formData, "/students/login");
 
   const email = String(formData.get("email") ?? "")
     .trim()

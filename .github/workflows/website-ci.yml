@@ -68,23 +68,20 @@ jobs:
         continue-on-error: true
         run: npm audit --audit-level=high
 
-      # QA-SEC-03: temporarily non-blocking by explicit owner request.
-      # This does NOT constitute legal approval; issue #3 stays open.
+      # QA-SEC-03: blocking audit of exact approved package/versions/licenses.
+      # Owner's recorded inclusion decision: docs/compliance/THIRD-PARTY-APPROVALS.md.
+      # A future license, version or package change must fail the gate.
       - name: Phase 2 - Dependency license audit
-        id: license_audit
-        continue-on-error: true
-        run: node scripts/quality/license-audit.mjs
-
-      # Preserve visible warnings even though these two audit steps are non-blocking.
-      - name: Report temporary audit exceptions
-        if: ${{ always() && (steps.dependency_audit.outcome == 'failure' || steps.license_audit.outcome == 'failure') }}
         run: |
-          if [ "${{ steps.dependency_audit.outcome }}" = "failure" ]; then
-            echo "::warning title=Dependency audit exception::The dependency audit failed but is temporarily non-blocking. Issue #4 remains unresolved."
-          fi
-          if [ "${{ steps.license_audit.outcome }}" = "failure" ]; then
-            echo "::warning title=Licence audit exception::The licence audit failed but is temporarily non-blocking. Issue #3 still requires approval."
-          fi
+          node tests/security/assert-license-policy.mjs
+          node scripts/quality/license-audit.mjs
+
+      # The vulnerability audit remains temporarily non-blocking by prior owner
+      # instruction. Its future failures are visible and require follow-up.
+      - name: Report temporary audit exceptions
+        if: ${{ always() && steps.dependency_audit.outcome == 'failure' }}
+        run: |
+          echo "::warning title=Dependency audit exception::The dependency audit failed but is temporarily non-blocking; investigate any new advisory before release."
 
       # QA-SAST-01: project-specific source security rules from tests/security/.
       - name: Phase 2 - Semgrep SAST rules
@@ -122,6 +119,19 @@ jobs:
       # tests/security/run-zap.sh manages the server and Docker lifetime.
       - name: Phase 5 - OWASP ZAP isolated active DAST scan
         run: bash tests/security/run-zap.sh
+
+      # Regression: DAST must not leave a local Next.js server occupying port 3000.
+      - name: Phase 5 - Verify scanner server cleanup
+        run: |
+          for attempt in $(seq 1 10); do
+            if ! curl --fail --silent --max-time 2 http://127.0.0.1:3000/ > /dev/null; then
+              echo "Local Next.js scanner server was cleaned up."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error title=Orphaned local server::Port 3000 is still used after the ZAP scan."
+          exit 1
 
       # Provision the actual browser used for end-to-end acceptance.
       - name: Phase 5 - Install Chromium browser

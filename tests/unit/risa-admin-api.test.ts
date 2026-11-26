@@ -62,29 +62,32 @@ describe("RISA administrator authorization", () => {
 });
 
 describe("RISA administrator overview", () => {
-  it("reads real course, enrolment, and material counts", async () => {
-    for (const number of [2, 4, 7]) {
+  it("reads real course, module, enrolment, and material counts", async () => {
+    for (const number of [2, 19, 4, 7]) {
       fetchMock.mockResolvedValueOnce(
         new Response(null, { headers: { "content-range": "*/" + number } }),
       );
     }
     expect(await getRisaAdminOverview("session-token")).toEqual({
       courses: 2,
+      modules: 19,
       enrolments: 4,
       materials: 7,
     });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     expect(fetchMock.mock.calls[0][1].headers.Prefer).toBe("count=exact");
   });
 
   it("shows unavailable counts instead of making up zero records", async () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 503 }));
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 200 }));
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 200 }));
     fetchMock.mockResolvedValueOnce(
       new Response(null, { status: 200, headers: { "content-range": "*/0" } }),
     );
     expect(await getRisaAdminOverview("session-token")).toEqual({
       courses: null,
+      modules: null,
       enrolments: null,
       materials: 0,
     });

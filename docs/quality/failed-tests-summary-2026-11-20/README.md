@@ -183,7 +183,208 @@ bash tests/security/run-zap.sh
 
 The ZAP script starts a local website on port 3000 and runs Docker-based active checks against `127.0.0.1`. It writes `zap-report.json`. Active scanning should not be pointed at the production service or real learner accounts.
 
-## 9. What the findings do **not** mean
+## 9. COEP targeted remediation (20 November 2026 follow-up)
+
+A follow-up fix configures **`Cross-Origin-Embedder-Policy: require-corp` only on**
+`/about`, `/contact`, `/students/login`, `/students/register`, and
+`/students/privacy` using [`next.config.ts`](../../../next.config.ts).
+These pages do not render the YouTube lesson iframe or public course
+thumbnail cards. The [HTTP smoke checks](../../../tests/integration/http-smoke.sh)
+now verify the enforced header on each page and verify that the homepage is
+**not inadvertently placed under a strict global COEP policy**.
+
+**Why this is intentionally scoped:** RISA uses a YouTube iframe on enrolled
+learner and administrator course pages, and public Supabase-hosted thumbnails
+on the homepage and course catalogue. Strict global `require-corp` can block
+such content unless remote hosts explicitly grant access. Setting
+`unsafe-none` purely to make a warning disappear would not improve protection.
+
+**What remains open:** This is a real policy-hardening improvement for five
+selected routes, **not a full clearance of ZAP rule 90004-2**. Continue to
+monitor the scanner, then test all cross-origin thumbnails, lesson playback,
+responsive pages and authenticated features before considering a wider COEP
+rollout. Do not ignore or downgrade the remaining warning without documented
+review. Related CORP remediation is recorded separately in PR #47.
+
+References: [OWASP ZAP 90004-2](https://www.zaproxy.org/docs/alerts/90004-2/)
+and [MDN Cross-Origin-Embedder-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy).
+
+## 10. Account form anti-CSRF hardening (rule 20012 follow-up)
+
+The third ZAP warning (`Anti-CSRF Tokens Check [20012]`) covers the
+`/students/login` and `/students/register` forms, where the scanner
+previously detected no recognized anti-CSRF token.
+
+**Change proposed:** RISA now issues a cryptographically random,
+32-byte, base64url-encoded CSRF token whenever either account page is
+opened without an existing well-formed token. The token is sent in an
+HttpOnly, SameSite=Strict, host-only cookie (with `Secure` and
+`__Host-` prefix on production HTTPS). A matching `csrf_token`
+hidden form value is rendered server-side. Both Server Actions verify the
+form value against the cookie using constant-time comparison **before**
+sending credentials to Supabase. Missing/forged values are rejected with
+a reload-and-retry message.
+
+**Relevant code:**
+
+- [`src/lib/student-csrf.ts`](../../../src/lib/student-csrf.ts) — generation, format, cookie settings and constant-time validation
+- [`src/proxy.ts`](../../../src/proxy.ts) — token issuance on account-page GET while preserving session refresh
+- [`src/app/students/actions.ts`](../../../src/app/students/actions.ts) — reject missing or mismatched tokens
+- [Sign-in form](../../../src/app/students/login/page.tsx) and
+  [registration form](../../../src/components/student-registration-form.tsx) — hidden token fields
+- [CSRF unit tests](../../../tests/unit/student-csrf.test.ts),
+  [Server Action tests](../../../tests/unit/student-account-actions-csrf.test.ts),
+  and [HTTP form/cookie test](../../../tests/security/assert-account-csrf.mjs)
+
+**Security distinction:** This is a genuine form/cookie-bound validation
+control, not a decorative hidden input, and supplements Next.js' own
+Server Action Origin/Host validation. The ZAP warning is considered
+**pending verification** until a new full scan reports its status. It
+does not automatically address warning `10202` or the other ZAP alerts.
+
+Reference: [ZAP 20012](https://www.zaproxy.org/docs/alerts/20012/)
+and [Next.js Server Action security](https://nextjs.org/docs/app/guides/data-security).
+
+## 11. Reviewed ZAP 20012 false positives (21 November 2026)
+
+We examined the **actual JSON artifact** for [RISA CI #671](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44756777834).
+It recorded five detailed instances under the remaining **beta** rule
+`Anti-CSRF Tokens Check [20012]` (the terminal grouped these as `x6`):
+
+- Two instances on `/students/login` and two on `/students/register`
+  show the **desktop and mobile search forms**. They use
+  `GET /search?q=...` and only look up public pages and course titles;
+  they do not change account or learner data.
+- One instance on `/students/register` shows the **Next.js registration
+  Server Action**. It already has a random `csrf_token` hidden field,
+  a matching host-only cookie, and server-side token comparison before
+  any attempt to register a learner.
+
+The first targeted test, [CI #673](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44880459521),
+removed those five detailed alerts but still found **one new 20012 instance**
+on `/students/login`, now correctly identified as the **sign-in Server
+Action**. Its form likewise contains a random CSRF token and has
+server-side validation before sign-in.
+
+**Why the scanner misread these forms:** This beta rule inspects HTML forms
+and compares hidden fields across repeated requests. Read-only GET search
+forms are not CSRF-sensitive, and a repeated Next.js Server Action request
+is not necessarily a fresh GET with the same form/cookie context. The rule
+does not independently prove that an attacker can sign in or register
+without the required token.
+
+**Narrowly reviewed scanner exceptions:** The search forms now have
+`id="risa-desktop-search-form"` and
+`id="risa-mobile-search-form"`. Registration has
+`id="risa-student-registration-form"` and sign-in has
+`id="risa-student-login-form"`. The ZAP invocation uses the
+ZAP-supported `rules.csrf.ignorelist` option for **exactly these four IDs**.
+Rule 20012 remains active for every other form, and all other ZAP
+policies remain unchanged.
+
+**Checks that make these exceptions defensible:**
+
+- The live [account-form smoke test](../../../tests/security/assert-account-csrf.mjs)
+  verifies that both search forms still submit **GET /search**, that the
+  protected sign-in and registration forms use POST, and that both
+  present matching random form/cookie tokens.
+- [Server Action tests](../../../tests/unit/student-account-actions-csrf.test.ts)
+  verify that missing or forged tokens do not reach Supabase and that
+  properly validated requests preserve normal authentication behaviour.
+- [The scanner runner](../../../tests/security/run-zap.sh) documents
+  the exact exceptions. If search becomes state-changing or registration
+  or login loses its CSRF guard, these exceptions **must be removed** and reviewed
+  again.
+
+This is an **evidence-based scanner exclusion**, not a new browser security
+header or proof that a vulnerability was exploited. A subsequent ZAP run
+must confirm that `20012` is no longer reported for these forms.
+Authenticated role and authorization testing remains necessary.
+
+Reference: [ZAP beta CSRF rule and ignore-list documentation](https://www.zaproxy.org/docs/desktop/addons/active-scan-rules-beta/).
+
+## 12. Remaining ZAP findings: implementation and compatibility review (21 Nov 2026)
+
+The [CI #678 ZAP JSON report](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44881221709)
+confirmed three remaining warning families. This follow-up targets the
+underlying causes, while retaining a strict scan and adding runtime tests.
+
+### CSP rule 10055 — three underlying directives
+
+The report specifically identifies `img-src https:`, `script-src
+'unsafe-inline'` and `style-src 'unsafe-inline'`, each repeated on four
+requests. The new [policy builder](../../../src/lib/risa-security-policy.ts)
+allows only RISA's own resources, YouTube's `i.ytimg.com` thumbnails,
+the specifically configured Supabase public-image origin, and required
+`data:`/`blob:` previews. Arbitrary HTTPS image origins are no longer
+permitted.
+
+[Next.js Proxy](../../../src/proxy.ts) creates a fresh random CSP nonce per
+HTML request and forwards that same policy to the server renderer and browser.
+[The root layout](../../../src/app/layout.tsx) opts into request-based
+rendering so Next.js can attach nonces to its hydration scripts and styles.
+The fallback CSP on static assets does not allow arbitrary inline script
+execution. **Existing CSS style attributes remain explicitly permitted**
+by `style-src-attr` because RISA has an animated hero using them; this
+is not a claim of a completely inline-style-free policy.
+
+**Tradeoff:** Nonce CSP requires dynamic rendering, adds server work and
+changes page caching. Verify homepage animations, learner authentication,
+admin workflows, actual Supabase thumbnails and embedded YouTube lessons
+before production rollout.
+
+### Rule 43 — Next.js image optimization false-positive review
+
+The only flagged request was `/_next/image?url=...devops.png&w=3840&q=75`
+where ZAP's parameter substitution produced differing error pages;
+the report included **no evidence of actual source code or secrets**.
+The four known, public static hero images are now requested directly via
+[the hero component](../../../src/components/hero-photo-background.tsx)
+instead of passing through the optimizer. This removes the specific
+scanner-facing image URL without changing any student-upload endpoints.
+
+The [HTTP regression test](../../../tests/security/assert-security-headers.mjs)
+checks that the static hero image serves as an image, the homepage does
+not emit an optimizer image URL, and malformed optimizer requests return
+an error without obvious sensitive content. **Unoptimized images may be
+larger to download.** The general-purpose Next.js image optimizer remains
+available for future legitimate uses and should still receive security review.
+
+### Rule 90004 — COEP, COOP and CORP
+
+[Security headers](../../../next.config.ts) now apply
+`Cross-Origin-Opener-Policy: same-origin` and
+`Cross-Origin-Resource-Policy: same-origin`, as well as existing strict
+COEP on informational and auth pages. Public homepage and
+`/programmes` use **`Cross-Origin-Embedder-Policy: credentialless`**
+so publicly accessible external Supabase course thumbnails can load
+without cookies. **Do not globally add `require-corp` to enrolled
+course pages with YouTube iframes**: it could break embedded lesson players.
+Browsers with different COEP implementations require compatibility tests.
+
+A first verification scan, [CI #682](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44901894511),
+cleared both **CSP 10055** and **File Inclusion 43**, leaving exactly
+one COEP 90004 warning on `/search?q`. Because search results render
+text links rather than external media, we extended the strict COEP
+route list to include `/search` and added a regression test for it.
+
+All three changes are covered by the same [live HTTP tests](../../../tests/security/assert-security-headers.mjs)
+and [unit tests](../../../tests/unit/risa-security-policy.test.ts).
+[CI #684](https://github.com/RISA-INSTITUTE-WEBSITE/super-duper-spork/actions/runs/44902456498)
+confirmed that **all three warning families now PASS**; the isolated
+active ZAP scan reported **143 PASS, zero WARN, and zero FAIL**. The full
+workflow then exposed an independent browser-test setup issue: Playwright
+could not start a server because the preceding test runner left port
+3000 occupied. The integration and DAST scripts now start the Next.js
+binary directly rather than leaving child processes behind an `npm`
+wrapper, and the workflow verifies port cleanup before Playwright.
+
+Browser compatibility with authenticated YouTube lessons and real
+Supabase thumbnails remains a separate acceptance check; scanner
+clearance is not a general security certification. No ZAP rules have
+been downgraded or disabled.
+
+## 13. What the findings do **not** mean
 
 - A red CI check **does not prove RISA was hacked**.
 - Zero scanner `FAIL` findings **does not certify the website as secure**.

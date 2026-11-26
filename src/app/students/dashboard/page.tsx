@@ -38,7 +38,7 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
   if (courses.length === 0) {
     return (
       <p className="risa-science-glass mt-5 rounded-[1.5rem] p-6 text-sm text-slate-600">
-        No enrolled courses yet. Browse courses to get started.
+        No enrolled modules yet. Browse courses to get started.
       </p>
     );
   }
@@ -66,7 +66,7 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
               href={"/students/courses/" + course.id}
               className="inline-flex min-h-10 items-center text-sm font-bold text-[#286518] hover:underline"
             >
-              Open course{" "}
+              Open module{" "}
               <span aria-hidden="true" className="ml-1">
                 →
               </span>
@@ -193,7 +193,7 @@ export default async function StudentDashboardPage() {
         courses.map((course) => course.id),
       )
     : null;
-  const courseCount = countLabel(courses, "course");
+  const courseCount = countLabel(courses, "module");
   const materialCount = countLabel(materials, "file");
 
   return (
@@ -287,7 +287,7 @@ export default async function StudentDashboardPage() {
             id="enrolled-heading"
             className="font-heading text-xl font-bold text-slate-950 sm:text-2xl"
           >
-            My courses
+            My modules
           </h2>
           <Link
             href="/programmes"

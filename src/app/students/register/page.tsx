@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { StudentRegistrationForm } from "@/components/student-registration-form";
 import { isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { studentCsrfCookieName } from "@/lib/student-csrf";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,7 @@ const errors: Record<string, string> = {
   consent: "Please review and acknowledge the student account privacy notice.",
   service: "Registration is currently unavailable. Please try again later.",
   setup: "Student registration has not been activated yet.",
+  csrf: "This form has expired. Reload the page and try again.",
 };
 
 export default async function StudentRegisterPage({
@@ -29,6 +32,7 @@ export default async function StudentRegisterPage({
 }) {
   const { error, status } = await searchParams;
   const enabled = isStudentAuthConfigured();
+  const csrfToken = (await cookies()).get(studentCsrfCookieName)?.value ?? "";
   const message = error && Object.hasOwn(errors, error) ? errors[error] : null;
   const submitted = status === "check-email";
 
@@ -86,7 +90,7 @@ export default async function StudentRegisterPage({
               </p>
             </div>
           ) : (
-            <StudentRegistrationForm enabled={enabled} />
+            <StudentRegistrationForm enabled={enabled} csrfToken={csrfToken} />
           )}
         </div>
       </div>

@@ -13,16 +13,27 @@ test("homepage is usable with an accessible main landmark", async ({ page }) => 
   );
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(
+    page.getByRole("navigation", { name: "Primary navigation" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Discover RISA" })).toHaveAttribute(
+    "href",
+    "/about",
+  );
+});
+
+test("vision, mission, and philosophy are on the About page", async ({ page }) => {
+  await page.goto("/about");
+  await expect(page.getByRole("main")).toHaveCount(1);
+  await expect(
     page.getByRole("heading", { name: "Our Vision", exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Our Mission" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Our Mission", exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Learn it. Understand it. Apply it. Test it. Improve it.",
     }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("navigation", { name: "Primary navigation" }),
   ).toBeVisible();
 });
 
@@ -30,14 +41,18 @@ test("course areas come directly after the four-photo hero", async ({ page }) =>
   await page.goto("/");
   const sections = page.locator("main > section");
 
+  await expect(sections).toHaveCount(4);
   await expect(sections.nth(0)).toHaveClass(/risa-hero/);
   await expect(sections.nth(0).locator(".risa-hero-photo")).toHaveCount(4);
   await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "courses-heading");
   await expect(sections.nth(2)).toHaveAttribute(
     "aria-labelledby",
-    "vision-mission-heading",
+    "popular-modules-heading",
   );
-  await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "philosophy-heading");
+  await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "next-heading");
+  await expect(
+    sections.nth(2).getByRole("heading", { name: "Modules from our popular domains" }),
+  ).toBeVisible();
   await expect(
     sections.nth(1).getByRole("heading", { name: "Explore our courses" }),
   ).toBeVisible();
@@ -353,4 +368,77 @@ test("course preview and enrolment review require verified accounts", async ({
 
   await page.goto("/admin/enrolment-requests");
   await expect(page).toHaveURL(/\/students\/login\/?$/);
+});
+
+test("institutional footer preserves navigation and stacks correctly on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+
+  const footer = page.locator("footer.risa-footer");
+  const navigation = footer.getByRole("navigation", { name: "Footer navigation" });
+  const columns = footer.locator(".risa-footer-columns");
+
+  await expect(footer.getByText("RISA Institute", { exact: true })).toBeVisible();
+  await expect(footer.getByRole("heading", { name: "Explore" })).toBeVisible();
+  await expect(footer.getByRole("heading", { name: "Development status" })).toBeVisible();
+
+  for (const [name, href] of [
+    ["Programmes", "/programmes"],
+    ["About RISA", "/about"],
+    ["Contact", "/contact"],
+  ]) {
+    await expect(navigation.getByRole("link", { name })).toHaveAttribute("href", href);
+  }
+
+  expect(
+    await columns.evaluate(
+      (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    ),
+  ).toBe(3);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await columns.evaluate(
+      (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
+    ),
+  ).toBe(1);
+  await expect(navigation.getByRole("link", { name: "Contact" })).toBeVisible();
+  await navigation.getByRole("link", { name: "Contact" }).click();
+  await expect(page).toHaveURL(/\/contact\/?$/);
+});
+
+test("the homepage loads with one gentle zoom-out for the first photo, text and navbar", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const firstPhoto = page.locator(".risa-hero-photo").first();
+  const firstImage = firstPhoto.locator("img");
+  const otherImage = page.locator(".risa-hero-photo").nth(1).locator("img");
+  const copy = page.locator(".risa-hero-content");
+  const header = page.locator("header.risa-navbar");
+
+  await expect(page.locator(".risa-hero-photo")).toHaveCount(4);
+  await expect(firstImage).toHaveCSS("animation-name", "risa-home-opening-photo");
+  await expect(copy).toHaveCSS("animation-name", "risa-home-opening-content");
+  await expect(header).toHaveCSS("animation-name", "risa-home-opening-content");
+  await expect(firstImage).toHaveCSS("animation-iteration-count", "1");
+  await expect(firstPhoto).toHaveCSS("animation-name", "risa-hero-photo-cycle");
+  await expect(firstPhoto).toHaveCSS("animation-iteration-count", "infinite");
+  await expect(otherImage).toHaveCSS("animation-name", "none");
+});
+
+test("homepage entrance respects reduced-motion preferences", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  await expect(page.locator(".risa-hero-photo").first().locator("img")).toHaveCSS(
+    "animation-name",
+    "none",
+  );
+  await expect(page.locator(".risa-hero-content")).toHaveCSS("animation-name", "none");
+  await expect(page.locator("header.risa-navbar")).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".risa-hero-photo").first()).toHaveCSS("opacity", "1");
 });
