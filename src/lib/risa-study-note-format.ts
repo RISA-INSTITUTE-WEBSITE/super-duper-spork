@@ -2,7 +2,7 @@ export function normalizeMathDelimiters(text: string): string {
   return text
     .replace(
       /\\\[([\s\S]*?)\\\]/g,
-      (_match, equation: string) => "\n$\n" + equation.trim() + "\n$\n",
+      (_match, equation: string) => "\n$$\n" + equation.trim() + "\n$$\n",
     )
     .replace(/\\\(([\s\S]*?)\\\)/g, (_match, equation: string) => "$" + equation + "$");
 }
