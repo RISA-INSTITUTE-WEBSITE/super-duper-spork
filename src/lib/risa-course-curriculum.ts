@@ -9,6 +9,7 @@ export type CourseTopic = {
   course_id: string;
   section_id?: string;
   sort_order?: number;
+  practical_lab_slug?: string;
   title: string;
   description: string;
   is_published: boolean;
@@ -59,6 +60,16 @@ function published(value: unknown): value is boolean {
   return typeof value === "boolean";
 }
 
+function parseTopicPlacement(row: JsonRow) {
+  return {
+    ...(typeof row.section_id === "string" ? { section_id: row.section_id } : {}),
+    ...(typeof row.sort_order === "number" ? { sort_order: row.sort_order } : {}),
+    ...(typeof row.practical_lab_slug === "string"
+      ? { practical_lab_slug: row.practical_lab_slug }
+      : {}),
+  };
+}
+
 function parseTopic(item: unknown): CourseTopic | null {
   const row = asRecord(item);
   if (
@@ -74,8 +85,7 @@ function parseTopic(item: unknown): CourseTopic | null {
   return {
     id: row.id,
     course_id: row.course_id,
-    ...(typeof row.section_id === "string" ? { section_id: row.section_id } : {}),
-    ...(typeof row.sort_order === "number" ? { sort_order: row.sort_order } : {}),
+    ...parseTopicPlacement(row),
     title: row.title,
     description: row.description,
     is_published: row.is_published,
@@ -183,7 +193,7 @@ async function getTopics(
 ): Promise<CourseTopic[] | null> {
   return fetchCollection(
     token,
-    "/rest/v1/risa_course_topics?select=id,course_id,title,description,is_published,section_id,sort_order" +
+    "/rest/v1/risa_course_topics?select=id,course_id,title,description,is_published,section_id,sort_order,practical_lab_slug" +
       "&course_id=eq." +
       courseId +
       publishedFilter(drafts) +
