@@ -41,11 +41,18 @@ test("course areas come directly after the four-photo hero", async ({ page }) =>
   await page.goto("/");
   const sections = page.locator("main > section");
 
-  await expect(sections).toHaveCount(3);
+  await expect(sections).toHaveCount(4);
   await expect(sections.nth(0)).toHaveClass(/risa-hero/);
   await expect(sections.nth(0).locator(".risa-hero-photo")).toHaveCount(4);
   await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "courses-heading");
-  await expect(sections.nth(2)).toHaveAttribute("aria-labelledby", "next-heading");
+  await expect(sections.nth(2)).toHaveAttribute(
+    "aria-labelledby",
+    "popular-modules-heading",
+  );
+  await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "next-heading");
+  await expect(
+    sections.nth(2).getByRole("heading", { name: "Modules from our popular domains" }),
+  ).toBeVisible();
   await expect(
     sections.nth(1).getByRole("heading", { name: "Explore our courses" }),
   ).toBeVisible();
