@@ -11,6 +11,7 @@ import { studentCookieNames } from "@/lib/student-session";
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/programmes", label: "Programmes" },
+  { href: "/computing-lab", label: "Labs" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;
