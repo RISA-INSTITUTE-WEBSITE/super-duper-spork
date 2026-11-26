@@ -20,8 +20,8 @@ export default function LabsPage() {
             Learn by doing
           </h1>
           <p className="mt-4 max-w-2xl leading-7 text-slate-600">
-            Choose a domain, experiment with a model and check your understanding.
-            These browser-based activities complement your course modules.
+            Choose a domain, experiment with a model and check your understanding. These
+            browser-based activities complement your course modules.
           </p>
         </header>
         <div className="mt-9 grid gap-5 sm:grid-cols-2">
