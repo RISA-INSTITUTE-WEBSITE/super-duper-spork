@@ -29,7 +29,7 @@ const moduleHeadingFont = Lexend({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Course preview & lessons | RISA",
+  title: "Module preview & lessons | RISA",
   robots: { index: false, follow: false },
 };
 
@@ -82,7 +82,7 @@ function EnrolledTopics({
             Lessons are coming soon
           </h2>
           <p className="mt-3 text-sm text-slate-600">
-            RISA has not yet published topics for this course.
+            RISA has not yet published topics for this module.
           </p>
         </div>
       </>
@@ -183,7 +183,7 @@ function CourseBanner({
       <p className="mt-3 text-xs font-semibold leading-5 text-[#286518]">
         {course.level} ·{" "}
         {isEnrolled
-          ? "Enrolled learner · Full course access"
+          ? "Enrolled learner · Full module access"
           : "Registered learner · Preview only"}
       </p>
     </header>
