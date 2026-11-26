@@ -5,7 +5,10 @@ import { studentCookieNames } from "@/lib/student-session";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const token = (await cookies()).get(studentCookieNames.access)?.value;
   const { id } = await params;
   const image = token ? await readStudyNoteImage(token, id) : null;
