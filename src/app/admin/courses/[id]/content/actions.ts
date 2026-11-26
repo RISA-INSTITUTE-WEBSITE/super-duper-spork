@@ -18,6 +18,7 @@ import {
   getModuleSections,
   moveModuleTopic,
   validSectionOrder,
+  validPracticalLab,
 } from "@/lib/risa-module-sections";
 import { getRisaCourseById } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
@@ -72,13 +73,15 @@ export async function createTopicAction(form: FormData): Promise<void> {
   }
   const sectionId = inputText(form, "sectionId");
   const order = Number(inputText(form, "sortOrder"));
-  if (!(await validTopicSection(token, courseId, sectionId)) || !validSectionOrder(order)) {
+  const labSlug = inputText(form, "labSlug");
+  if (!(await validTopicSection(token, courseId, sectionId)) || !validSectionOrder(order) || !validPracticalLab(labSlug)) {
     failed(courseId);
   }
   const ok = await createCourseContent(token, "risa_course_topics", {
     course_id: courseId,
     section_id: sectionId,
     sort_order: order,
+    practical_lab_slug: labSlug || null,
     title,
     description,
     is_published: form.get("published") === "on",
@@ -166,6 +169,7 @@ export async function moveTopicAction(form: FormData): Promise<void> {
     topicId,
     sectionId,
     order: Number(inputText(form, "sortOrder")),
+    labSlug: inputText(form, "labSlug"),
   });
   finish(courseId, ok ? "moved" : "failed");
 }
