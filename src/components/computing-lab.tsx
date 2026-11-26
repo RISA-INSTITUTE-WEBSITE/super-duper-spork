@@ -106,8 +106,8 @@ function BinaryLab({ onComplete }: { onComplete: (complete: boolean) => void }) 
       <h2 className="mt-2 text-2xl font-bold">Binary foundations</h2>
       <p className="mt-3 leading-7 text-slate-600">
         Computers represent data using bits. Each bit has a value of 0 or 1. In an
-        unsigned byte, eight bits represent numbers from 0 to 255. Turn bits on to
-        add their place values.
+        unsigned byte, eight bits represent numbers from 0 to 255. Turn bits on to add
+        their place values.
       </p>
       <div className="mt-5 grid grid-cols-4 gap-2 sm:grid-cols-8">
         {bitWeights.map((weight) => (
@@ -125,7 +125,7 @@ function BinaryLab({ onComplete }: { onComplete: (complete: boolean) => void }) 
             }
           >
             <span className="block text-xs">{weight}</span>
-            <span className="block font-mono text-xl">{(value & weight) ? 1 : 0}</span>
+            <span className="block font-mono text-xl">{value & weight ? 1 : 0}</span>
           </button>
         ))}
       </div>
@@ -154,7 +154,8 @@ function BinaryLab({ onComplete }: { onComplete: (complete: boolean) => void }) 
         {bitWeights.filter((weight) => value & weight).join(" + ") || "0"} = {value}
       </p>
       <p className="mt-3 text-sm text-slate-600">
-        Application: bytes encode pixel colour values, characters and machine instructions.
+        Application: bytes encode pixel colour values, characters and machine
+        instructions.
       </p>
       <Practice questions={binaryQuestions} onComplete={onComplete} />
     </section>
@@ -288,7 +289,9 @@ export function ComputingLab() {
           <h1 className="risa-display mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
             RISA Computing Lab
           </h1>
-          <p className="mt-3 text-xl font-semibold text-blue-800">Learn Computing by Doing</p>
+          <p className="mt-3 text-xl font-semibold text-blue-800">
+            Learn Computing by Doing
+          </p>
           <p className="mt-4 max-w-2xl leading-7 text-slate-700">
             Experiment with the building blocks of computers. Explore, predict, test and
             check your understanding.
@@ -296,7 +299,8 @@ export function ComputingLab() {
           <a
             href="#cs101"
             className={
-              button + " mt-6 inline-flex items-center border-blue-700 bg-blue-700 text-white"
+              button +
+              " mt-6 inline-flex items-center border-blue-700 bg-blue-700 text-white"
             }
           >
             Explore CS101
@@ -305,7 +309,9 @@ export function ComputingLab() {
       </section>
       <div className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-8">
         <section id="cs101" className={panel + " scroll-mt-8"}>
-          <p className="text-xs font-bold uppercase tracking-widest text-blue-700">CS101</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-blue-700">
+            CS101
+          </p>
           <h2 className="mt-2 text-2xl font-bold">
             Computer Architecture &amp; Data Representation
           </h2>
