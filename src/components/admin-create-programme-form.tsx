@@ -2,16 +2,17 @@
 
 import { useActionState } from "react";
 
-import { createProgrammeAction } from "@/app/admin/courses/actions";
+import { createProgrammeAction, type CourseCreationState } from "@/app/admin/courses/actions";
 
 const field =
   "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm";
 
 export function AdminCreateProgrammeForm() {
-  const [state, action, pending] = useActionState(createProgrammeAction, {
+  const initialState: CourseCreationState = {
     status: "idle",
     message: "",
-  });
+  };
+  const [state, action, pending] = useActionState(createProgrammeAction, initialState);
   return (
     <form action={action} className="risa-glass-card rounded-2xl p-6">
       <h2 className="text-xl font-bold">Create a course</h2>
