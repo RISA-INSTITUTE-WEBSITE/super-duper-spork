@@ -49,15 +49,25 @@ function StudyNoteImage({ src, alt }: { src?: string; alt?: string }) {
         unoptimized
         className="h-auto max-h-[680px] w-auto max-w-full rounded-xl border border-slate-200 bg-white object-contain shadow-sm"
       />
-      {alt && <span className="max-w-full text-center text-xs italic text-slate-500">{alt}</span>}
+      {alt && (
+        <span className="max-w-full text-center text-xs italic text-slate-500">
+          {alt}
+        </span>
+      )}
     </span>
   );
 }
 
 function OutcomesProgress({ done, total }: { done: number; total: number }) {
   return (
-    <div role="status" aria-live="polite" className="mb-4 rounded-xl border border-[#C8E0DC] bg-[#F3FAF8] p-3 text-slate-800">
-      <p className="font-bold">Learning outcomes: {done} of {total} achieved</p>
+    <div
+      role="status"
+      aria-live="polite"
+      className="mb-4 rounded-xl border border-[#C8E0DC] bg-[#F3FAF8] p-3 text-slate-800"
+    >
+      <p className="font-bold">
+        Learning outcomes: {done} of {total} achieved
+      </p>
       <progress
         aria-label="Learning outcomes achieved"
         value={done}
@@ -65,7 +75,8 @@ function OutcomesProgress({ done, total }: { done: number; total: number }) {
         className="mt-2 h-2 w-full accent-[#0D9488]"
       />
       <p className="mt-2 text-xs text-slate-600">
-        Tick each outcome when you feel confident you can demonstrate it. Progress is saved on this device.
+        Tick each outcome when you feel confident you can demonstrate it. Progress is
+        saved on this device.
       </p>
     </div>
   );
@@ -86,7 +97,9 @@ export function RisaStudyNoteMarkdown({
     setCheckedMap(loadChecks(checklistStorageKey));
   }, [checklistStorageKey]);
 
-  const done = tasks.filter((item) => checkedMap[taskKey(item)] ?? item.defaultChecked).length;
+  const done = tasks.filter(
+    (item) => checkedMap[taskKey(item)] ?? item.defaultChecked,
+  ).length;
 
   function toggleTask(item: ChecklistEntry, checked: boolean) {
     if (!checklistStorageKey) {
@@ -115,22 +128,47 @@ export function RisaStudyNoteMarkdown({
             <StudyNoteImage src={typeof src === "string" ? src : undefined} alt={alt} />
           ),
           table: ({ children }) => (
-            <div role="region" aria-label="Study notes table" tabIndex={0} className="my-4 max-w-full overflow-x-auto rounded-xl border border-slate-200">
+            <div
+              role="region"
+              aria-label="Study notes table"
+              tabIndex={0}
+              className="my-4 max-w-full overflow-x-auto rounded-xl border border-slate-200"
+            >
               <table className="edu-markdown-table edu-study-note-table w-full min-w-max border-collapse text-left text-sm">
                 {children}
               </table>
             </div>
           ),
           thead: ({ children }) => <thead className="text-slate-900">{children}</thead>,
-          tbody: ({ children }) => <tbody className="divide-y divide-slate-200">{children}</tbody>,
-          th: ({ children }) => <th scope="col" className="border-b border-slate-200 px-4 py-3 align-top font-bold">{children}</th>,
+          tbody: ({ children }) => (
+            <tbody className="divide-y divide-slate-200">{children}</tbody>
+          ),
+          th: ({ children }) => (
+            <th
+              scope="col"
+              className="border-b border-slate-200 px-4 py-3 align-top font-bold"
+            >
+              {children}
+            </th>
+          ),
           td: ({ children }) => <td className="px-4 py-3 align-top">{children}</td>,
           input: ({ checked }) =>
-            checklistStorageKey ? null : <input type="checkbox" checked={!!checked} disabled readOnly className="mr-2 accent-[#0D9488]" />,
+            checklistStorageKey ? null : (
+              <input
+                type="checkbox"
+                checked={!!checked}
+                disabled
+                readOnly
+                className="mr-2 accent-[#0D9488]"
+              />
+            ),
           li: ({ node, children, ...props }) => {
             const item = tasks.find((task) => task.line === node?.position?.start.line);
-            const hasCheckbox = node?.children?.some((child) =>
-              child.type === "element" && child.tagName === "input" && child.properties?.type === "checkbox",
+            const hasCheckbox = node?.children?.some(
+              (child) =>
+                child.type === "element" &&
+                child.tagName === "input" &&
+                child.properties?.type === "checkbox",
             );
             if (checklistStorageKey && hasCheckbox && item) {
               return (
@@ -151,10 +189,14 @@ export function RisaStudyNoteMarkdown({
             return <li {...props}>{children}</li>;
           },
           pre: ({ children }) => (
-            <pre className="my-4 overflow-x-auto rounded-xl bg-slate-100 p-4 text-sm">{children}</pre>
+            <pre className="my-4 overflow-x-auto rounded-xl bg-slate-100 p-4 text-sm">
+              {children}
+            </pre>
           ),
           blockquote: ({ children }) => (
-            <blockquote className="my-3 border-l-4 border-slate-300 pl-4 text-slate-700">{children}</blockquote>
+            <blockquote className="my-3 border-l-4 border-slate-300 pl-4 text-slate-700">
+              {children}
+            </blockquote>
           ),
         }}
       >
