@@ -13,6 +13,12 @@ import {
   parseYouTubeId,
   uuidPattern,
 } from "@/lib/risa-course-curriculum";
+import {
+  createModuleSection,
+  getModuleSections,
+  moveModuleTopic,
+  validSectionOrder,
+} from "@/lib/risa-module-sections";
 import { getRisaCourseById } from "@/lib/risa-course-admin";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -64,8 +70,15 @@ export async function createTopicAction(form: FormData): Promise<void> {
   if (!validText(title, 2, 140) || description.length > 1500) {
     failed(courseId);
   }
+  const sectionId = inputText(form, "sectionId");
+  const order = Number(inputText(form, "sortOrder"));
+  if (!(await validTopicSection(token, courseId, sectionId)) || !validSectionOrder(order)) {
+    failed(courseId);
+  }
   const ok = await createCourseContent(token, "risa_course_topics", {
     course_id: courseId,
+    section_id: sectionId,
+    sort_order: order,
     title,
     description,
     is_published: form.get("published") === "on",
@@ -127,4 +140,32 @@ export async function createQuestionAction(form: FormData): Promise<void> {
   const correctIndex = Number(inputText(form, "correctIndex"));
   const ok = await addQuizQuestion(token, { quizId, prompt, choices, correctIndex });
   finish(courseId, ok ? "question" : "failed");
+}
+
+async function validTopicSection(token: string, courseId: string, sectionId: string) {
+  const sections = await getModuleSections(token, courseId);
+  return sections?.some((section) => section.id === sectionId) === true;
+}
+
+export async function createSectionAction(form: FormData): Promise<void> {
+  const { token, courseId } = await authoringCourse(form);
+  const ok = await createModuleSection(token, courseId, {
+    title: inputText(form, "title"),
+    order: Number(inputText(form, "sortOrder")),
+  });
+  finish(courseId, ok ? "section" : "failed");
+}
+
+export async function moveTopicAction(form: FormData): Promise<void> {
+  const { token, courseId, topicId } = await authoringTopic(form);
+  const sectionId = inputText(form, "sectionId");
+  if (!(await validTopicSection(token, courseId, sectionId))) {
+    failed(courseId);
+  }
+  const ok = await moveModuleTopic(token, courseId, {
+    topicId,
+    sectionId,
+    order: Number(inputText(form, "sortOrder")),
+  });
+  finish(courseId, ok ? "moved" : "failed");
 }
