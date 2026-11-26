@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
+import { RisaDomainModules } from "@/components/risa-domain-modules";
 import { RisaProgrammeCards } from "@/components/risa-programme-cards";
 import { getPublicRisaCourses } from "@/lib/risa-course-admin";
 import { getRisaProgrammes } from "@/lib/risa-programmes";
@@ -127,6 +128,8 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      <RisaDomainModules programmes={courses} modules={modules} />
 
       <section
         aria-labelledby="next-heading"
