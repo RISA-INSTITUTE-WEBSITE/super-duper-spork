@@ -61,8 +61,8 @@ function PhysicsLab() {
       <section className={panel}>
         <h2 className="text-2xl font-bold">Motion on a straight track</h2>
         <p className="mt-3 leading-7 text-slate-600">
-          Predict where the cart will be, then adjust its initial speed, acceleration
-          and elapsed time. The track represents 600 metres.
+          Predict where the cart will be, then adjust its initial speed, acceleration and
+          elapsed time. The track represents 600 metres.
         </p>
         <Control label="Initial speed (m/s)" value={speed} max={10} onChange={setSpeed} />
         <Control
@@ -128,8 +128,8 @@ function DevOpsLab() {
     <section className={panel}>
       <h2 className="text-2xl font-bold">Build, test and deploy</h2>
       <p className="mt-3 leading-7 text-slate-600">
-        Configure simulated outcomes and run the pipeline. A failed build or test
-        prevents a deployment. No real infrastructure or code is executed.
+        Configure simulated outcomes and run the pipeline. A failed build or test prevents
+        a deployment. No real infrastructure or code is executed.
       </p>
       <div className="mt-5 grid gap-3">
         <label className="flex items-center gap-3 rounded-xl bg-slate-50 p-4">
@@ -163,11 +163,13 @@ function DevOpsLab() {
         Run pipeline
       </button>
       <ol aria-live="polite" className="mt-6 grid gap-3 sm:grid-cols-3">
-        {(results ?? [
-          { stage: "Build", status: "ready" },
-          { stage: "Test", status: "ready" },
-          { stage: "Deploy", status: "ready" },
-        ]).map((item) => (
+        {(
+          results ?? [
+            { stage: "Build", status: "ready" },
+            { stage: "Test", status: "ready" },
+            { stage: "Deploy", status: "ready" },
+          ]
+        ).map((item) => (
           <li key={item.stage} className="rounded-xl border border-slate-200 p-4">
             <h3 className="font-bold">{item.stage}</h3>
             <p className="mt-2 capitalize text-slate-700">{item.status}</p>
@@ -175,8 +177,8 @@ function DevOpsLab() {
         ))}
       </ol>
       <p className="mt-5 text-sm text-slate-600">
-        Challenge: make the build succeed but the tests fail. Explain why deployment
-        is blocked.
+        Challenge: make the build succeed but the tests fail. Explain why deployment is
+        blocked.
       </p>
     </section>
   );
