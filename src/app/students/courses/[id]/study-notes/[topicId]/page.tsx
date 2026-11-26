@@ -24,18 +24,7 @@ export default async function StudyNotesPage({
   if (!uuidPattern.test(id) || !uuidPattern.test(topicId)) {
     notFound();
   }
-  const token = (await cookies()).get(studentCookieNames.access)?.value;
-  if (!token) {
-    redirect("/students/login");
-  }
-  const identity = await getStudentIdentity(token);
-  if (!identity) {
-    redirect("/students/login");
-  }
-  const enrolled = await getEnrolledCourses(token, identity.id);
-  if (!enrolled?.some((course) => course.id === id)) {
-    notFound();
-  }
+  const { token, identity } = await requireEnrolledLearner(id);
   const [curriculum, notes] = await Promise.all([
     getCourseCurriculum(token, id),
     getTopicStudyNotes(token, topicId),
@@ -72,4 +61,20 @@ export default async function StudyNotesPage({
       </div>
     </main>
   );
+}
+
+async function requireEnrolledLearner(id: string) {
+  const token = (await cookies()).get(studentCookieNames.access)?.value;
+  if (!token) {
+    redirect("/students/login");
+  }
+  const identity = await getStudentIdentity(token);
+  if (!identity) {
+    redirect("/students/login");
+  }
+  const enrolled = await getEnrolledCourses(token, identity.id);
+  if (!enrolled?.some((course) => course.id === id)) {
+    notFound();
+  }
+  return { token, identity };
 }
