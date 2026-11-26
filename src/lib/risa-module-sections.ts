@@ -144,7 +144,6 @@ export async function moveModuleTopic(
   return topicUpdateSucceeded(response);
 }
 
-
 async function topicUpdateSucceeded(response: Response): Promise<boolean> {
   try {
     const rows: unknown = await response.json();
