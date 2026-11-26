@@ -39,24 +39,7 @@ jobs:
 
       # QA-REPRO-01: npm ci rejects drift from the committed package-lock.json.
       - name: Install dependencies
-        run: |
-          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-          node --input-type=module -e '
-            import { readFileSync } from "node:fs";
-            import { execFileSync } from "node:child_process";
-            const before = JSON.parse(execFileSync("git", ["show", "HEAD:package-lock.json"], { encoding: "utf8" }));
-            const after = JSON.parse(readFileSync("package-lock.json", "utf8"));
-            for (const [key, value] of Object.entries(after.packages)) {
-              if (JSON.stringify(value) !== JSON.stringify(before.packages[key])) {
-                console.log("LOCK_ENTRY " + JSON.stringify([key, value]));
-              }
-            }
-            for (const key of Object.keys(before.packages)) {
-              if (!(key in after.packages)) console.log("LOCK_DELETE " + JSON.stringify(key));
-            }
-            console.log("LOCK_COMPLETE " + Object.keys(after.packages).length);
-          '
-          exit 1
+        run: npm ci --no-audit --no-fund
 
       # Phase 1 - fastest, read-only static checks.
       # QA-STATIC-01: fail if Prettier would change a tracked source/config file.
