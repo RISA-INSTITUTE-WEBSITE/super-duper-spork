@@ -15,6 +15,7 @@ import {
 } from "@/lib/risa-module-sections";
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
 import { getLearnerLessonCompletions } from "@/lib/risa-lesson-progress";
+import { getTopicsWithStudyNotes } from "@/lib/risa-study-notes";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -59,10 +60,12 @@ function EnrolledTopics({
   curriculum,
   course,
   completedVideoIds,
+  studyNoteTopicIds,
 }: {
   curriculum: CourseCurriculum | null;
   course: RisaCourse;
   completedVideoIds: string[] | null;
+  studyNoteTopicIds: string[];
 }) {
   if (!curriculum) {
     return (
@@ -93,6 +96,7 @@ function EnrolledTopics({
       courseId={course.id}
       courseName={course.title}
       initialCompletedVideoIds={completedVideoIds}
+      studyNoteTopicIds={studyNoteTopicIds}
       courseBanner={<CourseBanner course={course} isEnrolled />}
     />
   );
@@ -128,11 +132,18 @@ async function CourseAccess({
           curriculum.videos.map((video) => video.id),
         )
       : null;
+    const studyNoteTopicIds = curriculum
+      ? await getTopicsWithStudyNotes(
+          token,
+          curriculum.topics.map((topic) => topic.id),
+        )
+      : [];
     return (
       <EnrolledTopics
         curriculum={curriculum}
         course={course}
         completedVideoIds={completedVideoIds}
+        studyNoteTopicIds={studyNoteTopicIds}
       />
     );
   }

@@ -214,6 +214,7 @@ export function TopicDetails({
   progressError,
   onSelectVideo,
   onToggleComplete,
+  studyNotesHref,
 }: {
   topic: CourseTopic;
   curriculum: CourseCurriculum;
@@ -223,6 +224,7 @@ export function TopicDetails({
   progressError: string | null;
   onSelectVideo: (videoId: string) => void;
   onToggleComplete: (videoId: string, complete: boolean) => void;
+  studyNotesHref?: string;
 }) {
   const videos = topicVideos(curriculum, topic.id);
   const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
@@ -276,6 +278,15 @@ export function TopicDetails({
         quizCount={quizzes.length}
         completedCount={completedCount}
       />
+
+      {studyNotesHref && (
+        <Link
+          href={studyNotesHref}
+          className="inline-flex rounded-xl border border-[#DCE9F6] bg-white px-5 py-3 font-bold text-[#286518] shadow-sm hover:bg-[#eefce5]"
+        >
+          Study notes →
+        </Link>
+      )}
 
       <TopicPracticalActivity slug={topic.practical_lab_slug} />
       <section aria-labelledby="risa-topic-playlist-heading" className="space-y-4">
@@ -341,18 +352,26 @@ export function TopicDetails({
   );
 }
 
+function studyNotesLink(courseId: string, topicId: string, availableIds: string[]) {
+  return availableIds.includes(topicId)
+    ? "/students/courses/" + courseId + "/study-notes/" + topicId
+    : undefined;
+}
+
 export function StudentCourseContent({
   curriculum,
   courseId,
   courseName,
   courseBanner,
   initialCompletedVideoIds,
+  studyNoteTopicIds = [],
 }: {
   curriculum: CourseCurriculum;
   courseId: string;
   courseName: string;
   courseBanner: ReactNode;
   initialCompletedVideoIds: string[] | null;
+  studyNoteTopicIds?: string[];
 }) {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
@@ -475,6 +494,7 @@ export function StudentCourseContent({
             progressError={progressError}
             onSelectVideo={selectVideo}
             onToggleComplete={toggleCompleted}
+            studyNotesHref={studyNotesLink(courseId, selectedTopic.id, studyNoteTopicIds)}
           />
         ) : (
           <>
