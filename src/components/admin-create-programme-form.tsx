@@ -2,10 +2,12 @@
 
 import { useActionState } from "react";
 
-import { createProgrammeAction, type CourseCreationState } from "@/app/admin/courses/actions";
+import {
+  createProgrammeAction,
+  type CourseCreationState,
+} from "@/app/admin/courses/actions";
 
-const field =
-  "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm";
+const field = "mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm";
 
 export function AdminCreateProgrammeForm() {
   const initialState: CourseCreationState = {
