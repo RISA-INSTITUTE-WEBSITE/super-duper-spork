@@ -164,9 +164,9 @@ describe("RISA institutional course codes", () => {
 
   it("preserves a new module's selected parent course", async () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
-    const module = { ...example, programme_slug: "cloud-devops" };
-    expect(await createRisaCourse("admin-token", module)).toBe("created");
-    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body))).toEqual(module);
+    const newModule = { ...example, programme_slug: "cloud-devops" };
+    expect(await createRisaCourse("admin-token", newModule)).toBe("created");
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body))).toEqual(newModule);
   });
 
   it("reports unique-code conflicts clearly", async () => {
