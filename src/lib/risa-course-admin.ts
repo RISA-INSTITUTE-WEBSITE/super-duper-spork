@@ -165,7 +165,9 @@ function parseRisaCourse(entry: unknown): RisaCourse | null {
     is_published: row.is_published as boolean,
     created_at: row.created_at as string,
     thumbnail_path: thumbnail,
-    ...(typeof row.programme_slug === "string" ? { programme_slug: row.programme_slug } : {}),
+    ...(typeof row.programme_slug === "string"
+      ? { programme_slug: row.programme_slug }
+      : {}),
   };
 }
 
