@@ -23,7 +23,12 @@ function parseSection(value: unknown): ModuleSection | null {
   ) {
     return null;
   }
-  return { id: row.id, course_id: row.course_id, title: row.title, sort_order: row.sort_order };
+  return {
+    id: row.id,
+    course_id: row.course_id,
+    title: row.title,
+    sort_order: row.sort_order,
+  };
 }
 
 export async function getModuleSections(
@@ -36,7 +41,8 @@ export async function getModuleSections(
   const response = await requestStudentBackend(
     token,
     "/rest/v1/risa_module_sections?select=id,course_id,title,sort_order&course_id=eq." +
-      courseId + "&order=sort_order.asc,created_at.asc&limit=100",
+      courseId +
+      "&order=sort_order.asc,created_at.asc&limit=100",
   );
   if (!response?.ok) {
     return null;
@@ -85,8 +91,12 @@ export async function createModuleSection(
   input: { title: string; order: number },
 ): Promise<boolean> {
   const title = input.title.trim();
-  if (!uuidPattern.test(courseId) || title.length < 2 || title.length > 140 ||
-      !validSectionOrder(input.order)) {
+  if (
+    !uuidPattern.test(courseId) ||
+    title.length < 2 ||
+    title.length > 140 ||
+    !validSectionOrder(input.order)
+  ) {
     return false;
   }
   const response = await requestStudentBackend(token, "/rest/v1/risa_module_sections", {
@@ -106,8 +116,11 @@ export async function moveModuleTopic(
   courseId: string,
   input: { topicId: string; sectionId: string; order: number; labSlug?: string },
 ): Promise<boolean> {
-  if (![courseId, input.topicId, input.sectionId].every((id) => uuidPattern.test(id)) ||
-      !validSectionOrder(input.order) || !validPracticalLab(input.labSlug ?? "")) {
+  if (
+    ![courseId, input.topicId, input.sectionId].every((id) => uuidPattern.test(id)) ||
+    !validSectionOrder(input.order) ||
+    !validPracticalLab(input.labSlug ?? "")
+  ) {
     return false;
   }
   const response = await requestStudentBackend(
@@ -119,13 +132,20 @@ export async function moveModuleTopic(
       body: JSON.stringify({
         section_id: input.sectionId,
         sort_order: input.order,
-        ...(input.labSlug !== undefined ? { practical_lab_slug: input.labSlug || null } : {}),
+        ...(input.labSlug !== undefined
+          ? { practical_lab_slug: input.labSlug || null }
+          : {}),
       }),
     },
   );
   if (!response?.ok) {
     return false;
   }
+  return topicUpdateSucceeded(response);
+}
+
+
+async function topicUpdateSucceeded(response: Response): Promise<boolean> {
   try {
     const rows: unknown = await response.json();
     return Array.isArray(rows) && rows.length === 1;
