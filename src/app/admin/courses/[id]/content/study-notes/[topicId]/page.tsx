@@ -11,7 +11,10 @@ import { getStudentIdentity } from "@/lib/student-auth-api";
 import { studentCookieNames } from "@/lib/student-session";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Study Notes Studio | RISA", robots: { index: false, follow: false } };
+export const metadata = {
+  title: "Study Notes Studio | RISA",
+  robots: { index: false, follow: false },
+};
 
 export default async function StudyNotesStudioPage({
   params,
@@ -40,8 +43,14 @@ export default async function StudyNotesStudioPage({
     notFound();
   }
   return (
-    <main id="main-content" className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 sm:px-8">
-      <Link href={"/admin/courses/" + id + "/content"} className="font-bold text-[#286518] hover:underline">
+    <main
+      id="main-content"
+      className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 sm:px-8"
+    >
+      <Link
+        href={"/admin/courses/" + id + "/content"}
+        className="font-bold text-[#286518] hover:underline"
+      >
         ← Module content
       </Link>
       <RisaStudyNotesStudio
