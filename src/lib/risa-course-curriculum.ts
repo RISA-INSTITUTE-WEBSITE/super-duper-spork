@@ -47,7 +47,10 @@ export type CourseCurriculum = {
 };
 
 /** Public-to-registered preview: no quiz questions or playable player data are rendered. */
-export type CoursePreviewCurriculum = Pick<CourseCurriculum, "topics" | "videos" | "sections">;
+export type CoursePreviewCurriculum = Pick<
+  CourseCurriculum,
+  "topics" | "videos" | "sections"
+>;
 
 type JsonRow = Record<string, unknown>;
 function asRecord(item: unknown): JsonRow | null {
