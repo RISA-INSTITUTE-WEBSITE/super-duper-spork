@@ -134,7 +134,10 @@ async function CourseAccess({
         )
       : null;
     const studyNoteTopicIds = curriculum
-      ? await getTopicsWithStudyNotes(token, curriculum.topics.map((topic) => topic.id))
+      ? await getTopicsWithStudyNotes(
+          token,
+          curriculum.topics.map((topic) => topic.id),
+        )
       : [];
     return (
       <EnrolledTopics
