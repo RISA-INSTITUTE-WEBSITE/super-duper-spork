@@ -327,6 +327,12 @@ function TopicCard({
       {topic.description && (
         <p className="mt-3 text-sm text-slate-600">{topic.description}</p>
       )}
+      <Link
+        href={"/admin/courses/" + courseId + "/content/study-notes/" + topic.id}
+        className="mt-4 inline-flex rounded-xl bg-[#286518] px-5 py-3 text-sm font-bold text-white hover:bg-[#1d4f11]"
+      >
+        Study Notes Studio →
+      </Link>
       {videos.length > 0 && <AdminTopicVideoPreviews videos={videos} />}
       <div className="mt-5 grid gap-4 lg:grid-cols-2">
         <AddVideoForm courseId={courseId} topicId={topic.id} />
