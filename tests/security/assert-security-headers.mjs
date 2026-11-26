@@ -68,6 +68,13 @@ check(
   "Homepage is missing CORP",
 );
 
+const logo = await fetch(base + "/risa-logo.svg");
+check(logo.ok, "RISA logo missing");
+check(
+  logo.headers.get("cross-origin-resource-policy") === "same-origin",
+  "Static logo is missing CORP",
+);
+
 const repeat = await page("/");
 const secondNonce = policyDirectives(repeat.headers.get("content-security-policy") ?? "")
   .get("script-src")
