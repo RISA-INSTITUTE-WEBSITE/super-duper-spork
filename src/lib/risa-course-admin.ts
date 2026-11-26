@@ -25,6 +25,7 @@ export type NewRisaCourse = {
   description: string;
   level: string;
   is_published: boolean;
+  programme_slug?: string;
 };
 
 export type RisaCourse = NewRisaCourse & {
@@ -47,11 +48,16 @@ export function validateNewRisaCourse(input: {
   description: string;
   isPublished: boolean;
   level?: string;
+  programmeSlug?: string;
 }): NewRisaCourse | null {
   const code = input.code.trim().toUpperCase();
   const title = input.title.trim().replace(/\s+/g, " ");
   const description = input.description.trim();
   const level = validateCourseLevel(input.level ?? "1st Year Level");
+  const programme = input.programmeSlug;
+  if (programme !== undefined && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(programme)) {
+    return null;
+  }
 
   if (
     !courseCodePattern.test(code) ||
@@ -70,12 +76,27 @@ export function validateNewRisaCourse(input: {
     description,
     level,
     is_published: input.isPublished,
+    ...(programme ? { programme_slug: programme } : {}),
   };
+}
+
+export type InitialCourseThumbnail = {
+  courseId: string;
+  thumbnailPath: string;
+};
+
+function validInitialThumbnail(thumbnail: InitialCourseThumbnail): boolean {
+  return (
+    courseIdPattern.test(thumbnail.courseId) &&
+    thumbnailPathPattern.test(thumbnail.thumbnailPath) &&
+    thumbnail.thumbnailPath.startsWith(thumbnail.courseId + "/")
+  );
 }
 
 export async function createRisaCourse(
   token: string,
   course: NewRisaCourse,
+  thumbnail?: InitialCourseThumbnail,
 ): Promise<CreateCourseResult> {
   const validated = validateNewRisaCourse({
     code: course.code,
@@ -83,8 +104,9 @@ export async function createRisaCourse(
     description: course.description,
     level: course.level,
     isPublished: course.is_published,
+    programmeSlug: course.programme_slug,
   });
-  if (!validated) {
+  if (!validated || (thumbnail && !validInitialThumbnail(thumbnail))) {
     return "unavailable";
   }
 
@@ -94,7 +116,12 @@ export async function createRisaCourse(
       "Content-Type": "application/json",
       Prefer: "return=minimal",
     },
-    body: JSON.stringify(validated),
+    body: JSON.stringify({
+      ...validated,
+      ...(thumbnail
+        ? { id: thumbnail.courseId, thumbnail_path: thumbnail.thumbnailPath }
+        : {}),
+    }),
   });
   if (response?.status === 409) {
     return "duplicate";
@@ -139,11 +166,14 @@ function parseRisaCourse(entry: unknown): RisaCourse | null {
     is_published: row.is_published as boolean,
     created_at: row.created_at as string,
     thumbnail_path: thumbnail,
+    ...(typeof row.programme_slug === "string"
+      ? { programme_slug: row.programme_slug }
+      : {}),
   };
 }
 
 const courseFields =
-  "id,code,slug,title,description,level,thumbnail_path,is_published,created_at";
+  "id,code,slug,title,description,level,thumbnail_path,is_published,created_at,programme_slug";
 
 async function readCourses(response: Response | null): Promise<RisaCourse[] | null> {
   if (!response?.ok) {

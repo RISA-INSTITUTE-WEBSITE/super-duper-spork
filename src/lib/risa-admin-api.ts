@@ -40,14 +40,16 @@ export async function isRisaAdministrator(
 
 export type RisaAdminOverview = {
   courses: number | null;
+  modules: number | null;
   enrolments: number | null;
   materials: number | null;
 };
 
 async function countAdminRecords(
   token: string,
-  resource: "risa_courses" | "risa_enrollments" | "risa_course_materials",
-  column: "id" | "student_id",
+  resource:
+    "risa_programmes" | "risa_courses" | "risa_enrollments" | "risa_course_materials",
+  column: "id" | "student_id" | "slug",
 ): Promise<number | null> {
   const response = await requestStudentBackend(
     token,
@@ -63,10 +65,11 @@ async function countAdminRecords(
 }
 
 export async function getRisaAdminOverview(token: string): Promise<RisaAdminOverview> {
-  const [courses, enrolments, materials] = await Promise.all([
+  const [courses, modules, enrolments, materials] = await Promise.all([
+    countAdminRecords(token, "risa_programmes", "slug"),
     countAdminRecords(token, "risa_courses", "id"),
     countAdminRecords(token, "risa_enrollments", "student_id"),
     countAdminRecords(token, "risa_course_materials", "id"),
   ]);
-  return { courses, enrolments, materials };
+  return { courses, modules, enrolments, materials };
 }

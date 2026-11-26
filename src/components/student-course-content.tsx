@@ -1,11 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 
+import { setLessonCompletedAction } from "@/app/students/courses/[id]/lesson-progress-actions";
+import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
+import { RisaLessonCompletionControl } from "@/components/risa-lesson-completion-control";
+import { ModuleTopicGroups } from "@/components/risa-module-topic-groups";
 import {
   InlineYouTubePlayer,
   YouTubeLessonThumbnail,
 } from "@/components/risa-video-media";
+import { labDomains } from "@/lib/risa-virtual-labs";
 import { StudentPracticeQuiz } from "@/components/student-practice-quiz";
 import type {
   CourseCurriculum,
@@ -17,226 +23,308 @@ function topicVideos(curriculum: CourseCurriculum, topicId: string): TopicVideo[
   return curriculum.videos.filter((video) => video.topic_id === topicId);
 }
 
-type TopicTileProps = {
-  topic: CourseTopic;
-  order: number;
-  curriculum: CourseCurriculum;
-  onOpen: (topicId: string, videoId?: string) => void;
-};
-
-function TopicTile({ topic, order, curriculum, onOpen }: TopicTileProps) {
-  const videos = topicVideos(curriculum, topic.id);
-  const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
-  const firstVideo = videos[0];
-
-  return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[1.6rem] border border-white/90 bg-[linear-gradient(155deg,rgba(255,255,255,0.94),rgba(230,235,242,0.84))] p-3.5 shadow-[0_12px_28px_rgba(46,61,85,0.09)] transition-transform duration-200 hover:-translate-y-0.5 sm:p-4">
-      <button
-        type="button"
-        onClick={() => onOpen(topic.id)}
-        aria-label={"Open topic " + topic.title}
-        className="flex flex-1 cursor-pointer flex-col rounded-2xl text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
-      >
-        <div className="w-full overflow-hidden rounded-[1.1rem] border-2 border-white bg-[#e8f1ff] shadow-sm">
-          {firstVideo ? (
-            <YouTubeLessonThumbnail
-              key={firstVideo.id}
-              videoId={firstVideo.youtube_id}
-              title={firstVideo.title}
-            />
-          ) : (
-            <div
-              className="flex aspect-video items-center justify-center bg-gradient-to-br from-[#e9f2ff] via-white to-[#e0f2d3] text-5xl text-[#286518]/60"
-              aria-hidden="true"
-            >
-              ◇
-            </div>
-          )}
-        </div>
-        <div className="mt-4 flex w-full items-center justify-between gap-3">
-          <span className="rounded-lg border border-white bg-white/80 px-2.5 py-1 text-xs font-extrabold text-[#286518]">
-            {String(order).padStart(2, "0")}
-          </span>
-          <span className="text-xs font-semibold text-slate-600">
-            {videos.length} {videos.length === 1 ? "lesson" : "lessons"}
-          </span>
-        </div>
-        <h3 className="mt-3 font-heading text-lg font-extrabold text-slate-950 transition-colors group-hover:text-[#286518]">
-          {topic.title}
-        </h3>
-        {topic.description && (
-          <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
-            {topic.description}
-          </p>
-        )}
-        <div className="mt-auto flex w-full items-center justify-between gap-3 border-t border-white/90 pt-4 text-sm">
-          <span className="font-semibold text-slate-600">
-            {quizzes.length} {quizzes.length === 1 ? "quiz" : "quizzes"}
-          </span>
-          <span className="font-bold text-[#286518]">View topic ›</span>
-        </div>
-      </button>
-
-      {videos.length > 0 && (
-        <div className="mt-4 border-t border-white/90 pt-3">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-            Lesson previews
-          </p>
-          <div className="grid grid-cols-3 gap-2">
-            {videos.slice(0, 3).map((video) => (
-              <button
-                key={video.id}
-                type="button"
-                onClick={() => onOpen(topic.id, video.id)}
-                aria-label={"Play " + video.title + " inside RISA"}
-                title={video.title}
-                className="overflow-hidden rounded-xl border border-white bg-white p-1 transition hover:border-[#78eb29] focus-visible:outline-2 focus-visible:outline-[#286518]"
-              >
-                <YouTubeLessonThumbnail videoId={video.youtube_id} title={video.title} />
-              </button>
-            ))}
-          </div>
-          {videos.length > 3 && (
-            <p className="mt-2 text-xs text-slate-500">
-              +{videos.length - 3} more lessons inside this topic
-            </p>
-          )}
-        </div>
-      )}
-    </article>
-  );
+/**
+ * Only accept topic/video query parameters that are present in the learner's
+ * already-authorized curriculum. URL state never grants access to content.
+ */
+export function resolveCourseNavigation(
+  curriculum: CourseCurriculum,
+  search: URLSearchParams,
+): { topicId: string | null; videoId: string | null } {
+  const topic = curriculum.topics.find((item) => item.id === search.get("topic"));
+  const video = topic
+    ? curriculum.videos.find(
+        (item) => item.topic_id === topic.id && item.id === search.get("video"),
+      )
+    : undefined;
+  return { topicId: topic?.id ?? null, videoId: video?.id ?? null };
 }
 
 function LessonSelector({
   video,
-  isActive,
+  order,
   onSelect,
 }: {
   video: TopicVideo;
-  isActive: boolean;
+  order: number;
   onSelect: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-pressed={isActive}
-      className={
-        "flex min-w-0 items-center gap-3 rounded-[1.15rem] border p-2.5 text-left transition focus-visible:outline-2 focus-visible:outline-[#286518] " +
-        (isActive
-          ? "border-[#78eb29] bg-[#eefce5]"
-          : "border-white bg-white/85 hover:border-[#a0d987]")
-      }
+    <div
+      id={"lesson-item-" + video.id}
+      className="edu-topic-lesson-card group flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-[26px] p-4 sm:p-5"
     >
-      <div className="w-24 shrink-0 overflow-hidden rounded-lg sm:w-32">
-        <YouTubeLessonThumbnail videoId={video.youtube_id} title={video.title} />
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-label={"Open lesson " + order + ": " + video.title}
+        className="relative flex flex-1 min-w-0 items-start gap-4 rounded-lg text-left cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#155DFC]"
+      >
+        <div className="relative w-28 sm:w-36 h-18 sm:h-22 rounded-xl bg-slate-950 overflow-hidden shrink-0 border border-slate-200">
+          <YouTubeLessonThumbnail videoId={video.youtube_id} title={video.title} />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+            <span className="w-8 h-8 rounded-full bg-[#155DFC] text-white flex items-center justify-center shadow-md">
+              <svg
+                aria-hidden="true"
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="m10 8 6 4-6 4V8Z" />
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="rounded-full border border-[#DCE9F6] bg-[#EAF1FF] px-2.5 py-1 font-heading text-[11px] font-bold uppercase tracking-[0.075em] text-[#5274C3]">
+              Lesson {order}
+            </span>
+          </div>
+          <h3 className="font-heading text-[17px] font-extrabold leading-[1.28] tracking-[-0.025em] text-[#0A0F1D] transition-colors group-hover:text-[#2814D1] sm:text-[19px]">
+            {video.title}
+          </h3>
+        </div>
+      </button>
+      <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#DCE9F6] bg-white/70 text-[#2814D1]">
+          <svg
+            aria-hidden="true"
+            className="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m9 5 7 7-7 7" />
+          </svg>
+        </span>
       </div>
-      <span className="min-w-0">
-        <span className="block text-xs font-bold text-slate-900 sm:text-sm">
-          {video.title}
-        </span>
-        <span className="mt-1 block text-xs font-semibold text-[#286518]">
-          {isActive ? "Now playing" : "Play on RISA"}
-        </span>
-      </span>
-    </button>
+    </div>
   );
 }
 
-type TopicDetailsProps = {
+function TopicBanner({
+  topic,
+  lessonCount,
+  quizCount,
+  completedCount,
+}: {
   topic: CourseTopic;
-  curriculum: CourseCurriculum;
-  selectedVideoId: string | null;
-  onSelectVideo: (videoId: string) => void;
-  onBack: () => void;
-};
+  lessonCount: number;
+  quizCount: number;
+  completedCount: number | null;
+}) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-[26px] p-6 sm:p-8 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6"
+      style={{ backgroundColor: "#5274C3" }}
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(125deg,rgba(255,255,255,0.13),transparent_56%,rgba(0,0,0,0.12))]"
+      />
+      <div className="relative z-10 flex min-w-0 items-start sm:items-center gap-4">
+        <div className="w-16 h-16 shrink-0 rounded-2xl border border-white/20 backdrop-blur-md flex items-center justify-center bg-white/15 text-white">
+          <svg
+            aria-hidden="true"
+            className="w-8 h-8 text-white"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 7v14M3 18V5a2 2 0 0 1 2-2h3a4 4 0 0 1 4 4 4 4 0 0 1 4-4h3a2 2 0 0 1 2 2v13a1 1 0 0 1-1 1h-5a4 4 0 0 0-4 4 4 4 0 0 0-4-4H4a1 1 0 0 1-1-1Z" />
+          </svg>
+        </div>
+        <div className="min-w-0">
+          <span className="inline-flex rounded-full bg-black/20 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-white/90">
+            RISA · Course Topic
+          </span>
+          <h2 className="mt-2 text-2xl sm:text-3xl font-black text-white">
+            {topic.title}
+          </h2>
+          <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-white/85">
+            {topic.description || "Explore the lesson playlist for this topic."}
+          </p>
+        </div>
+      </div>
+      <div className="relative z-10 flex flex-wrap items-center gap-2.5 md:justify-end">
+        <div className="shrink-0 rounded-2xl border border-white/20 bg-black/20 px-4 py-2.5 text-center backdrop-blur-md">
+          <p className="text-2xl font-black text-white">{lessonCount}</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-white/85">
+            Video Lessons
+          </p>
+        </div>
+        {completedCount !== null && (
+          <div className="shrink-0 rounded-2xl border border-white/20 bg-black/20 px-4 py-2.5 text-center backdrop-blur-md">
+            <p className="text-2xl font-black text-white">{completedCount}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-white/85">
+              Completed
+            </p>
+          </div>
+        )}
+        {quizCount > 0 && (
+          <div className="shrink-0 rounded-2xl border border-white/20 bg-black/20 px-4 py-2.5 text-center backdrop-blur-md">
+            <p className="text-2xl font-black text-white">{quizCount}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-white/85">
+              Practice Quizzes
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-function TopicDetails({
+function TopicPracticalActivity({ slug }: { slug?: string }) {
+  const lab = labDomains.find((item) => item.slug === slug);
+  if (!lab) {
+    return null;
+  }
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <h3 className="text-xl font-bold">Practical activity</h3>
+      <p className="mt-2 text-sm text-slate-600">{lab.description}</p>
+      <Link
+        href={lab.href}
+        className="mt-4 inline-flex rounded-xl bg-[#286518] px-4 py-3 font-bold text-white"
+      >
+        Open {lab.title} →
+      </Link>
+    </section>
+  );
+}
+
+export function TopicDetails({
   topic,
   curriculum,
   selectedVideoId,
+  completedVideoIds,
+  savingProgress,
+  progressError,
   onSelectVideo,
-  onBack,
-}: TopicDetailsProps) {
+  onToggleComplete,
+}: {
+  topic: CourseTopic;
+  curriculum: CourseCurriculum;
+  selectedVideoId: string | null;
+  completedVideoIds: string[] | null;
+  savingProgress: boolean;
+  progressError: string | null;
+  onSelectVideo: (videoId: string) => void;
+  onToggleComplete: (videoId: string, complete: boolean) => void;
+}) {
   const videos = topicVideos(curriculum, topic.id);
   const quizzes = curriculum.quizzes.filter((quiz) => quiz.topic_id === topic.id);
-  const currentVideo = videos.find((video) => video.id === selectedVideoId) ?? videos[0];
+  const currentVideo = videos.find((video) => video.id === selectedVideoId);
+  const completedCount =
+    completedVideoIds === null
+      ? null
+      : videos.filter((video) => completedVideoIds.includes(video.id)).length;
+
+  // A selected lesson is its own focused view: the breadcrumb above provides
+  // navigation back to the topic playlist and course catalogue.
+  if (currentVideo) {
+    return (
+      <section
+        id="risa-topic-player"
+        aria-labelledby="playing-heading"
+        className="scroll-mt-24 space-y-4"
+      >
+        <h2
+          id="playing-heading"
+          className="font-heading text-xl font-extrabold text-[#0a2035] sm:text-2xl"
+        >
+          {currentVideo.title}
+        </h2>
+        <InlineYouTubePlayer
+          videoId={currentVideo.youtube_id}
+          title={currentVideo.title}
+        />
+        <RisaLessonCompletionControl
+          completed={completedVideoIds?.includes(currentVideo.id) ?? false}
+          completedCount={completedCount}
+          totalCount={videos.length}
+          saving={savingProgress}
+          error={progressError}
+          onToggle={() =>
+            onToggleComplete(
+              currentVideo.id,
+              !completedVideoIds?.includes(currentVideo.id),
+            )
+          }
+        />
+      </section>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex min-h-11 items-center text-sm font-bold text-[#286518] hover:underline focus-visible:outline-2 focus-visible:outline-[#286518]"
-      >
-        ← All course topics
-      </button>
-      <header className="risa-glass-card rounded-[1.5rem] p-6 sm:p-8">
-        <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#286518]">
-          Course topic
-        </p>
-        <h2 className="mt-2 font-heading text-2xl font-bold text-slate-950 sm:text-3xl">
-          {topic.title}
-        </h2>
-        {topic.description && (
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            {topic.description}
-          </p>
-        )}
-      </header>
-      {currentVideo ? (
-        <section
-          aria-labelledby="playing-heading"
-          className="risa-science-glass rounded-[1.6rem] p-4 sm:p-7"
-        >
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#286518]">
-            Now playing on RISA
-          </p>
-          <h3
-            id="playing-heading"
-            className="mb-4 mt-2 font-heading text-xl font-bold text-slate-950"
+      <TopicBanner
+        topic={topic}
+        lessonCount={videos.length}
+        quizCount={quizzes.length}
+        completedCount={completedCount}
+      />
+
+      <TopicPracticalActivity slug={topic.practical_lab_slug} />
+      <section aria-labelledby="risa-topic-playlist-heading" className="space-y-4">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="flex size-10 items-center justify-center rounded-xl bg-[#eaf1ff] text-[#286518]"
           >
-            {currentVideo.title}
+            <svg
+              className="size-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="m10 8 6 4-6 4V8Z" />
+            </svg>
+          </span>
+          <h3
+            id="risa-topic-playlist-heading"
+            className="flex items-center gap-2 font-heading text-xl font-extrabold leading-snug tracking-[-0.02em] text-[#0A0F1D] sm:text-2xl"
+          >
+            Lesson Video Playlist ({videos.length})
           </h3>
-          <InlineYouTubePlayer
-            videoId={currentVideo.youtube_id}
-            title={currentVideo.title}
-          />
-          <p className="mt-3 text-xs text-slate-600">
-            This lesson plays here using YouTube&apos;s embedded player and controls.
-          </p>
-        </section>
-      ) : (
-        <div className="risa-science-glass rounded-[1.5rem] p-6 text-sm text-slate-600">
-          Video lessons for this topic have not been published yet.
         </div>
-      )}
-      {videos.length > 0 && (
-        <section
-          aria-label="Videos in this topic"
-          className="risa-glass-card rounded-[1.5rem] p-5 sm:p-7"
-        >
-          <h3 className="font-heading text-xl font-bold text-slate-950">Video lessons</h3>
-          <p className="mt-2 text-sm text-slate-600">
-            Choose a thumbnail to switch lessons without leaving this page.
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {videos.map((video) => (
+        {videos.length === 0 ? (
+          <div className="rounded-[24px] border border-[#e0e7ef] bg-white p-8 text-center text-sm text-slate-600">
+            Video lessons for this topic have not been published yet.
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {videos.map((video, index) => (
               <LessonSelector
                 key={video.id}
                 video={video}
-                isActive={currentVideo?.id === video.id}
+                order={index + 1}
                 onSelect={() => onSelectVideo(video.id)}
               />
             ))}
           </div>
-        </section>
-      )}
+        )}
+      </section>
+
       {quizzes.length > 0 && (
         <section aria-labelledby="topic-quiz-heading" className="space-y-5">
           <h3
             id="topic-quiz-heading"
-            className="font-heading text-xl font-bold text-slate-950"
+            className="font-heading text-xl font-extrabold text-[#0a2035] sm:text-2xl"
           >
             Practice quizzes
           </h3>
@@ -253,60 +341,157 @@ function TopicDetails({
   );
 }
 
-export function StudentCourseContent({ curriculum }: { curriculum: CourseCurriculum }) {
+export function StudentCourseContent({
+  curriculum,
+  courseId,
+  courseName,
+  courseBanner,
+  initialCompletedVideoIds,
+}: {
+  curriculum: CourseCurriculum;
+  courseId: string;
+  courseName: string;
+  courseBanner: ReactNode;
+  initialCompletedVideoIds: string[] | null;
+}) {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const [completedVideoIds, setCompletedVideoIds] = useState<string[] | null>(
+    initialCompletedVideoIds,
+  );
+  const [progressError, setProgressError] = useState<string | null>(null);
+  const [savingProgress, startProgressSave] = useTransition();
   const selectedTopic = curriculum.topics.find((topic) => topic.id === selectedTopicId);
+  const currentVideo = selectedTopic
+    ? topicVideos(curriculum, selectedTopic.id).find(
+        (video) => video.id === selectedVideoId,
+      )
+    : undefined;
 
-  const showTopic = (topicId: string, videoId?: string) => {
+  // Match Edu-ca-te's browser-history navigation while validating IDs against
+  // the approved course curriculum returned by RISA's server.
+  useEffect(() => {
+    const syncFromUrl = () => {
+      const navigation = resolveCourseNavigation(
+        curriculum,
+        new URLSearchParams(window.location.search),
+      );
+      setSelectedTopicId(navigation.topicId);
+      setSelectedVideoId(navigation.videoId);
+    };
+    syncFromUrl();
+    window.addEventListener("popstate", syncFromUrl);
+    return () => window.removeEventListener("popstate", syncFromUrl);
+  }, [curriculum]);
+
+  const navigateTo = (topicId: string | null, videoId: string | null) => {
+    const url = new URL(window.location.href);
+    if (topicId) {
+      url.searchParams.set("topic", topicId);
+    } else {
+      url.searchParams.delete("topic");
+    }
+    if (topicId && videoId) {
+      url.searchParams.set("video", videoId);
+    } else {
+      url.searchParams.delete("video");
+    }
+    window.history.pushState(null, "", url.pathname + url.search + url.hash);
     setSelectedTopicId(topicId);
-    setSelectedVideoId(videoId ?? topicVideos(curriculum, topicId)[0]?.id ?? null);
+    setSelectedVideoId(videoId);
+  };
+
+  const showTopic = (topicId: string) => {
+    navigateTo(topicId, null);
     document.getElementById("course-topic-content")?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
   };
 
+  const selectVideo = (videoId: string) => {
+    if (!selectedTopicId) {
+      return;
+    }
+    navigateTo(selectedTopicId, videoId);
+    requestAnimationFrame(() => {
+      document.getElementById("risa-topic-player")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  };
+
+  const showAllTopics = () => {
+    navigateTo(null, null);
+  };
+
+  const toggleCompleted = (videoId: string, completed: boolean) => {
+    if (savingProgress || completedVideoIds === null) {
+      return;
+    }
+    setProgressError(null);
+    startProgressSave(async () => {
+      try {
+        const result = await setLessonCompletedAction(courseId, videoId, completed);
+        if (result.status === "success") {
+          setCompletedVideoIds(result.completedVideoIds);
+        } else {
+          setProgressError(result.message);
+        }
+      } catch {
+        setProgressError("Unable to save lesson progress. Please try again.");
+      }
+    });
+  };
+
   return (
-    <section id="course-topic-content" className="mt-9 scroll-mt-24">
-      {selectedTopic ? (
-        <TopicDetails
-          topic={selectedTopic}
-          curriculum={curriculum}
-          selectedVideoId={selectedVideoId}
-          onSelectVideo={setSelectedVideoId}
-          onBack={() => {
-            setSelectedTopicId(null);
-            setSelectedVideoId(null);
-          }}
-        />
-      ) : (
-        <>
-          <div className="mb-5">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#286518]">
-              Curriculum topics
-            </p>
-            <h2 className="mt-2 font-heading text-2xl font-bold text-slate-950 sm:text-3xl">
-              Choose a topic
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Each topic shows the thumbnail of its first published video, with lesson
-              previews below.
-            </p>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {curriculum.topics.map((topic, index) => (
-              <TopicTile
-                key={topic.id}
-                topic={topic}
-                order={index + 1}
-                curriculum={curriculum}
-                onOpen={showTopic}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </section>
+    <>
+      <RisaCourseBreadcrumb
+        items={[
+          { label: courseName, onClick: selectedTopic ? showAllTopics : undefined },
+          ...(selectedTopic
+            ? [
+                {
+                  label: selectedTopic.title,
+                  onClick: currentVideo
+                    ? () => navigateTo(selectedTopic.id, null)
+                    : undefined,
+                },
+              ]
+            : []),
+          ...(currentVideo ? [{ label: currentVideo.title }] : []),
+        ]}
+      />
+      {!selectedTopic && courseBanner}
+      <section id="course-topic-content" className="mt-9 scroll-mt-24">
+        {selectedTopic ? (
+          <TopicDetails
+            topic={selectedTopic}
+            curriculum={curriculum}
+            selectedVideoId={selectedVideoId}
+            completedVideoIds={completedVideoIds}
+            savingProgress={savingProgress}
+            progressError={progressError}
+            onSelectVideo={selectVideo}
+            onToggleComplete={toggleCompleted}
+          />
+        ) : (
+          <>
+            <div className="mb-7">
+              <h2 className="font-heading text-2xl font-extrabold text-[#0a2035] sm:text-3xl">
+                Choose a topic
+              </h2>
+              <p className="mt-2 text-sm font-medium text-[#286518]" role="status">
+                {completedVideoIds === null
+                  ? "Saved progress is temporarily unavailable."
+                  : `${completedVideoIds.length} of ${curriculum.videos.length} lessons completed`}
+              </p>
+            </div>
+            <ModuleTopicGroups curriculum={curriculum} onSelect={showTopic} />
+          </>
+        )}
+      </section>
+    </>
   );
 }

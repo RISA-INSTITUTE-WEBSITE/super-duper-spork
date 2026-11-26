@@ -6,12 +6,8 @@ import {
   requestEnrolmentAction,
   type EnrolmentActionState,
 } from "@/app/students/courses/[id]/actions";
-import { YouTubeLessonThumbnail } from "@/components/risa-video-media";
-import type {
-  CoursePreviewCurriculum,
-  CourseTopic,
-  TopicVideo,
-} from "@/lib/risa-course-curriculum";
+import { ModuleTopicGroups } from "@/components/risa-module-topic-groups";
+import type { CoursePreviewCurriculum } from "@/lib/risa-course-curriculum";
 import type { EnrolmentRequestStatus } from "@/lib/risa-course-enrolment";
 
 const initialState: EnrolmentActionState = { status: "idle", message: "" };
@@ -22,96 +18,6 @@ type CoursePreviewProps = {
   curriculum: CoursePreviewCurriculum;
   requestStatus: EnrolmentRequestStatus | null;
 };
-
-function PreviewTopicTile({
-  topic,
-  order,
-  videos,
-  onOpen,
-}: {
-  topic: CourseTopic;
-  order: number;
-  videos: TopicVideo[];
-  onOpen: (title: string) => void;
-}) {
-  return (
-    <article className="risa-glass-card flex flex-col overflow-hidden rounded-[1.6rem] p-4 sm:p-5">
-      <button
-        type="button"
-        onClick={() => onOpen(topic.title)}
-        aria-label={"Request access to topic " + topic.title}
-        className="group relative w-full overflow-hidden rounded-xl border border-white bg-[#dbeafe] text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#286518]"
-      >
-        <div className="pointer-events-none aspect-video overflow-hidden blur-[9px] brightness-75">
-          {videos.length ? (
-            <YouTubeLessonThumbnail
-              videoId={videos[0].youtube_id}
-              title={videos[0].title}
-            />
-          ) : (
-            <div className="size-full bg-gradient-to-br from-[#155DFC] via-[#dbeafe] to-[#286518]" />
-          )}
-        </div>
-        <span className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/25 text-white">
-          <span aria-hidden="true" className="text-3xl">
-            🔒
-          </span>
-          <span className="rounded-full border border-white/70 bg-black/40 px-4 py-1.5 text-xs font-bold backdrop-blur-sm">
-            Enrol to unlock lessons
-          </span>
-        </span>
-      </button>
-
-      <div className="mt-5 flex items-center justify-between">
-        <span className="rounded-lg bg-[#eefce5] px-3 py-1 text-xs font-bold text-[#286518]">
-          Topic {String(order).padStart(2, "0")}
-        </span>
-        <span className="text-xs font-semibold text-slate-500">
-          {videos.length} {videos.length === 1 ? "video" : "videos"}
-        </span>
-      </div>
-      <h3 className="mt-4 font-heading text-xl font-bold text-slate-950">
-        {topic.title}
-      </h3>
-      {topic.description && (
-        <p className="mt-2 flex-1 text-sm leading-7 text-slate-600">
-          {topic.description}
-        </p>
-      )}
-
-      {videos.length > 0 && (
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          {videos.slice(0, 3).map((video) => (
-            <button
-              key={video.id}
-              type="button"
-              onClick={() => onOpen(video.title)}
-              aria-label={"Request enrolment to view " + video.title}
-              className="group relative overflow-hidden rounded-lg border border-white bg-white p-1 focus-visible:outline-2 focus-visible:outline-[#286518]"
-            >
-              <div className="pointer-events-none blur-[6px] brightness-75">
-                <YouTubeLessonThumbnail videoId={video.youtube_id} title={video.title} />
-              </div>
-              <span
-                className="absolute inset-0 flex items-center justify-center text-lg text-white drop-shadow"
-                aria-hidden="true"
-              >
-                🔒
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={() => onOpen(topic.title)}
-        className="mt-5 min-h-11 rounded-xl border border-[#286518]/20 bg-[#eefce5] px-4 py-2 text-sm font-bold text-[#286518] transition hover:bg-white focus-visible:outline-2 focus-visible:outline-[#286518]"
-      >
-        View topic · Enrol first
-      </button>
-    </article>
-  );
-}
 
 function PromptStatus({
   state,
@@ -295,23 +201,11 @@ export function LockedCoursePreview({
       >
         {requestStatus === "pending" ? "View enrolment request" : "Request enrolment"}
       </button>
-      {curriculum.topics.length === 0 ? (
-        <p className="risa-glass-card mt-7 rounded-2xl p-7 text-sm text-slate-600">
-          RISA has not published any topics for this course yet.
-        </p>
-      ) : (
-        <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {curriculum.topics.map((topic, index) => (
-            <PreviewTopicTile
-              key={topic.id}
-              topic={topic}
-              order={index + 1}
-              videos={curriculum.videos.filter((video) => video.topic_id === topic.id)}
-              onOpen={openPrompt}
-            />
-          ))}
-        </div>
-      )}
+      <ModuleTopicGroups
+        curriculum={curriculum}
+        locked
+        onSelect={(_id, title) => openPrompt(title)}
+      />
       {selectedTitle && (
         <EnrolmentPrompt
           courseId={courseId}

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { signInStudent } from "@/app/students/actions";
 import { isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { studentCsrfCookieName } from "@/lib/student-csrf";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,7 @@ export default async function StudentLoginPage({
 }) {
   const { error, status } = await searchParams;
   const enabled = isStudentAuthConfigured();
+  const csrfToken = (await cookies()).get(studentCsrfCookieName)?.value ?? "";
 
   return (
     <main
@@ -59,11 +62,13 @@ export default async function StudentLoginPage({
             >
               {error === "setup"
                 ? "Student sign-in is not active yet."
-                : error === "verify"
-                  ? "Please verify your email address before signing in."
-                  : error === "confirmation"
-                    ? "We could not confirm your email. Please request a new confirmation email through the RISA team."
-                    : "Unable to sign in. Check your credentials and try again."}
+                : error === "csrf"
+                  ? "This form has expired. Reload the page and try again."
+                  : error === "verify"
+                    ? "Please verify your email address before signing in."
+                    : error === "confirmation"
+                      ? "We could not confirm your email. Please request a new confirmation email through the RISA team."
+                      : "Unable to sign in. Check your credentials and try again."}
             </p>
           )}
           {status === "signed-out" && (
@@ -75,7 +80,12 @@ export default async function StudentLoginPage({
             </p>
           )}
 
-          <form action={signInStudent} className="mt-8 space-y-5">
+          <form
+            id="risa-student-login-form"
+            action={signInStudent}
+            className="mt-8 space-y-5"
+          >
+            <input type="hidden" name="csrf_token" value={csrfToken} />
             <fieldset disabled={!enabled} className="space-y-5">
               <div>
                 <label

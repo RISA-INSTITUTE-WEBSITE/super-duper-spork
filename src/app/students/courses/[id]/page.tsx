@@ -1,26 +1,34 @@
 import type { Metadata } from "next";
+import { Lexend } from "next/font/google";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { LockedCoursePreview } from "@/components/locked-course-preview";
+import { RisaCourseBreadcrumb } from "@/components/risa-course-breadcrumb";
 import { StudentCourseContent } from "@/components/student-course-content";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { getRisaCourseById, type RisaCourse } from "@/lib/risa-course-admin";
+import { uuidPattern, type CourseCurriculum } from "@/lib/risa-course-curriculum";
 import {
-  getCourseCurriculum,
-  getCoursePreviewCurriculum,
-  uuidPattern,
-  type CourseCurriculum,
-} from "@/lib/risa-course-curriculum";
+  getStructuredCurriculum,
+  getStructuredPreview,
+} from "@/lib/risa-module-sections";
 import { getCourseEnrolmentRequest } from "@/lib/risa-course-enrolment";
+import { getLearnerLessonCompletions } from "@/lib/risa-lesson-progress";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { studentCookieNames } from "@/lib/student-session";
+
+// Load Lexend only for RISA module headings; keep site-wide typography unchanged.
+const moduleHeadingFont = Lexend({
+  subsets: ["latin"],
+  weight: "700",
+  display: "swap",
+});
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Course preview & lessons | RISA",
+  title: "Module preview & lessons | RISA",
   robots: { index: false, follow: false },
 };
 
@@ -47,68 +55,110 @@ function CourseAlert({ message }: { message: string }) {
   );
 }
 
-function EnrolledTopics({ curriculum }: { curriculum: CourseCurriculum | null }) {
+function EnrolledTopics({
+  curriculum,
+  course,
+  completedVideoIds,
+}: {
+  curriculum: CourseCurriculum | null;
+  course: RisaCourse;
+  completedVideoIds: string[] | null;
+}) {
   if (!curriculum) {
     return (
-      <CourseAlert message="Course content is currently unavailable. Please try again." />
+      <>
+        <CourseIntroduction course={course} isEnrolled />
+        <CourseAlert message="Course content is currently unavailable. Please try again." />
+      </>
     );
   }
-  if (curriculum.topics.length === 0) {
+  if (curriculum.topics.length === 0 && !curriculum.sections?.length) {
     return (
-      <div className="risa-glass-card mt-9 rounded-[1.5rem] p-7">
-        <h2 className="font-heading text-xl font-bold text-slate-950">
-          Lessons are coming soon
-        </h2>
-        <p className="mt-3 text-sm text-slate-600">
-          RISA has not yet published topics for this course.
-        </p>
-      </div>
+      <>
+        <CourseIntroduction course={course} isEnrolled />
+        <div className="risa-glass-card mt-9 rounded-[1.5rem] p-7">
+          <h2 className="font-heading text-xl font-bold text-slate-950">
+            Lessons are coming soon
+          </h2>
+          <p className="mt-3 text-sm text-slate-600">
+            RISA has not yet published topics for this module.
+          </p>
+        </div>
+      </>
     );
   }
-  return <StudentCourseContent curriculum={curriculum} />;
+  return (
+    <StudentCourseContent
+      curriculum={curriculum}
+      courseId={course.id}
+      courseName={course.title}
+      initialCompletedVideoIds={completedVideoIds}
+      courseBanner={<CourseBanner course={course} isEnrolled />}
+    />
+  );
 }
 
 async function CourseAccess({
   token,
-  courseId,
+  course,
   studentId,
-  courseName,
   isEnrolled,
   isVerified,
 }: {
   token: string;
-  courseId: string;
+  course: RisaCourse;
   studentId: string;
-  courseName: string;
   isEnrolled: boolean;
   isVerified: boolean;
 }) {
   if (!isVerified) {
     return (
-      <CourseAlert message="Your enrolment status is temporarily unavailable. Course access cannot be verified." />
+      <>
+        <CourseIntroduction course={course} isEnrolled={isEnrolled} />
+        <CourseAlert message="Your enrolment status is temporarily unavailable. Course access cannot be verified." />
+      </>
     );
   }
   if (isEnrolled) {
-    const curriculum = await getCourseCurriculum(token, courseId);
-    return <EnrolledTopics curriculum={curriculum} />;
+    const curriculum = await getStructuredCurriculum(token, course.id);
+    const completedVideoIds = curriculum
+      ? await getLearnerLessonCompletions(
+          token,
+          studentId,
+          curriculum.videos.map((video) => video.id),
+        )
+      : null;
+    return (
+      <EnrolledTopics
+        curriculum={curriculum}
+        course={course}
+        completedVideoIds={completedVideoIds}
+      />
+    );
   }
 
   const [preview, request] = await Promise.all([
-    getCoursePreviewCurriculum(token, courseId),
-    getCourseEnrolmentRequest(token, courseId, studentId),
+    getStructuredPreview(token, course.id),
+    getCourseEnrolmentRequest(token, course.id, studentId),
   ]);
   if (!preview || request === undefined) {
     return (
-      <CourseAlert message="The course preview is temporarily unavailable. Please try again." />
+      <>
+        <CourseIntroduction course={course} isEnrolled={false} />
+        <CourseAlert message="The course preview is temporarily unavailable. Please try again." />
+      </>
     );
   }
   return (
-    <LockedCoursePreview
-      courseId={courseId}
-      courseName={courseName}
-      curriculum={preview}
-      requestStatus={request?.status ?? null}
-    />
+    <>
+      <CourseIntroduction course={course} isEnrolled={false} />
+      <LockedCoursePreview
+        courseId={course.id}
+        courseName={course.title}
+        curriculum={preview}
+        requestStatus={request?.status ?? null}
+      />
+    </>
   );
 }
 
@@ -120,30 +170,37 @@ function CourseBanner({
   isEnrolled: boolean;
 }) {
   return (
-    <>
-      <Link
-        href={isEnrolled ? "/students/dashboard" : "/programmes"}
-        className="text-sm font-semibold text-[#286518] hover:underline"
+    <header className="mt-5 w-full max-w-4xl rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:px-7 sm:py-6">
+      <h1
+        className={`${moduleHeadingFont.className} text-2xl font-bold leading-snug tracking-tight text-slate-950 sm:text-3xl`}
       >
-        {isEnrolled ? "← Back to My Learning" : "← All available courses"}
-      </Link>
-      <header className="risa-science-glass mt-6 rounded-[2rem] p-7 sm:p-10">
-        <span className="rounded-lg bg-[#eefce5] px-3 py-1 font-mono text-sm font-bold text-[#286518]">
-          {course.code}
-        </span>
-        <h1 className="mt-5 font-heading text-3xl font-bold text-slate-950 sm:text-4xl">
-          {course.title}
-        </h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-          {course.description || "Discover the RISA curriculum."}
-        </p>
-        <p className="mt-4 text-xs font-semibold text-[#286518]">
-          {course.level} ·{" "}
-          {isEnrolled
-            ? "Enrolled learner · Full course access"
-            : "Registered learner · Preview only"}
-        </p>
-      </header>
+        {course.code} - {course.title}
+      </h1>
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        {course.description || "Discover the RISA curriculum."}
+      </p>
+      <p className="mt-3 text-xs font-semibold leading-5 text-[#286518]">
+        {course.level} ·{" "}
+        {isEnrolled
+          ? "Enrolled learner · Full module access"
+          : "Registered learner · Preview only"}
+      </p>
+    </header>
+  );
+}
+
+/** The catalogue and unavailable/locked views show the course-level breadcrumb. */
+function CourseIntroduction({
+  course,
+  isEnrolled,
+}: {
+  course: RisaCourse;
+  isEnrolled: boolean;
+}) {
+  return (
+    <>
+      <RisaCourseBreadcrumb items={[{ label: course.title }]} />
+      <CourseBanner course={course} isEnrolled={isEnrolled} />
     </>
   );
 }
@@ -175,12 +232,10 @@ export default async function StudentCoursePage({
       id="main-content"
       className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 sm:px-8 lg:py-16"
     >
-      <CourseBanner course={course} isEnrolled={isEnrolled} />
       <CourseAccess
         token={token}
-        courseId={id}
+        course={course}
         studentId={identity.id}
-        courseName={course.title}
         isEnrolled={isEnrolled}
         isVerified={enrolled !== null}
       />

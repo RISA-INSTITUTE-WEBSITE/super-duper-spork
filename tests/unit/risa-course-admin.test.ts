@@ -114,12 +114,59 @@ describe("RISA institutional course codes", () => {
     expect(JSON.parse(String(req.body))).toEqual(example);
   });
 
+  it("creates a course with its initial level and thumbnail in one insert", async () => {
+    const courseId = "11111111-1111-4111-8111-111111111111";
+    const thumbnailPath = courseId + "/22222222-2222-4222-8222-222222222222.png";
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
+
+    expect(
+      await createRisaCourse(
+        "admin-jwt",
+        { ...example, level: "2nd Year Level", is_published: true },
+        { courseId, thumbnailPath },
+      ),
+    ).toBe("created");
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body))).toEqual({
+      ...example,
+      level: "2nd Year Level",
+      is_published: true,
+      id: courseId,
+      thumbnail_path: thumbnailPath,
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects mismatched or untrusted thumbnail paths before inserting", async () => {
+    const courseId = "11111111-1111-4111-8111-111111111111";
+    expect(
+      await createRisaCourse("admin-jwt", example, {
+        courseId,
+        thumbnailPath:
+          "22222222-2222-4222-8222-222222222222/33333333-3333-4333-8333-333333333333.png",
+      }),
+    ).toBe("unavailable");
+    expect(
+      await createRisaCourse("admin-jwt", example, {
+        courseId,
+        thumbnailPath: "https://malicious.example/course.png",
+      }),
+    ).toBe("unavailable");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("does not allow callers to override canonical code slugs or add payload fields", async () => {
     fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
     const tampered = { ...example, code: "dve101", slug: "forged", is_admin: true };
     expect(await createRisaCourse("token", tampered)).toBe("created");
     const data = JSON.parse(String(fetchMock.mock.calls[0][1].body));
     expect(data).toEqual(example);
+  });
+
+  it("preserves a new module's selected parent course", async () => {
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 201 }));
+    const newModule = { ...example, programme_slug: "cloud-devops" };
+    expect(await createRisaCourse("admin-token", newModule)).toBe("created");
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body))).toEqual(newModule);
   });
 
   it("reports unique-code conflicts clearly", async () => {

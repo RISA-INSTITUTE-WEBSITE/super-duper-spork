@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { signOutStudent } from "@/app/students/actions";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
+import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import {
   getCourseMaterials,
   getEnrolledCourses,
@@ -37,7 +38,7 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
   if (courses.length === 0) {
     return (
       <p className="risa-science-glass mt-5 rounded-[1.5rem] p-6 text-sm text-slate-600">
-        No enrolled courses yet. Browse courses to get started.
+        No enrolled modules yet. Browse courses to get started.
       </p>
     );
   }
@@ -65,7 +66,7 @@ function EnrolledCoursesContent({ courses }: { courses: EnrolledCourse[] | null 
               href={"/students/courses/" + course.id}
               className="inline-flex min-h-10 items-center text-sm font-bold text-[#286518] hover:underline"
             >
-              Open course{" "}
+              Open module{" "}
               <span aria-hidden="true" className="ml-1">
                 →
               </span>
@@ -182,14 +183,17 @@ export default async function StudentDashboardPage() {
   const { firstName, initials } = learnerGreeting(user.fullName);
 
   // Read enrolments and resources with the learner's JWT and row-level security.
-  const courses = await getEnrolledCourses(accessToken, user.id);
+  const [courses, isAdmin] = await Promise.all([
+    getEnrolledCourses(accessToken, user.id),
+    isRisaAdministrator(accessToken, user.id),
+  ]);
   const materials = courses
     ? await getCourseMaterials(
         accessToken,
         courses.map((course) => course.id),
       )
     : null;
-  const courseCount = countLabel(courses, "course");
+  const courseCount = countLabel(courses, "module");
   const materialCount = countLabel(materials, "file");
 
   return (
@@ -252,6 +256,14 @@ export default async function StudentDashboardPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="inline-flex min-h-11 items-center rounded-full bg-[#286518] px-4 text-sm font-bold text-white transition hover:bg-[#1d4f11]"
+            >
+              Administration Centre
+            </Link>
+          )}
           <Link
             href="/students/profile"
             className="inline-flex min-h-11 items-center rounded-full border border-[#78eb29]/40 bg-white/80 px-4 text-sm font-semibold text-[#286518] transition hover:bg-white"
@@ -275,7 +287,7 @@ export default async function StudentDashboardPage() {
             id="enrolled-heading"
             className="font-heading text-xl font-bold text-slate-950 sm:text-2xl"
           >
-            My courses
+            My modules
           </h2>
           <Link
             href="/programmes"

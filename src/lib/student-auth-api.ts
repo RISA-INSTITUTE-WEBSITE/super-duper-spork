@@ -335,7 +335,10 @@ export async function requestPublicCourseCatalogue(
   path: string,
 ): Promise<Response | null> {
   const config = getAuthConfig();
-  if (!config || !path.startsWith("/rest/v1/risa_courses?")) {
+  const allowed =
+    path.startsWith("/rest/v1/risa_courses?") ||
+    path.startsWith("/rest/v1/risa_programmes?");
+  if (!config || !allowed) {
     return null;
   }
   try {

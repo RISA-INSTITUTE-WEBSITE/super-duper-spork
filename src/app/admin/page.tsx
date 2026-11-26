@@ -85,14 +85,22 @@ export default async function RisaAdminPage() {
               Administrator access verified
             </div>
           </div>
-          <form action={signOutStudent}>
-            <button
-              type="submit"
-              className="min-h-11 rounded-xl border border-white bg-white/85 px-5 py-2 text-sm font-semibold text-[#286518] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#286518]"
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/students/dashboard"
+              className="inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
             >
-              Sign out
-            </button>
-          </form>
+              My Learning
+            </Link>
+            <form action={signOutStudent}>
+              <button
+                type="submit"
+                className="min-h-11 rounded-xl border border-white bg-white/85 px-5 py-2 text-sm font-semibold text-[#286518] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#286518]"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </section>
 
@@ -107,16 +115,21 @@ export default async function RisaAdminPage() {
           Live records from RISA&apos;s course system. A dash indicates that the backend
           count is unavailable, not that there are zero records.
         </p>
-        <div className="mt-6 grid gap-5 md:grid-cols-3">
+        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <AdminMetric
             label="Courses"
             value={overview.courses}
-            description="Published and unpublished course records."
+            description="Published and unpublished parent courses."
+          />
+          <AdminMetric
+            label="Modules"
+            value={overview.modules}
+            description="Coded teaching modules across all courses."
           />
           <AdminMetric
             label="Enrolments"
             value={overview.enrolments}
-            description="Learner-to-course assignments."
+            description="Learner-to-module assignments."
           />
           <AdminMetric
             label="Course files"
@@ -132,9 +145,8 @@ export default async function RisaAdminPage() {
             Course administration
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Create courses with unique institutional codes, prepare draft curricula and
-            publish approved courses. Learner enrolment and content uploads remain
-            available to authorized project maintainers through Supabase.
+            Create parent courses, assign coded modules, prepare draft curricula and
+            publish approved content.
           </p>
           <Link
             href="/admin/courses"

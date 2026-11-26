@@ -9,6 +9,7 @@ import { HeaderProfileLink, type HeaderUser } from "@/components/header-profile-
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/programmes", label: "Programmes" },
+  { href: "/labs", label: "Labs" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;
@@ -169,6 +170,7 @@ export function MobileNavigation({ user }: { user: HeaderUser | null }) {
         className="absolute inset-x-0 top-full z-30 border-b border-[#78eb29] bg-white px-5 py-4 shadow-lg sm:px-8"
       >
         <form
+          id="risa-mobile-search-form"
           role="search"
           action="/search"
           method="get"
@@ -268,6 +270,17 @@ export function MobileNavigation({ user }: { user: HeaderUser | null }) {
                         My Learning
                       </Link>
                     </li>
+                    {user.isAdmin && (
+                      <li>
+                        <Link
+                          href="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex min-h-12 items-center rounded-xl bg-[#eefce5] px-4 py-3 font-heading text-lg font-semibold text-[#286518] transition hover:bg-[#daf4c6]"
+                        >
+                          Administration Centre
+                        </Link>
+                      </li>
+                    )}
                     <li>
                       <Link
                         href="/students/profile"

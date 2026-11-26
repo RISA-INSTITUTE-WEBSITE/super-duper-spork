@@ -2,13 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
-import { getPublicRisaCourses, risaThumbnailUrl } from "@/lib/risa-course-admin";
-
-const pathwayAccents = [
-  "from-sky-400 to-cyan-300",
-  "from-indigo-400 to-sky-300",
-  "from-teal-400 to-emerald-300",
-] as const;
+import { RisaDomainModules } from "@/components/risa-domain-modules";
+import { RisaProgrammeCards } from "@/components/risa-programme-cards";
+import { getPublicRisaCourses } from "@/lib/risa-course-admin";
+import { getRisaProgrammes } from "@/lib/risa-programmes";
 
 function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   return (
@@ -30,7 +27,10 @@ function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const courses = await getPublicRisaCourses();
+  const [courses, modules] = await Promise.all([
+    getRisaProgrammes(),
+    getPublicRisaCourses(),
+  ]);
 
   return (
     <main id="main-content" className="flex-1">
@@ -102,10 +102,6 @@ export default async function HomePage() {
               >
                 Explore our courses
               </h2>
-              <p className="mt-4 leading-7 text-slate-600">
-                Browse the courses published by RISA administrators. Each course shows its
-                institutional code, academic level and course overview.
-              </p>
             </div>
             <Link
               href="/programmes"
@@ -115,7 +111,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {courses === null ? (
+          {courses === null || modules === null ? (
             <p
               role="status"
               className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
@@ -128,165 +124,12 @@ export default async function HomePage() {
               published by RISA administration.
             </p>
           ) : (
-            <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {courses.map((course, index) => {
-                const thumbnailUrl = risaThumbnailUrl(course.thumbnail_path);
-                return (
-                  <article
-                    key={course.id}
-                    className="risa-pathway-card group relative isolate flex flex-col overflow-hidden rounded-[1.6rem] transition duration-200 hover:-translate-y-1"
-                  >
-                    <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-[#dbeafe] via-[#f0f9ff] to-[#d9f7ca]">
-                      {thumbnailUrl ? (
-                        <Image
-                          src={thumbnailUrl}
-                          alt={course.title + " course thumbnail"}
-                          fill
-                          unoptimized
-                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover transition duration-300 group-hover:scale-[1.03]"
-                        />
-                      ) : (
-                        <div className="flex size-full items-center justify-center px-6">
-                          <span className="font-mono text-4xl font-black tracking-wider text-[#155DFC]/35">
-                            {course.code}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="relative flex flex-1 flex-col p-6 sm:p-7">
-                      <div
-                        aria-hidden="true"
-                        className={
-                          "absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r " +
-                          pathwayAccents[index % pathwayAccents.length]
-                        }
-                      />
-                      <span className="w-fit rounded-full bg-white/75 px-3 py-1.5 text-xs font-bold text-blue-800">
-                        {course.level}
-                      </span>
-                      <h3 className="mt-5 text-xl font-bold leading-snug tracking-tight text-slate-950">
-                        <span className="font-mono text-[#286518]">{course.code}</span>
-                        {" — "}
-                        {course.title}
-                      </h3>
-                      <p className="mt-4 flex-1 text-sm leading-7 text-slate-600">
-                        {course.description || "Explore this RISA learning course."}
-                      </p>
-                      <Link
-                        href={"/students/courses/" + course.id}
-                        className="mt-6 inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 transition hover:gap-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
-                      >
-                        Preview topics <ArrowIcon diagonal />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+            <RisaProgrammeCards programmes={courses} modules={modules} />
           )}
         </div>
       </section>
 
-      <section
-        aria-labelledby="vision-mission-heading"
-        className="bg-white py-20 sm:py-24"
-      >
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
-            RISA — Vision and Mission
-          </p>
-          <h2
-            id="vision-mission-heading"
-            className="risa-display mt-3 text-[2.6rem] font-bold tracking-tight text-[#0A0F1D] sm:text-[3.5rem]"
-          >
-            Our Vision and Mission
-          </h2>
-          <div className="mt-10 grid gap-5 lg:grid-cols-2">
-            <article className="risa-glass-card relative isolate overflow-hidden rounded-[1.6rem] p-7 sm:p-8">
-              <span className="inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
-                01
-              </span>
-              <h3 className="mt-7 text-2xl font-bold tracking-tight text-slate-950">
-                Our Vision
-              </h3>
-              <p className="mt-4 leading-8 text-slate-600">
-                To become a globally recognized centre of excellence in applied sciences
-                education, where theoretical knowledge meets practical experience,
-                empowering individuals to think critically, innovate confidently, and
-                develop sustainable solutions to real-world challenges.
-              </p>
-            </article>
-            <article className="risa-glass-card relative isolate overflow-hidden rounded-[1.6rem] p-7 sm:p-8">
-              <span className="inline-flex size-12 items-center justify-center rounded-xl border border-white/90 bg-white/75 text-sm font-bold text-[#155DFC] shadow-sm">
-                02
-              </span>
-              <h3 className="mt-7 text-2xl font-bold tracking-tight text-slate-950">
-                Our Mission
-              </h3>
-              <p className="mt-4 leading-8 text-slate-600">
-                To make scientific and technical education accessible, practical,
-                rigorous, and relevant by integrating foundational knowledge with hands-on
-                experimentation, engineering applications, research, and real-world
-                problem-solving.
-              </p>
-              <p className="mt-4 leading-8 text-slate-600">
-                RISA is committed to developing competent, creative, and independent
-                learners who can understand scientific principles, apply their knowledge,
-                design and test solutions, and contribute meaningfully to technological
-                advancement and societal development.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section
-        aria-labelledby="philosophy-heading"
-        className="risa-pathways-section py-20 sm:py-24"
-      >
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
-            Our Educational Philosophy
-          </p>
-          <h2
-            id="philosophy-heading"
-            className="risa-display mt-3 max-w-4xl text-[2.6rem] font-bold tracking-tight text-[#0A0F1D] sm:text-[3.5rem]"
-          >
-            Learn it. Understand it. Apply it. Test it. Improve it.
-          </h2>
-          <p className="mt-6 max-w-4xl text-base leading-8 text-slate-600 sm:text-lg">
-            At RISA, education goes beyond memorizing theories and passing examinations.
-            We believe that meaningful learning emerges when students actively engage with
-            concepts, investigate problems, experiment with solutions, and demonstrate
-            what they have learned through practical work.
-          </p>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            <article className="risa-glass-card rounded-[1.6rem] p-7 sm:p-8">
-              <h3 className="text-xl font-bold tracking-tight text-slate-950">Theory</h3>
-              <p className="mt-3 leading-7 text-slate-600">
-                Theory provides the foundation.
-              </p>
-            </article>
-            <article className="risa-glass-card rounded-[1.6rem] p-7 sm:p-8">
-              <h3 className="text-xl font-bold tracking-tight text-slate-950">
-                Practical Experience
-              </h3>
-              <p className="mt-3 leading-7 text-slate-600">
-                Practical experience develops competence.
-              </p>
-            </article>
-            <article className="risa-glass-card rounded-[1.6rem] p-7 sm:p-8">
-              <h3 className="text-xl font-bold tracking-tight text-slate-950">
-                Innovation
-              </h3>
-              <p className="mt-3 leading-7 text-slate-600">
-                Innovation transforms knowledge into impact.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
+      <RisaDomainModules programmes={courses} modules={modules} />
 
       <section
         aria-labelledby="next-heading"
@@ -301,7 +144,17 @@ export default async function HomePage() {
           className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
         />
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,29rem)] lg:gap-14">
+          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-10">
+            <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-[0_18px_45px_-22px_rgba(15,23,42,0.4)] ring-1 ring-slate-200/80 md:max-w-none">
+              <Image
+                src="/images/risa-commitment-study.jpg"
+                alt="Student studying among open books and notes"
+                width={738}
+                height={750}
+                unoptimized
+                className="aspect-[4/5] w-full object-cover object-center"
+              />
+            </div>
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
                 The RISA commitment
@@ -331,7 +184,10 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div aria-hidden="true" className="flex justify-center lg:justify-end">
+            <div
+              aria-hidden="true"
+              className="flex justify-center md:col-span-2 lg:col-span-1 lg:justify-end"
+            >
               <Image
                 src="/risa-logo-animated.svg"
                 alt=""

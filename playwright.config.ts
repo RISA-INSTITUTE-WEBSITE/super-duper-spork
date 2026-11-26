@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   // Browser tests must exercise a production-mode server, not the dev server.
   webServer: {
-    command: "npm run start -- --hostname 127.0.0.1",
+    command: "./node_modules/.bin/next start --hostname 127.0.0.1",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
