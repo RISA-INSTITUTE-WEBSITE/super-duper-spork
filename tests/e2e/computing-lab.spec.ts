@@ -21,12 +21,18 @@ test("computing lab supports binary and logic practice", async ({ page }) => {
   await expect(logic.getByRole("table")).toBeVisible();
   await logic.getByRole("button", { name: "A: 0" }).click();
   await expect(logic.getByRole("button", { name: "A: 1" })).toBeVisible();
-  await logic.getByRole("group", { name: "AND: A = 1, B = 0. What is the output?" })
-    .getByRole("button", { name: "0", exact: true }).click();
-  await logic.getByRole("group", { name: "NOT: A = 0. What is the output?" })
-    .getByRole("button", { name: "1", exact: true }).click();
-  await logic.getByRole("group", { name: "XOR: A = 1, B = 1. What is the output?" })
-    .getByRole("button", { name: "0", exact: true }).click();
+  await logic
+    .getByRole("group", { name: "AND: A = 1, B = 0. What is the output?" })
+    .getByRole("button", { name: "0", exact: true })
+    .click();
+  await logic
+    .getByRole("group", { name: "NOT: A = 0. What is the output?" })
+    .getByRole("button", { name: "1", exact: true })
+    .click();
+  await logic
+    .getByRole("group", { name: "XOR: A = 1, B = 1. What is the output?" })
+    .getByRole("button", { name: "0", exact: true })
+    .click();
   await logic.getByRole("button", { name: "Check answers" }).click();
   await expect(page.getByText("2/2 checkpoints completed")).toBeVisible();
   await page.reload();
