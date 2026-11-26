@@ -6,7 +6,7 @@ import {
   requestEnrolmentAction,
   type EnrolmentActionState,
 } from "@/app/students/courses/[id]/actions";
-import { RisaTopicCard } from "@/components/risa-topic-card";
+import { ModuleTopicGroups } from "@/components/risa-module-topic-groups";
 import type { CoursePreviewCurriculum } from "@/lib/risa-course-curriculum";
 import type { EnrolmentRequestStatus } from "@/lib/risa-course-enrolment";
 
@@ -201,24 +201,11 @@ export function LockedCoursePreview({
       >
         {requestStatus === "pending" ? "View enrolment request" : "Request enrolment"}
       </button>
-      {curriculum.topics.length === 0 ? (
-        <p className="risa-glass-card mt-7 rounded-2xl p-7 text-sm text-slate-600">
-          RISA has not published any topics for this course yet.
-        </p>
-      ) : (
-        <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {curriculum.topics.map((topic, index) => (
-            <RisaTopicCard
-              key={topic.id}
-              topic={topic}
-              order={index + 1}
-              videos={curriculum.videos.filter((video) => video.topic_id === topic.id)}
-              locked
-              onSelect={() => openPrompt(topic.title)}
-            />
-          ))}
-        </div>
-      )}
+      <ModuleTopicGroups
+        curriculum={curriculum}
+        locked
+        onSelect={(_id, title) => openPrompt(title)}
+      />
       {selectedTitle && (
         <EnrolmentPrompt
           courseId={courseId}
