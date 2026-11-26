@@ -1,5 +1,7 @@
 /** Resize static diagrams as Edu-ca-te does, before uploading to the private backend. */
-export async function prepareStudyNoteImage(file: File): Promise<{ mime: string; data: string }> {
+export async function prepareStudyNoteImage(
+  file: File,
+): Promise<{ mime: string; data: string }> {
   if (!["image/png", "image/jpeg", "image/webp", "image/gif"].includes(file.type)) {
     throw new Error("Choose a JPG, PNG, WebP or GIF image.");
   }
