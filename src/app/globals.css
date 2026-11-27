@@ -457,3 +457,68 @@ body:has(.risa-hero) .risa-navbar,
   background: #ffffff;
   color: #171717;
 }
+
+/* Programming Studio workbench palettes, inspired by VS Code built-in themes. */
+.risa-programming-ide[data-theme="dark-plus"] {
+  --ide-editor: #1e1e1e;
+  --ide-sidebar: #252526;
+  --ide-panel: #333333;
+  --ide-border: #3c3c3c;
+  --ide-fg: #d4d4d4;
+  --ide-muted: #a6a6a6;
+  --ide-code: #d4d4d4;
+  --ide-token: #b5cea8;
+  --ide-accent: #007acc;
+  --ide-button-fg: #ffffff;
+  --ide-button-hover: #0062a3;
+  --ide-focus: #3794ff;
+  --ide-hover: #37373d;
+}
+
+.risa-programming-ide[data-theme="light-plus"] {
+  --ide-editor: #ffffff;
+  --ide-sidebar: #f3f3f3;
+  --ide-panel: #eeeeee;
+  --ide-border: #cccccc;
+  --ide-fg: #333333;
+  --ide-muted: #616161;
+  --ide-code: #000000;
+  --ide-token: #008000;
+  --ide-accent: #0066b8;
+  --ide-button-fg: #ffffff;
+  --ide-button-hover: #005a9e;
+  --ide-focus: #0066b8;
+  --ide-hover: #e4e6f1;
+}
+
+.risa-programming-ide[data-theme="monokai"] {
+  --ide-editor: #272822;
+  --ide-sidebar: #1e1f1c;
+  --ide-panel: #34352e;
+  --ide-border: #49483e;
+  --ide-fg: #f8f8f2;
+  --ide-muted: #b3b3a8;
+  --ide-code: #f8f8f2;
+  --ide-token: #a6e22e;
+  --ide-accent: #a6e22e;
+  --ide-button-fg: #272822;
+  --ide-button-hover: #c2f05f;
+  --ide-focus: #66d9ef;
+  --ide-hover: #49483e;
+}
+
+.risa-programming-ide[data-theme="high-contrast"] {
+  --ide-editor: #000000;
+  --ide-sidebar: #000000;
+  --ide-panel: #000000;
+  --ide-border: #ffffff;
+  --ide-fg: #ffffff;
+  --ide-muted: #d0d0d0;
+  --ide-code: #ffffff;
+  --ide-token: #ffff00;
+  --ide-accent: #ffffff;
+  --ide-button-fg: #000000;
+  --ide-button-hover: #ffff00;
+  --ide-focus: #ffff00;
+  --ide-hover: #292929;
+}

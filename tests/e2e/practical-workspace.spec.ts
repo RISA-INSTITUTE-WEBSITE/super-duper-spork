@@ -21,3 +21,53 @@ test("staff and practical submissions require sign in", async ({ page }) => {
     await expect(page).toHaveURL(/\/students\/login/);
   }
 });
+
+test("programming studio examples, keyboard shortcut and console controls", async ({
+  page,
+}) => {
+  await page.goto("/workspace");
+  await expect(
+    page.getByRole("heading", { name: "RISA Programming Studio" }),
+  ).toBeVisible();
+  const editor = page.getByRole("textbox", { name: "Editor" });
+  await page.getByRole("button", { name: "Addition", exact: true }).click();
+  await expect(editor).toHaveValue("print(12 + 7)");
+  await page.getByRole("button", { name: "Run exercise" }).click();
+  await expect(page.locator("pre")).toHaveText("19");
+  await editor.fill("print(12 * 9)");
+  await editor.press("Control+Enter");
+  await expect(page.locator("pre")).toHaveText("108");
+  await page.getByRole("button", { name: "Clear output" }).click();
+  await expect(page.locator("pre")).toContainText("Ready.");
+  await expect(editor).toHaveValue("print(12 * 9)");
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(editor).toHaveValue("print(8 * 5)");
+  await page.getByRole("button", { name: "Linux terminal" }).click();
+  await expect(
+    page.getByRole("heading", { name: "RISA Programming Studio" }),
+  ).toHaveCount(0);
+});
+
+test("programming studio switches themes without losing code or console output", async ({
+  page,
+}) => {
+  await page.goto("/workspace");
+  const studio = page.locator(".risa-programming-ide");
+  const selector = page.getByRole("combobox", { name: "Color theme" });
+  const editor = page.getByRole("textbox", { name: "Editor" });
+  await expect(studio).toHaveAttribute("data-theme", "dark-plus");
+  await editor.fill("print(12 * 9)");
+  await page.getByRole("button", { name: "Run exercise" }).click();
+  for (const [theme, color] of [
+    ["light-plus", "rgb(255, 255, 255)"],
+    ["monokai", "rgb(39, 40, 34)"],
+    ["high-contrast", "rgb(0, 0, 0)"],
+    ["dark-plus", "rgb(30, 30, 30)"],
+  ]) {
+    await selector.selectOption(theme);
+    await expect(studio).toHaveAttribute("data-theme", theme);
+    await expect(editor).toHaveCSS("background-color", color);
+    await expect(editor).toHaveValue("print(12 * 9)");
+    await expect(studio.locator("pre")).toHaveText("108");
+  }
+});
