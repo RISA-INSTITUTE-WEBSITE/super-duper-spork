@@ -69,12 +69,15 @@ function DomainRow({
         <h3 id={"domain-" + programme.slug} className="text-xl font-bold text-slate-950">
           {programme.title}
         </h3>
-        <Link
-          href={"/programmes/" + programme.slug}
-          className="text-sm font-bold text-[#286518] underline-offset-4 hover:underline"
-        >
-          View all {published.length} {published.length === 1 ? "module" : "modules"} →
-        </Link>
+        {published.length > 4 && (
+          <Link
+            href={"/programmes/" + programme.slug}
+            aria-label={"View More " + programme.title + " modules"}
+            className="text-sm font-bold text-[#286518] underline-offset-4 hover:underline"
+          >
+            View More <span aria-hidden="true">→</span>
+          </Link>
+        )}
       </div>
       <div
         role="region"
@@ -83,7 +86,7 @@ function DomainRow({
         className="mt-3 max-w-full snap-x snap-proximity overflow-x-auto overscroll-x-contain rounded-xl focus-visible:outline-2 focus-visible:outline-[#155DFC]"
       >
         <ul className="flex w-max min-w-full flex-nowrap gap-4 px-1 pb-4 pt-1">
-          {published.map((module) => (
+          {published.slice(0, 4).map((module) => (
             <ModuleTile key={module.id} module={module} />
           ))}
         </ul>
