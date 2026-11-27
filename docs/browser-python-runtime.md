@@ -13,6 +13,7 @@ packages are available. Imports automatically load known packages. For example:
 
 ```python
 import numpy as np
+
 print(np.arange(5) ** 2)
 ```
 
@@ -20,8 +21,10 @@ Compatible PyPI wheels can be installed in the current session using:
 
 ```python
 import micropip
+
 await micropip.install("humanize")
 import humanize
+
 print(humanize.intcomma(1000000))
 ```
 
