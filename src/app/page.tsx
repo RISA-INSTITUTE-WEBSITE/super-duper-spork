@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
 import { RisaDomainModules } from "@/components/risa-domain-modules";
-import { RisaOrbitLink } from "@/components/risa-orbit-link";
+import { RisaChevronLink } from "@/components/risa-chevron-link";
 import { RisaProgrammeCards } from "@/components/risa-programme-cards";
 import { getPublicRisaCourses } from "@/lib/risa-course-admin";
 import { getRisaProgrammes } from "@/lib/risa-programmes";
@@ -101,7 +101,7 @@ export default async function HomePage() {
                 Explore our courses
               </h2>
             </div>
-            <RisaOrbitLink href="/programmes" label="More" />
+            <RisaChevronLink href="/programmes" label="More" />
           </div>
 
           {courses === null || modules === null ? (
