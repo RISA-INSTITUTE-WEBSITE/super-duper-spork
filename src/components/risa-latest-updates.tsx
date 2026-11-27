@@ -33,11 +33,11 @@ export function RisaLatestUpdates() {
           id="latest-updates-heading"
           className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
         >
-          Latest deals/updates
+          Latest updates on RISA
         </h2>
         <div
           aria-roledescription="carousel"
-          aria-label="Latest deals and updates"
+          aria-label="Latest updates on RISA"
           role="region"
           className="mt-5"
         >
