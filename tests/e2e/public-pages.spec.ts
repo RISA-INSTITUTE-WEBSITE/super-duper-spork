@@ -347,6 +347,11 @@ test("homepage progress content sits on the white section without a boxed banner
   await page.goto("/");
   const section = page.locator('section[aria-labelledby="next-heading"]');
   await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  const photo = section.locator('img[src="/images/risa-commitment-study.jpg"]');
+  await expect(photo).toHaveCount(1);
+  await expect(photo).toHaveCSS("opacity", "0.16");
+  await expect(photo).toHaveCSS("object-fit", "cover");
+  await expect(photo).toHaveAttribute("alt", "");
   await expect(
     section.getByRole("heading", {
       name: "Theory into practice. Knowledge into impact.",

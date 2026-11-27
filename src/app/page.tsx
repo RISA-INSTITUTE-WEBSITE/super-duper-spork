@@ -132,6 +132,16 @@ export default async function HomePage() {
         aria-labelledby="next-heading"
         className="relative isolate overflow-hidden bg-white py-20 sm:py-24"
       >
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <Image
+            src="/images/risa-commitment-study.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            unoptimized
+            className="object-cover object-center opacity-[0.16]"
+          />
+        </div>
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-[#38b6ff]/15"
@@ -141,17 +151,7 @@ export default async function HomePage() {
           className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
         />
         <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-10">
-            <div className="relative mx-auto w-full max-w-sm overflow-hidden rounded-2xl shadow-[0_18px_45px_-22px_rgba(15,23,42,0.4)] ring-1 ring-slate-200/80 md:max-w-none">
-              <Image
-                src="/images/risa-commitment-study.jpg"
-                alt="Student studying among open books and notes"
-                width={738}
-                height={750}
-                unoptimized
-                className="aspect-[4/5] w-full object-cover object-center"
-              />
-            </div>
+          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-14">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#286518]">
                 The RISA commitment
@@ -183,7 +183,7 @@ export default async function HomePage() {
             </div>
             <div
               aria-hidden="true"
-              className="flex justify-center md:col-span-2 lg:col-span-1 lg:justify-end"
+              className="flex justify-center md:justify-end"
             >
               <Image
                 src="/risa-logo-animated.svg"
@@ -195,7 +195,7 @@ export default async function HomePage() {
               />
             </div>
           </div>
-          <p className="mt-6 text-center text-sm leading-6 text-slate-500">
+          <p className="mt-6 text-center text-sm leading-6 text-slate-700">
             Website in development. Registered learners can preview course topics and
             request enrolment. Access to full lessons requires approval by RISA
             administration.
