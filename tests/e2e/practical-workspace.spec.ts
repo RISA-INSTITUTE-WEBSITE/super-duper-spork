@@ -94,11 +94,12 @@ test("real Python supports functions, stdin, imports and isolated execution", as
   );
   await run.click();
   await expect(console).toHaveText("[0, 1, 4, 9]", { timeout: 190_000 });
-  await page
-    .getByLabel("Standard input (one response per line, before running)")
-    .fill("RISA");
   await editor.fill("import math\nprint(input(), math.sqrt(81))");
   await run.click();
+  const input = page.getByRole("textbox", { name: "Terminal input" });
+  await expect(input).toBeVisible({ timeout: 190_000 });
+  await input.fill("RISA");
+  await input.press("Enter");
   await expect(console).toContainText("RISA 9.0", { timeout: 190_000 });
   await editor.fill("import numpy as np\nprint(int(np.sum(np.arange(5))))");
   await run.click();
@@ -157,4 +158,45 @@ test("library manager installs compatible packages without overwriting editor", 
   await expect(
     page.getByRole("button", { name: "Install library", exact: true }),
   ).toBeDisabled();
+});
+
+test("terminal prompts sequentially, echoes responses and preserves live Python state", async ({
+  page,
+}) => {
+  test.setTimeout(420_000);
+  await setLabSession(page, "admin");
+  await page.goto("/workspace");
+  const editor = page.getByRole("textbox", { name: "Editor" });
+  const terminal = page.getByRole("region", { name: "Terminal" });
+  const transcript = terminal.locator("pre");
+  const input = terminal.getByRole("textbox", { name: "Terminal input" });
+  await editor.fill(
+    'print("Starting")\nbill = float(input("Bill: "))\ntip = float(input("Tip: "))\npeople = int(input("People: "))\nprint(f"Each: {bill * (1 + tip / 100) / people:.2f}")',
+  );
+  await page.getByRole("button", { name: "Run exercise" }).click();
+  await expect(transcript).toContainText("Starting", { timeout: 190_000 });
+  await expect(input).toBeFocused({ timeout: 190_000 });
+  await expect(transcript).toContainText("Bill:");
+  await expect(transcript).not.toContainText("Tip:");
+  await input.fill("1000");
+  await input.press("Enter");
+  await expect(transcript).toContainText("Bill: 1000");
+  await expect(transcript).toContainText("Tip:");
+  await expect(input).toBeFocused();
+  await input.fill("15");
+  await input.press("Enter");
+  await expect(transcript).toContainText("Tip: 15");
+  await expect(transcript).toContainText("People:");
+  await input.fill("4");
+  await input.press("Enter");
+  await expect(transcript).toContainText("Each: 287.50");
+  await expect(input).toHaveCount(0);
+  expect((await transcript.innerText()).match(/Starting/g)).toHaveLength(1);
+  await expect(page.getByLabel(/Standard input/)).toHaveCount(0);
+  await editor.fill('input("Waiting: ")');
+  await page.getByRole("button", { name: "Run exercise" }).click();
+  await expect(input).toBeVisible();
+  await page.getByRole("button", { name: "Stop", exact: true }).click();
+  await expect(transcript).toContainText("Execution stopped");
+  await expect(input).toHaveCount(0);
 });
