@@ -37,7 +37,9 @@ test("vision, mission, and philosophy are on the About page", async ({ page }) =
   ).toBeVisible();
 });
 
-test("latest updates sit between the four-photo hero and course areas", async ({ page }) => {
+test("latest updates sit between the four-photo hero and course areas", async ({
+  page,
+}) => {
   await page.goto("/");
   const sections = page.locator("main > section");
 
