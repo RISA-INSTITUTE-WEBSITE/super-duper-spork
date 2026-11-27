@@ -72,3 +72,48 @@ test("programming studio switches themes without losing code or console output",
     await expect(studio.locator("pre")).toHaveText("108");
   }
 });
+
+test("real Python supports functions, stdin, imports and isolated execution", async ({
+  page,
+}) => {
+  test.setTimeout(300_000);
+  await page.goto("/workspace");
+  const editor = page.getByRole("textbox", { name: "Editor", exact: true });
+  const console = page.locator(".risa-programming-ide pre");
+  const run = page.getByRole("button", { name: "Run exercise" });
+  await editor.fill("def square(n):\n    return n ** 2\nprint([square(n) for n in range(4)])");
+  await run.click();
+  await expect(console).toHaveText("[0, 1, 4, 9]", { timeout: 130_000 });
+  await page.getByLabel("Standard input (one response per line, before running)").fill("RISA");
+  await editor.fill("import math\nprint(input(), math.sqrt(81))");
+  await run.click();
+  await expect(console).toContainText("RISA 9.0", { timeout: 130_000 });
+  await editor.fill("import numpy as np\nprint(int(np.sum(np.arange(5))))");
+  await run.click();
+  await expect(console).toHaveText("10", { timeout: 130_000 });
+  await expect(page.locator('iframe[title="Isolated Python runtime"]')).toHaveAttribute(
+    "sandbox",
+    "allow-scripts",
+  );
+  await editor.fill("while True:\n    pass");
+  await run.click();
+  await page.getByRole("button", { name: "Stop", exact: true }).click();
+  await expect(console).toContainText("Execution stopped");
+});
+
+test("Python sandbox is narrowly scoped and has no application connectivity", async ({
+  request,
+}) => {
+  const response = await request.get("/python-sandbox.html");
+  expect(response.ok()).toBeTruthy();
+  const policy = response.headers()["content-security-policy"];
+  expect(policy).toContain("sandbox allow-scripts");
+  expect(policy).not.toContain("allow-same-origin");
+  expect(policy).toContain("frame-ancestors 'self'");
+  expect(policy).toContain("'wasm-unsafe-eval'");
+  expect(policy).not.toContain("'unsafe-eval'");
+  expect(policy).not.toContain("'unsafe-inline'");
+  expect(policy).not.toContain("connect-src 'self'");
+  const normal = await request.get("/workspace");
+  expect(normal.headers()["content-security-policy"]).not.toContain("'wasm-unsafe-eval'");
+});

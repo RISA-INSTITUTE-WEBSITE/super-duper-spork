@@ -144,6 +144,10 @@ export function ProgrammingIDE({
               Find the area of a rectangle measuring 12 m by 9 m.
             </p>
           </div>
+          <p className="mt-5 text-xs leading-5 text-[color:var(--ide-muted)]">
+            Import supported libraries directly. For compatible PyPI packages, use
+            import micropip and await micropip.install(...). Do not enter secrets.
+          </p>
           <p className="mt-6 text-[11px] font-bold uppercase tracking-widest text-[color:var(--ide-muted)]">
             Starter examples
           </p>
