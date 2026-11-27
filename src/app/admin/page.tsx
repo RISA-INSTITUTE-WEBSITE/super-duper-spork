@@ -145,10 +145,7 @@ export default async function RisaAdminPage() {
           <p className="mt-3 text-sm text-slate-600">
             Review and develop the laboratories before releasing them to learners.
           </p>
-          <Link
-            href="/admin/labs"
-            className="mt-5 inline-flex font-bold text-[#286518]"
-          >
+          <Link href="/admin/labs" className="mt-5 inline-flex font-bold text-[#286518]">
             Open lab preview →
           </Link>
         </article>

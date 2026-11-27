@@ -40,7 +40,9 @@ test("verified learner cannot access labs even with admin profile metadata", asy
   expect(await response.text()).not.toContain("loadPyodide");
 });
 
-test("public navigation and search do not advertise unreleased labs", async ({ page }) => {
+test("public navigation and search do not advertise unreleased labs", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Labs", exact: true })).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -57,7 +59,9 @@ test("verified administrator can open lab preview from administration", async ({
   await page.goto("/admin");
   await page.getByRole("link", { name: "Open lab preview" }).click();
   await expect(page).toHaveURL(/\/admin\/labs$/);
-  await expect(page.getByRole("link", { name: "Open Practical Workspace" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Open Practical Workspace" }),
+  ).toBeVisible();
   await page.goto("/labs");
   await expect(page).toHaveURL(/\/admin\/labs$/);
 });
