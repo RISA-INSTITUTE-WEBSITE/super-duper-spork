@@ -58,6 +58,21 @@ test("course areas come directly after the four-photo hero", async ({ page }) =>
   ).toBeVisible();
 });
 
+test("homepage course preview links to the full catalogue and shows at most three cards", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const section = page.locator('section[aria-labelledby="courses-heading"]');
+  expect(await section.locator("article").count()).toBeLessThanOrEqual(3);
+  await expect(section.getByRole("link", { name: "More", exact: true })).toHaveAttribute(
+    "href",
+    "/programmes",
+  );
+  await expect(section.getByText("View all courses")).toHaveCount(0);
+  await section.getByRole("link", { name: "More", exact: true }).click();
+  await expect(page).toHaveURL(/\/programmes\/?$/);
+});
+
 test("primary navigation works", async ({ page }) => {
   // QA-E2E-02: visitors can reach the learning-pathway listing.
   await page.goto("/");
