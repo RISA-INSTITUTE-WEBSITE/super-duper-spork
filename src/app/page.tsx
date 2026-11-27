@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
 import { RisaDomainModules } from "@/components/risa-domain-modules";
+import { RisaOrbitLink } from "@/components/risa-orbit-link";
 import { RisaProgrammeCards } from "@/components/risa-programme-cards";
 import { getPublicRisaCourses } from "@/lib/risa-course-admin";
 import { getRisaProgrammes } from "@/lib/risa-programmes";
@@ -91,7 +92,7 @@ export default async function HomePage() {
         className="risa-pathways-section py-20 sm:py-24"
       >
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex items-center justify-between gap-4">
             <div className="max-w-2xl">
               <h2
                 id="courses-heading"
@@ -100,12 +101,7 @@ export default async function HomePage() {
                 Explore our courses
               </h2>
             </div>
-            <Link
-              href="/programmes"
-              className="inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
-            >
-              More <ArrowIcon />
-            </Link>
+            <RisaOrbitLink href="/programmes" label="More" />
           </div>
 
           {courses === null || modules === null ? (
