@@ -139,13 +139,9 @@ export default async function HomePage() {
             fill
             sizes="100vw"
             unoptimized
-            className="object-cover object-center opacity-[0.16]"
+            className="object-cover object-center opacity-25"
           />
         </div>
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-28 size-80 rounded-full border-[55px] border-[#38b6ff]/15"
-        />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-44 right-16 size-80 rounded-full bg-blue-400/10 blur-3xl"
@@ -164,20 +160,20 @@ export default async function HomePage() {
               </h2>
               <p className="mt-5 leading-8 text-slate-600">
                 Discover RISA&apos;s approach to practical scientific education, or
-                contact the team to learn more as the platform develops.
+                contact the team to learn more.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
                   href="/about"
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#286518] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#1d4f11] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
                 >
-                  About the institute <ArrowIcon />
+                  About the institute
                 </Link>
                 <Link
                   href="/contact"
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/85 px-6 py-3 text-sm font-semibold text-[#286518] transition hover:border-[#286518] hover:bg-[#eefce5] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#286518]"
                 >
-                  Contact RISA <ArrowIcon diagonal />
+                  Contact RISA
                 </Link>
               </div>
             </div>
@@ -196,9 +192,8 @@ export default async function HomePage() {
             </div>
           </div>
           <p className="mt-6 text-center text-sm leading-6 text-slate-700">
-            Website in development. Registered learners can preview course topics and
-            request enrolment. Access to full lessons requires approval by RISA
-            administration.
+            Registered learners can preview course topics and request enrolment. Access to
+            full lessons requires approval by RISA administration.
           </p>
         </div>
       </section>
