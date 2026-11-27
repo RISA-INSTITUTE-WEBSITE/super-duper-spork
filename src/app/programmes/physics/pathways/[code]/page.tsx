@@ -35,15 +35,12 @@ export default async function PhysicsPathwayPage({
         <p className="font-mono text-sm font-bold text-[#286518]">{pathway.code}</p>
         <h1 className="mt-3 text-4xl font-bold">{pathway.title}</h1>
         <p className="mt-4 leading-7 text-slate-600">
-          Curriculum proposal under academic review. All core modules are shared;
-          elective recommendations are flexible and subject to academic approval. This
-          pathway does not confer accreditation or professional registration.
+          Curriculum proposal under academic review. Not an accredited qualification.
         </p>
       </header>
       {published === null && (
         <p role="status" className="mt-5 text-sm text-slate-600">
-          Live module availability is temporarily unavailable. The proposed curriculum
-          remains visible.
+          Live module availability is temporarily unavailable.
         </p>
       )}
       {[1, 2, 3].map((level) => (
@@ -56,9 +53,10 @@ export default async function PhysicsPathwayPage({
               .filter((module) => module.level === level)
               .map((module) => {
                 const live = available.get(module.code);
-                const recommendations = Object.entries(pathway.packages).filter(
-                  ([key]) => key === module.code || key.startsWith(module.code + " "),
-                );
+                const entries = Object.entries(pathway.packages);
+                const recommendations = entries.filter(([key]) => {
+                  return key.split(" ")[0] === module.code;
+                });
                 return (
                   <li
                     key={module.code}
@@ -73,12 +71,15 @@ export default async function PhysicsPathwayPage({
                         Career-oriented practical choice; all core theory is required.
                       </p>
                     )}
-                    {recommendations.map(([key, selection]) => (
-                      <p key={key} className="mt-2 text-sm text-slate-600">
-                        {key}: {selection === "—" ? "" : selection + " — "}
-                        {describePhysicsPackage(key, selection)}
-                      </p>
-                    ))}
+                    {recommendations.map(([key, selection]) => {
+                      const label = describePhysicsPackage(key, selection);
+                      const prefix = selection === "—" ? "" : selection + " — ";
+                      return (
+                        <p key={key} className="mt-2 text-sm text-slate-600">
+                          {key}: {prefix + label}
+                        </p>
+                      );
+                    })}
                     {module.code === "PHY307" && (
                       <p className="mt-2 text-sm text-slate-600">
                         Suggested supervised research: {pathway.research}
@@ -103,9 +104,10 @@ export default async function PhysicsPathwayPage({
         </section>
       ))}
       <p className="mt-8 leading-7 text-slate-600">
-        PHY304 is optional even when recommended. Other electives remain in the
-        institutional catalogue. Full lessons require approved module access; changing
-        pathways or substituting electives requires prerequisite and workload review.
+        PHY304 is optional. Full lessons require approved module access.
+      </p>
+      <p className="mt-3 leading-7 text-slate-600">
+        Elective substitutions and pathway changes require academic review.
       </p>
     </main>
   );
