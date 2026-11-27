@@ -21,8 +21,7 @@ const keywords = new Set(
 
 // A bounded lexical highlighter, not a parser or interpreter. String bodies
 // are scanned separately so comments and brackets inside literals stay intact.
-const tokenPattern =
-  /(?<comment>#[^\r\n]*)|(?<quote>(?:[rRuUbBfFtT]|[rR][fFbBtT]|[fFbBtT][rR])?(?:"""|'''|"|'))|(?<number>0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][+-]?[\d_]+)?[jJ]?)|(?<name>[_\p{ID_Start}][_\p{ID_Continue}]*)|(?<bracket>[()[\]{}])|(?<operator>[+\-*/%<>=!&|^~@:,.;]+)|(?<space>\s+)|[\s\S]/gu;
+const tokenPattern = String.raw`(?<comment>#[^\r\n]*)|(?<quote>(?:[rRuUbBfFtT]|[rR][fFbBtT]|[fFbBtT][rR])?(?:"""|'''|"|'))|(?<number>0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][+-]?[\d_]+)?[jJ]?)|(?<name>[_\p{ID_Start}][_\p{ID_Continue}]*)|(?<bracket>[()[\]{}])|(?<operator>[+\-*/%<>=!&|^~@:,.;]+)|(?<space>\s+)|[\s\S]`;
 
 function quoteEnd(source: string, start: number, opening: string): number {
   const delimiter = opening.match(/(?:"""|'''|"|')$/)?.[0] ?? '"';
@@ -91,7 +90,7 @@ function classify(
 }
 
 export function highlightPython(source: string): PythonToken[] {
-  const scanner = new RegExp(tokenPattern);
+  const scanner = new RegExp(tokenPattern, "gu");
   const tokens: PythonToken[] = [];
   const stack: string[] = [];
   let match: RegExpExecArray | null;
