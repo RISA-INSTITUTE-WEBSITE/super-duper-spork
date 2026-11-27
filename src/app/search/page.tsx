@@ -14,6 +14,13 @@ export const metadata: Metadata = {
 
 const pages = [
   {
+    href: "/policies",
+    title: "Institutional policies",
+    description: "Read published RISA policies and institutional guidelines.",
+    keywords: "policies governance rules academic conduct",
+    category: "Page",
+  },
+  {
     href: "/",
     title: "RISA homepage",
     description: "Learn the science and discover applied learning at RISA.",

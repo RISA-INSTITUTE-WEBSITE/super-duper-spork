@@ -337,7 +337,8 @@ export async function requestPublicCourseCatalogue(
   const config = getAuthConfig();
   const allowed =
     path.startsWith("/rest/v1/risa_courses?") ||
-    path.startsWith("/rest/v1/risa_programmes?");
+    path.startsWith("/rest/v1/risa_programmes?") ||
+    path.startsWith("/rest/v1/risa_policies?");
   if (!config || !allowed) {
     return null;
   }

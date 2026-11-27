@@ -17,7 +17,9 @@ export default async function PhysicsPathwayPage({
 }) {
   const { code } = await params;
   const pathway = findPhysicsPathway(code);
-  if (!pathway) notFound();
+  if (!pathway) {
+    notFound();
+  }
 
   const published = await getPublicRisaCourses();
   const available = new Map(

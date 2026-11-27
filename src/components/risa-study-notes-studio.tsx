@@ -10,7 +10,11 @@ import {
 } from "@/app/admin/courses/[id]/content/study-notes/[topicId]/actions";
 import { RisaStudyNoteMarkdown } from "@/components/risa-study-note-markdown";
 import { prepareStudyNoteImage } from "@/lib/risa-note-image-preparation";
-import { pythonStudioFence, studyNoteTemplate, validStudyNote } from "@/lib/risa-study-note-format";
+import {
+  pythonStudioFence,
+  studyNoteTemplate,
+  validStudyNote,
+} from "@/lib/risa-study-note-format";
 import type { StudyNote } from "@/lib/risa-study-notes";
 
 const primaryButton =
@@ -192,7 +196,9 @@ export function RisaStudyNotesStudio({
             onClick={() => {
               rememberCursor();
               const { start, end } = cursor.current;
-              setMarkdown((old) => old.slice(0, start) + pythonStudioFence + old.slice(end));
+              setMarkdown(
+                (old) => old.slice(0, start) + pythonStudioFence + old.slice(end),
+              );
               setNotice("Python block inserted. Add code inside the fence and preview.");
             }}
           >

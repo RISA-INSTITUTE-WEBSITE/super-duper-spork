@@ -405,7 +405,9 @@ export function physicsPathwayHref(code: string): string {
 }
 
 export function describePhysicsPackage(module: string, code: string): string {
-  if (code === "—") return "No default recommendation";
+  if (code === "—") {
+    return "No default recommendation";
+  }
   if (module === "PHY202") {
     return code === "H1"
       ? "Electromagnetic energy conversion"
