@@ -51,6 +51,40 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
   );
 
   useEffect(() => {
+    function reportStatus(data: { version?: unknown; message?: unknown }) {
+      if (typeof data.version === "string") {
+        setVersion(data.version.slice(0, 40));
+      }
+      if (typeof data.message === "string") {
+        setOutput(data.message.slice(0, 200));
+      }
+    }
+
+    function reportError(data: { detail?: unknown }) {
+      const detail = typeof data.detail === "string" ? data.detail.slice(0, 1000) : "";
+      stop(
+        "Python startup failed. " + detail + " Retry after checking your connection.",
+      );
+    }
+
+    function receiveRunMessage(
+      data: { type?: unknown; detail?: unknown; version?: unknown; message?: unknown },
+      request: PythonRun,
+    ) {
+      if (data?.type === "runtime-error") {
+        reportError(data);
+        return;
+      }
+      if (data?.type === "runtime-status") {
+        reportStatus(data);
+        return;
+      }
+      const result = pythonResult(data, request.id);
+      if (result !== null) {
+        finish(result);
+      }
+    }
+
     function receive(event: MessageEvent) {
       if (event.source !== frame.current?.contentWindow || event.origin !== "null") {
         return;
@@ -67,24 +101,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       if (!request) {
         return;
       }
-      if (data?.type === "runtime-error") {
-        const detail = typeof data.detail === "string" ? data.detail.slice(0, 1000) : "";
-        stop("Python startup failed. " + detail + " Retry after checking your connection.");
-        return;
-      }
-      if (data?.type === "runtime-status") {
-        if (typeof data.version === "string") {
-          setVersion(data.version.slice(0, 40));
-        }
-        if (typeof data.message === "string") {
-          setOutput(data.message.slice(0, 200));
-        }
-        return;
-      }
-      const result = pythonResult(data, request.id);
-      if (result !== null) {
-        finish(result);
-      }
+      receiveRunMessage(data, request);
     }
     window.addEventListener("message", receive);
     return () => {

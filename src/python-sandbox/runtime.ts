@@ -163,7 +163,11 @@ export const pythonSandboxPolicy = [
     " " +
     compatibility,
   "worker-src blob:",
-  "connect-src " + primary + " " + compatibility + " https://pypi.org https://files.pythonhosted.org",
+  "connect-src " +
+    primary +
+    " " +
+    compatibility +
+    " https://pypi.org https://files.pythonhosted.org",
 ].join("; ");
 
 export const pythonSandboxHtml =
