@@ -63,6 +63,7 @@ function acceptLine(data) {
   resolve(data.value);
 }
 const boot = async () => {
+  const started = performance.now();
   try {
     ${loader}
     runtime = await loadPyodide({
@@ -89,7 +90,7 @@ const boot = async () => {
         "_builtins.input = _terminal_input",
       ].join("\n"),
     )});
-    self.postMessage({ type: "ready", version: runtime.version });
+    self.postMessage({ type: "ready", version: runtime.version, startupMs: performance.now() - started });
   } catch (error) {
     self.postMessage({ type: "boot-error", detail: String(error).slice(0, 500) });
   }
@@ -113,10 +114,13 @@ self.onmessage = async ({ data }) => {
     runtime.setStdin({ error: true });
     runtime.setStdout({ write: write(stdoutDecoder), isatty: true });
     runtime.setStderr({ write: write(stderrDecoder), isatty: true });
-    await runtime.loadPackagesFromImports(data.code, {
-      messageCallback: () => {},
-      errorCallback: (error) => append(String(error) + "\\n"),
-    });
+    // Ordinary scripts do not need a package-import discovery pass.
+    if (/\\b(?:import|from)\\b/.test(data.code)) {
+      await runtime.loadPackagesFromImports(data.code, {
+        messageCallback: () => {},
+        errorCallback: (error) => append(String(error) + "\\n"),
+      });
+    }
     const result = await runtime.runPythonAsync(data.code);
     if (result !== undefined && result !== null) {
       try { append(String(result) + "\\n"); } finally { result?.destroy?.(); }
@@ -153,6 +157,8 @@ const bridge = `
   let inputSequence;
   let ready = false;
   let legacy = false;
+  let preferredLegacy = false;
+  let triedFallback = false;
   let bootTimer;
   let primaryError = "";
   const send = (message) => parent.postMessage(message, parentOrigin);
@@ -168,16 +174,23 @@ const bridge = `
   function fail(detail) {
     const wasReady = ready;
     releaseWorker();
-    if (!wasReady && !legacy && pending) {
+    if (!wasReady && !triedFallback) {
       primaryError = detail;
-      legacy = true;
-      send({ type: "runtime-status", message: "Trying compatible Python runtime…" });
+      triedFallback = true;
+      legacy = !legacy;
+      send({ type: "runtime-status", message: "Trying alternate Python runtime…" });
       createWorker();
       return;
     }
     const message = primaryError ? primaryError + "; fallback: " + detail : detail;
     send({ type: "runtime-error", detail: message.slice(0, 1000) });
     pending = undefined;
+  }
+  function startWorker() {
+    legacy = preferredLegacy;
+    triedFallback = false;
+    primaryError = "";
+    createWorker();
   }
   function createWorker() {
     try {
@@ -193,7 +206,8 @@ const bridge = `
         } else if (!ready && data?.type === "ready") {
           clearTimeout(bootTimer);
           ready = true;
-          send({ type: "runtime-status", message: "Python ready. Running code…", version: String(data.version).slice(0, 40) });
+          preferredLegacy = legacy;
+          send({ type: "runtime-ready", version: String(data.version).slice(0, 40), startupMs: data.startupMs, legacy });
           if (pending) current.postMessage(pending);
         } else if (ready && data?.type === "terminal-output" && data.id === pending?.id && typeof data.output === "string") {
           send({ type: "terminal-output", id: data.id, output: data.output.slice(0, 20000) });
@@ -216,6 +230,15 @@ const bridge = `
   addEventListener("message", (event) => {
     if (event.source !== parent || event.origin !== parentOrigin) return;
     const data = event.data;
+    if (data?.type === "ping") {
+      send({ type: "frame-ready" });
+      return;
+    }
+    if (data?.type === "warmup") {
+      preferredLegacy = data.preferCompatibility === true;
+      if (!worker) startWorker();
+      return;
+    }
     if (data?.type === "input") {
       if (!ready || !pending || data.id !== pending.id || data.sequence !== inputSequence || inputSequence === undefined) return;
       if (typeof data.value !== "string" || data.value.length > 1000 || /[\\r\\n]/.test(data.value)) return;
@@ -226,7 +249,7 @@ const bridge = `
     if (pending || data?.type !== "run" || typeof data.id !== "string") return;
     if (typeof data.code !== "string" || data.code.length > 20000) return;
     pending = { type: "run", id: data.id, code: data.code };
-    if (!worker) createWorker();
+    if (!worker) startWorker();
     else if (ready) worker.postMessage(pending);
   });
   addEventListener("pagehide", releaseWorker);

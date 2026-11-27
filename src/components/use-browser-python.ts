@@ -13,14 +13,39 @@ type RuntimeMessage = {
   message?: unknown;
   output?: unknown;
   sequence?: unknown;
+  startupMs?: unknown;
+  legacy?: unknown;
 };
+
+type RuntimePhase = "warming" | "ready" | "failed";
+const preferenceKey = "risa-python-preferred-runtime";
+
+function prefersCompatibility(): boolean {
+  try {
+    return localStorage.getItem(preferenceKey) === "compatibility";
+  } catch {
+    return false;
+  }
+}
+
+function rememberRuntime(legacy: unknown) {
+  try {
+    localStorage.setItem(preferenceKey, legacy === true ? "compatibility" : "primary");
+  } catch {
+    // Storage may be disabled; runtime still works.
+  }
+}
 
 export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
   const loaded = useRef(false);
   const active = useRef<PythonRun | null>(null);
   const waiting = useRef<number | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [generation, setGeneration] = useState(0);
+  const runStarted = useRef(0);
+  const [generation, setGeneration] = useState(1);
+  const [phase, setPhase] = useState<RuntimePhase>("warming");
+  const [startupMs, setStartupMs] = useState<number | null>(null);
+  const [lastRunMs, setLastRunMs] = useState<number | null>(null);
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
   const [inputSequence, setInputSequence] = useState<number | null>(null);
@@ -50,6 +75,9 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       finish(message);
       loaded.current = false;
       setVersion("");
+      setPhase("warming");
+      setStartupMs(null);
+      setLastRunMs(null);
       setGeneration((value) => value + 1);
     },
     [finish],
@@ -71,9 +99,26 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       if (typeof data.version === "string") {
         setVersion(data.version.slice(0, 40));
       }
-      if (typeof data.message === "string") {
+      if (active.current && typeof data.message === "string") {
         setOutput(data.message.slice(0, 200));
       }
+    }
+
+    function reportReady(data: RuntimeMessage) {
+      setPhase("ready");
+      reportStatus(data);
+      if (typeof data.startupMs === "number" && Number.isFinite(data.startupMs)) {
+        setStartupMs(Math.max(0, Math.round(data.startupMs)));
+      }
+      rememberRuntime(data.legacy);
+    }
+
+    function reportError(data: RuntimeMessage) {
+      const detail = typeof data.detail === "string" ? data.detail.slice(0, 1000) : "";
+      setPhase("failed");
+      setVersion("");
+      setStartupMs(null);
+      finish("Python runtime failed. " + detail + " Run again to retry.");
     }
 
     function receiveTerminal(data: RuntimeMessage) {
@@ -89,18 +134,35 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       if (data.type === "terminal-output") {
         setOutput(data.output.slice(0, 20000));
       } else if (data.type === "result") {
+        setLastRunMs(Math.max(0, Math.round(performance.now() - runStarted.current)));
         finish(data.output.slice(0, 20100) || "Completed with no output.");
       }
     }
 
-    function receiveRunMessage(data: RuntimeMessage, request: PythonRun) {
+    function receiveRuntime(data: RuntimeMessage) {
       if (data.type === "runtime-error") {
-        const detail = typeof data.detail === "string" ? data.detail.slice(0, 1000) : "";
-        stop("Python runtime failed. " + detail);
+        reportError(data);
+      } else if (data.type === "runtime-ready") {
+        reportReady(data);
       } else if (data.type === "runtime-status") {
         reportStatus(data);
-      } else if (data.id === request.id) {
+      } else if (active.current && data.id === active.current.id) {
         receiveTerminal(data);
+      }
+    }
+
+    function warmFrame() {
+      if (loaded.current) {
+        return;
+      }
+      loaded.current = true;
+      const target = frame.current?.contentWindow;
+      target?.postMessage(
+        { type: "warmup", preferCompatibility: prefersCompatibility() },
+        "*",
+      );
+      if (active.current) {
+        target?.postMessage(active.current, "*");
       }
     }
 
@@ -113,22 +175,17 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
         return;
       }
       if (data.type === "frame-ready") {
-        loaded.current = true;
-        if (active.current) {
-          frame.current?.contentWindow?.postMessage(active.current, "*");
-        }
+        warmFrame();
         return;
       }
-      if (active.current) {
-        receiveRunMessage(data, active.current);
-      }
+      receiveRuntime(data);
     }
     window.addEventListener("message", receive);
     return () => {
       window.removeEventListener("message", receive);
       cancelTimer();
     };
-  }, [armTimer, cancelTimer, finish, frame, stop]);
+  }, [armTimer, cancelTimer, finish, frame]);
 
   function run(code: string) {
     if (active.current || code.length > 20000) {
@@ -136,12 +193,15 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
     }
     const request: PythonRun = { type: "run", id: crypto.randomUUID(), code };
     active.current = request;
+    runStarted.current = performance.now();
+    setLastRunMs(null);
     setRunning(true);
-    setOutput("Loading Python or running your code…");
+    if (phase === "failed") {
+      setPhase("warming");
+    }
+    setOutput(phase === "ready" ? "Running Python…" : "Starting Python…");
     armTimer(executionLimit);
-    if (generation === 0) {
-      setGeneration(1);
-    } else if (loaded.current) {
+    if (loaded.current) {
       frame.current?.contentWindow?.postMessage(request, "*");
     }
   }
@@ -166,6 +226,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
 
   return {
     generation,
+    frameLoaded: () => frame.current?.contentWindow?.postMessage({ type: "ping" }, "*"),
     output,
     running,
     inputSequence,
@@ -173,6 +234,9 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
     run,
     stop,
     version,
+    phase,
+    startupMs,
+    lastRunMs,
     clear: () => setOutput(""),
   };
 }
