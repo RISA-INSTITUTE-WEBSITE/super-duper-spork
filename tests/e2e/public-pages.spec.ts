@@ -349,7 +349,7 @@ test("homepage progress content sits on the white section without a boxed banner
   await expect(section).toHaveCSS("background-color", "rgb(255, 255, 255)");
   const photo = section.locator('img[src="/images/risa-commitment-study.jpg"]');
   await expect(photo).toHaveCount(1);
-  await expect(photo).toHaveCSS("opacity", "0.16");
+  await expect(photo).toHaveCSS("opacity", "0.25");
   await expect(photo).toHaveCSS("object-fit", "cover");
   await expect(photo).toHaveAttribute("alt", "");
   await expect(
@@ -359,6 +359,12 @@ test("homepage progress content sits on the white section without a boxed banner
   ).toBeVisible();
   await expect(section.getByRole("link", { name: /About the institute/ })).toBeVisible();
   await expect(section.getByRole("link", { name: /Contact RISA/ })).toBeVisible();
+  await expect(
+    section.getByRole("link", { name: /About the institute/ }).locator("svg"),
+  ).toHaveCount(0);
+  await expect(
+    section.getByRole("link", { name: /Contact RISA/ }).locator("svg"),
+  ).toHaveCount(0);
 });
 
 test("RISA section animates original black liquid and green sphere without changing navbar", async ({
@@ -420,7 +426,12 @@ test("institutional footer preserves navigation and stacks correctly on mobile",
 
   await expect(footer.getByText("RISA Institute", { exact: true })).toBeVisible();
   await expect(footer.getByRole("heading", { name: "Explore" })).toBeVisible();
-  await expect(footer.getByRole("heading", { name: "Development status" })).toBeVisible();
+  await expect(
+    footer.getByRole("heading", { name: "Development status" }),
+  ).toHaveCount(0);
+  await expect(page.getByText("Website in development", { exact: false })).toHaveCount(
+    0,
+  );
 
   for (const [name, href] of [
     ["Programmes", "/programmes"],
@@ -434,7 +445,7 @@ test("institutional footer preserves navigation and stacks correctly on mobile",
     await columns.evaluate(
       (element) => getComputedStyle(element).gridTemplateColumns.split(" ").length,
     ),
-  ).toBe(3);
+  ).toBe(2);
 
   await page.setViewportSize({ width: 390, height: 844 });
   expect(
