@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { RisaOrbitLink } from "@/components/risa-orbit-link";
+import { RisaChevronLink } from "@/components/risa-chevron-link";
 import { risaThumbnailUrl, type RisaCourse } from "@/lib/risa-course-admin";
 import { modulesForProgramme, type RisaProgramme } from "@/lib/risa-programmes";
 
@@ -71,7 +71,7 @@ function DomainRow({
           {programme.title}
         </h3>
         {published.length > 4 && (
-          <RisaOrbitLink
+          <RisaChevronLink
             href={"/programmes/" + programme.slug}
             label={"View More " + programme.title + " modules"}
           />
