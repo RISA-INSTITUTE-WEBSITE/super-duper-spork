@@ -5,10 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { RisaStudyNotesStudio } from "@/components/risa-study-notes-studio";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import { getRisaAdminCourses, type RisaCourse } from "@/lib/risa-course-admin";
-import {
-  getStructuredCurriculum,
-  groupModuleTopics,
-} from "@/lib/risa-module-sections";
+import { getStructuredCurriculum, groupModuleTopics } from "@/lib/risa-module-sections";
 import {
   getRisaProgrammes,
   modulesForProgramme,
@@ -124,11 +121,7 @@ function TopicSelector({
           ))}
         </select>
       </label>
-      <button
-        type="submit"
-        className={buttonClass}
-        disabled={!curriculum.topics.length}
-      >
+      <button type="submit" className={buttonClass} disabled={!curriculum.topics.length}>
         Open editor
       </button>
       {!curriculum.topics.length && (
