@@ -85,6 +85,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           src="/python-sandbox.html"
           sandbox="allow-scripts"
           title="Isolated Python runtime"
+          onLoad={python.frameLoaded}
           hidden
         />
       )}

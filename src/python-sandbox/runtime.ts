@@ -206,6 +206,7 @@ const bridge = `
         } else if (!ready && data?.type === "ready") {
           clearTimeout(bootTimer);
           ready = true;
+          preferredLegacy = legacy;
           send({ type: "runtime-ready", version: String(data.version).slice(0, 40), startupMs: data.startupMs, legacy });
           if (pending) current.postMessage(pending);
         } else if (ready && data?.type === "terminal-output" && data.id === pending?.id && typeof data.output === "string") {
@@ -229,6 +230,10 @@ const bridge = `
   addEventListener("message", (event) => {
     if (event.source !== parent || event.origin !== parentOrigin) return;
     const data = event.data;
+    if (data?.type === "ping") {
+      send({ type: "frame-ready" });
+      return;
+    }
     if (data?.type === "warmup") {
       preferredLegacy = data.preferCompatibility === true;
       if (!worker) startWorker();

@@ -160,6 +160,9 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
         return;
       }
       if (data.type === "frame-ready") {
+        if (loaded.current) {
+          return;
+        }
         loaded.current = true;
         frame.current?.contentWindow?.postMessage(
           { type: "warmup", preferCompatibility: prefersCompatibility() },
@@ -218,6 +221,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
 
   return {
     generation,
+    frameLoaded: () => frame.current?.contentWindow?.postMessage({ type: "ping" }, "*"),
     output,
     running,
     inputSequence,
