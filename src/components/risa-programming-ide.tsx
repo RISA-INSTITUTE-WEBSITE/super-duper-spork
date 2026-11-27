@@ -1,6 +1,46 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
+
+const themes = [
+  { id: "dark-plus", label: "Dark+" },
+  { id: "light-plus", label: "Light+" },
+  { id: "monokai", label: "Monokai" },
+  { id: "high-contrast", label: "High Contrast" },
+] as const;
+
+type StudioTheme = (typeof themes)[number]["id"];
+
+function ThemeSelector({
+  theme,
+  onChange,
+}: {
+  theme: StudioTheme;
+  onChange: (theme: StudioTheme) => void;
+}) {
+  return (
+    <label className="flex items-center gap-2 text-xs font-semibold">
+      Theme
+      <select
+        aria-label="Color theme"
+        value={theme}
+        onChange={(event) => {
+          const selected = themes.find((item) => item.id === event.target.value);
+          if (selected) {
+            onChange(selected.id);
+          }
+        }}
+        className="min-h-10 rounded-md border border-[var(--ide-border)] bg-[var(--ide-editor)] px-2 text-[var(--ide-fg)]"
+      >
+        {themes.map((item) => (
+          <option key={item.id} value={item.id}>
+            {item.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 
 const examples = [
   { label: "Area of a rectangle", code: "print(8 * 5)" },
@@ -25,53 +65,60 @@ export function ProgrammingIDE({
   onReset,
   onClear,
 }: ProgrammingIDEProps) {
+  const [theme, setTheme] = useState<StudioTheme>("dark-plus");
   const gutter = useRef<HTMLDivElement>(null);
   const lineCount = Math.max(12, source.split("\n").length);
   return (
-    <div className="mt-6 overflow-hidden rounded-2xl border border-[#253247] bg-[#0b1220] text-slate-100 shadow-xl">
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[#293649] bg-[#111b2c] px-4 py-3 sm:px-5">
+    <div
+      data-theme={theme}
+      className="risa-programming-ide mt-6 overflow-hidden rounded-2xl border border-[var(--ide-border)] bg-[var(--ide-editor)] text-[var(--ide-fg)] shadow-xl"
+    >
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--ide-border)] bg-[var(--ide-panel)] px-4 py-3 sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#78eb29]/15 font-mono text-lg font-bold text-[#a6f66d]">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[var(--ide-hover)] font-mono text-lg font-bold text-[var(--ide-token)]">
             &lt;/&gt;
           </span>
           <div>
             <h2 className="text-base font-bold">RISA Programming Studio</h2>
-            <p className="text-xs text-slate-400">CS102 · Programming fundamentals</p>
+            <p className="text-xs text-[var(--ide-muted)]">CS102 · Programming fundamentals</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onRun}
-          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#78eb29] px-4 py-2 text-sm font-bold text-[#122608] hover:bg-[#a6f66d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-        >
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            className="size-4"
-            fill="currentColor"
+        <div className="flex flex-wrap items-center gap-3">
+          <ThemeSelector theme={theme} onChange={setTheme} />
+          <button
+            type="button"
+            onClick={onRun}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--ide-accent)] px-4 py-2 text-sm font-bold text-[var(--ide-button-fg)] hover:bg-[var(--ide-button-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ide-focus)]"
           >
-            <path d="M4 2.5v11l9-5.5z" />
-          </svg>
-          Run exercise
-        </button>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 16 16"
+              className="size-4"
+              fill="currentColor"
+            >
+              <path d="M4 2.5v11l9-5.5z" />
+            </svg>
+            Run exercise
+          </button>
+        </div>
       </header>
       <div className="grid min-w-0 lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className="border-b border-[#293649] bg-[#101a2a] p-4 lg:border-b-0 lg:border-r">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+        <aside className="border-b border-[var(--ide-border)] bg-[var(--ide-sidebar)] p-4 lg:border-b-0 lg:border-r">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-[var(--ide-muted)]">
             Exercise 01
           </p>
-          <h3 className="mt-3 text-sm font-bold text-white">Arithmetic operations</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
+          <h3 className="mt-3 text-sm font-bold text-[var(--ide-fg)]">Arithmetic operations</h3>
+          <p className="mt-2 text-sm leading-6 text-[var(--ide-fg)]">
             Calculate the area of a rectangle. Change the two dimensions and run the
             expression again.
           </p>
-          <div className="mt-5 rounded-lg border border-[#293649] bg-[#0b1220] p-3">
-            <p className="text-xs font-bold text-[#a6f66d]">Your challenge</p>
-            <p className="mt-2 text-xs leading-5 text-slate-300">
+          <div className="mt-5 rounded-lg border border-[var(--ide-border)] bg-[var(--ide-editor)] p-3">
+            <p className="text-xs font-bold text-[var(--ide-token)]">Your challenge</p>
+            <p className="mt-2 text-xs leading-5 text-[var(--ide-fg)]">
               Find the area of a rectangle measuring 12 m by 9 m.
             </p>
           </div>
-          <p className="mt-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+          <p className="mt-6 text-[11px] font-bold uppercase tracking-widest text-[var(--ide-muted)]">
             Starter examples
           </p>
           <div className="mt-2 grid gap-2">
@@ -80,7 +127,7 @@ export function ProgrammingIDE({
                 key={example.label}
                 type="button"
                 onClick={() => onSourceChange(example.code)}
-                className="rounded-lg border border-[#293649] px-3 py-2 text-left text-xs font-medium text-slate-200 hover:border-[#78eb29] hover:bg-[#78eb29]/10"
+                className="rounded-lg border border-[var(--ide-border)] px-3 py-2 text-left text-xs font-medium text-[var(--ide-fg)] hover:border-[var(--ide-focus)] hover:bg-[var(--ide-hover)]"
               >
                 {example.label}
               </button>
@@ -88,15 +135,15 @@ export function ProgrammingIDE({
           </div>
         </aside>
         <div className="min-w-0">
-          <div className="flex items-center justify-between gap-2 border-b border-[#293649] bg-[#111b2c]">
-            <div className="flex items-center gap-2 border-t-2 border-[#78eb29] bg-[#0b1220] px-4 py-3 font-mono text-xs">
-              <span className="font-bold text-[#a6f66d]">PY</span>
+          <div className="flex items-center justify-between gap-2 border-b border-[var(--ide-border)] bg-[var(--ide-panel)]">
+            <div className="flex items-center gap-2 border-t-2 border-[var(--ide-accent)] bg-[var(--ide-editor)] px-4 py-3 font-mono text-xs">
+              <span className="font-bold text-[var(--ide-token)]">PY</span>
               main.py
             </div>
             <button
               type="button"
               onClick={onReset}
-              className="mr-3 rounded-md px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800"
+              className="mr-3 rounded-md px-3 py-2 text-xs font-semibold text-[var(--ide-fg)] hover:bg-[var(--ide-hover)]"
             >
               Reset
             </button>
@@ -105,7 +152,7 @@ export function ProgrammingIDE({
             <div
               aria-hidden="true"
               ref={gutter}
-              className="h-72 w-11 shrink-0 overflow-hidden border-r border-[#1c293d] py-4 text-right font-mono text-sm leading-6 text-slate-500 sm:h-80"
+              className="h-72 w-11 shrink-0 overflow-hidden border-r border-[var(--ide-border)] py-4 text-right font-mono text-sm leading-6 text-[var(--ide-muted)] sm:h-80"
             >
               {Array.from({ length: lineCount }, (_, index) => (
                 <div key={index} className="pr-3">
@@ -133,32 +180,32 @@ export function ProgrammingIDE({
               autoCapitalize="off"
               autoCorrect="off"
               wrap="off"
-              className="h-72 min-w-0 flex-1 resize-none overflow-auto bg-[#0b1220] p-4 font-mono text-sm leading-6 text-[#d4e6ff] caret-[#78eb29] focus:outline-2 focus:outline-inset focus:outline-[#78eb29] sm:h-80"
+              className="h-72 min-w-0 flex-1 resize-none overflow-auto bg-[var(--ide-editor)] p-4 font-mono text-sm leading-6 text-[var(--ide-code)] caret-[var(--ide-code)] focus:outline-2 focus:outline-inset focus:outline-[var(--ide-focus)] sm:h-80"
             />
           </div>
-          <section aria-label="Console" className="border-t border-[#293649]">
-            <div className="flex items-center justify-between bg-[#111b2c] px-4 py-2">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-slate-300">
+          <section aria-label="Console" className="border-t border-[var(--ide-border)]">
+            <div className="flex items-center justify-between bg-[var(--ide-panel)] px-4 py-2">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[var(--ide-fg)]">
                 Output console
               </h3>
               <button
                 type="button"
                 onClick={onClear}
-                className="rounded-md px-2 py-2 text-xs font-medium text-slate-300 hover:bg-slate-800"
+                className="rounded-md px-2 py-2 text-xs font-medium text-[var(--ide-fg)] hover:bg-[var(--ide-hover)]"
               >
                 Clear output
               </button>
             </div>
             <pre
               aria-live="polite"
-              className="min-h-28 max-h-48 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-sm leading-6 text-[#a6f66d]"
+              className="min-h-28 max-h-48 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-sm leading-6 text-[var(--ide-token)]"
             >
               {output || "Ready. Run your exercise to see the result."}
             </pre>
           </section>
         </div>
       </div>
-      <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[#293649] bg-[#111b2c] px-4 py-2 text-[11px] text-slate-400">
+      <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--ide-border)] bg-[var(--ide-panel)] px-4 py-2 text-[11px] text-[var(--ide-muted)]">
         <span>Python-style arithmetic simulator · No external execution</span>
         <span>{source.length}/2,000 characters · Ctrl/⌘ + Enter to run</span>
       </footer>
