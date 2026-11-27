@@ -4,6 +4,7 @@ import Link from "next/link";
 import { HeroPhotoBackground } from "@/components/hero-photo-background";
 import { RisaDomainModules } from "@/components/risa-domain-modules";
 import { RisaChevronLink } from "@/components/risa-chevron-link";
+import { RisaLatestUpdates } from "@/components/risa-latest-updates";
 import { RisaProgrammeCards } from "@/components/risa-programme-cards";
 import { getPublicRisaCourses } from "@/lib/risa-course-admin";
 import { getRisaProgrammes } from "@/lib/risa-programmes";
@@ -86,6 +87,8 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <RisaLatestUpdates />
 
       <section
         aria-labelledby="courses-heading"
