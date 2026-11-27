@@ -18,8 +18,8 @@ export default async function MarkdownPresenterPage() {
       </Link>
       <h1 className="mt-6 text-3xl font-bold">Markdown Presenter</h1>
       <p className="my-4 text-sm text-slate-600">
-        Present notes or assessments from any module with interactive Python blocks.
-        This private preview does not save, publish or grade your content.
+        Present notes or assessments from any module with interactive Python blocks. This
+        private preview does not save, publish or grade your content.
       </p>
       <MarkdownPresenter />
     </main>

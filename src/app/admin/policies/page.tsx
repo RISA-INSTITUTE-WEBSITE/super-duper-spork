@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { requireAdminSession } from "@/lib/risa-staff-session";
-import { getPolicy, listPolicies, type Policy, type PolicySummary } from "@/lib/risa-policies";
+import {
+  getPolicy,
+  listPolicies,
+  type Policy,
+  type PolicySummary,
+} from "@/lib/risa-policies";
 import { savePolicyAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -63,7 +68,7 @@ function PolicyForm({
     <form
       action={savePolicyAction}
       className="mt-8 space-y-5 rounded-2xl border border-slate-200 bg-white p-6"
-        >
+    >
       <h2 className="text-xl font-bold">{editing ? "Edit policy" : "New policy"}</h2>
       <input type="hidden" name="mode" value={editing ? "edit" : "create"} />
       <label className="block font-semibold">
@@ -134,11 +139,7 @@ function PolicyForm({
       </label>
       <label className="block font-semibold">
         Visibility
-        <select
-          name="status"
-          defaultValue={visibility}
-          className={fieldClass}
-        >
+        <select name="status" defaultValue={visibility} className={fieldClass}>
           <option value="draft">Draft — administrators only</option>
           <option value="published">Published — visible to everyone</option>
         </select>
@@ -155,7 +156,6 @@ function PolicyForm({
         </Link>
       )}
     </form>
-
   );
 }
 

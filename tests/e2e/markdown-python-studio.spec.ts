@@ -9,24 +9,26 @@ test("administrator can embed Python in arbitrary Markdown without loading hidde
   await setLabSession(page, "admin");
   await page.goto("/admin/labs");
   await page.getByRole("link", { name: "Open Markdown Presenter" }).click();
-  await page.getByRole("textbox", { name: "Presentation Markdown" }).fill(
-    [
-      "# Chemistry assessment",
-      "",
-      "Calculate the concentration.",
-      "",
-      "```python-run",
-      "print(0.5 / 0.25)",
-      "```",
-      "",
-      "```python",
-      "print('static example')",
-      "```",
-      "",
-      "```python-run",
-      "```",
-    ].join("\n"),
-  );
+  await page
+    .getByRole("textbox", { name: "Presentation Markdown" })
+    .fill(
+      [
+        "# Chemistry assessment",
+        "",
+        "Calculate the concentration.",
+        "",
+        "```python-run",
+        "print(0.5 / 0.25)",
+        "```",
+        "",
+        "```python",
+        "print('static example')",
+        "```",
+        "",
+        "```python-run",
+        "```",
+      ].join("\n"),
+    );
   await page.getByRole("button", { name: "Present Markdown" }).click();
   await expect(page.getByRole("heading", { name: "Chemistry assessment" })).toBeVisible();
   const open = page.getByRole("button", { name: "Open Python Studio", exact: true });
@@ -39,10 +41,9 @@ test("administrator can embed Python in arbitrary Markdown without loading hidde
   await expect(studio).not.toContainText("CS102");
   await expect(studio).not.toContainText("Your challenge");
   await studio.getByRole("button", { name: "Run", exact: true }).click();
-  await expect(studio.getByRole("region", { name: "Terminal" }).locator("pre")).toHaveText(
-    "2.0",
-    { timeout: 190_000 },
-  );
+  await expect(
+    studio.getByRole("region", { name: "Terminal" }).locator("pre"),
+  ).toHaveText("2.0", { timeout: 190_000 });
   await editor.fill("print(99)");
   await studio.getByRole("button", { name: "Reset", exact: true }).click();
   await expect(editor).toHaveValue("print(0.5 / 0.25)");

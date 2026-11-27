@@ -61,7 +61,9 @@ describe("Edu-ca-te note formatting", () => {
     expect(normalizeMathDelimiters(note)).toContain("$\nF=ma\n$");
     expect(normalizeMathDelimiters(pythonStudioFence)).toBe(pythonStudioFence);
     expect(normalizeMathDelimiters("~~~python-run\n" + code)).toContain(code);
-    expect(normalizeMathDelimiters("````python\n```\n" + code + "\n````")).toContain(code);
+    expect(normalizeMathDelimiters("````python\n```\n" + code + "\n````")).toContain(
+      code,
+    );
   });
 
   it("tracks checklist text and position", () => {
