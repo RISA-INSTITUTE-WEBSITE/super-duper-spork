@@ -151,6 +151,21 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       }
     }
 
+    function warmFrame() {
+      if (loaded.current) {
+        return;
+      }
+      loaded.current = true;
+      const target = frame.current?.contentWindow;
+      target?.postMessage(
+        { type: "warmup", preferCompatibility: prefersCompatibility() },
+        "*",
+      );
+      if (active.current) {
+        target?.postMessage(active.current, "*");
+      }
+    }
+
     function receive(event: MessageEvent) {
       if (event.source !== frame.current?.contentWindow || event.origin !== "null") {
         return;
@@ -160,17 +175,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
         return;
       }
       if (data.type === "frame-ready") {
-        if (loaded.current) {
-          return;
-        }
-        loaded.current = true;
-        frame.current?.contentWindow?.postMessage(
-          { type: "warmup", preferCompatibility: prefersCompatibility() },
-          "*",
-        );
-        if (active.current) {
-          frame.current?.contentWindow?.postMessage(active.current, "*");
-        }
+        warmFrame();
         return;
       }
       receiveRuntime(data);
