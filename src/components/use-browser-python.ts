@@ -180,8 +180,18 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       }
       receiveRuntime(data);
     }
+    function probeFrame() {
+      if (!loaded.current) {
+        frame.current?.contentWindow?.postMessage({ type: "ping" }, "*");
+      }
+    }
     window.addEventListener("message", receive);
+    // An eagerly loaded iframe can announce readiness before React attaches
+    // its listener. Retry the handshake, never the user's Python script.
+    probeFrame();
+    const probe = setInterval(probeFrame, 250);
     return () => {
+      clearInterval(probe);
       window.removeEventListener("message", receive);
       cancelTimer();
     };
