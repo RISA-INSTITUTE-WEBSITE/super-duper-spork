@@ -24,8 +24,8 @@ export function PythonLibraryManager({
         Python libraries
       </summary>
       <p className="mt-3 text-xs leading-5 text-[color:var(--ide-muted)]">
-        Install compatible packages on demand in this browser session. The catalogue is
-        a set of suggestions, not a restriction.
+        Install compatible packages on demand in this browser session. The catalogue is a
+        set of suggestions, not a restriction.
       </p>
       <label className="mt-3 block text-xs font-semibold">
         Suggested library
