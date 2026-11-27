@@ -239,3 +239,28 @@ test("Python syntax colours follow all four themes without altering code", async
   await expect(call).toHaveText("print");
   await expect(editor).toHaveValue("print(12 * 9)");
 });
+
+test("Python prewarms before Run and reuses the interpreter for subsequent commands", async ({
+  page,
+}) => {
+  test.setTimeout(420_000);
+  await setLabSession(page, "admin");
+  await page.goto("/workspace");
+  const status = page.getByRole("status", { name: "Python runtime status" });
+  const editor = page.getByRole("textbox", { name: "Editor" });
+  const terminal = page.getByRole("region", { name: "Terminal" }).locator("pre");
+  const run = page.getByRole("button", { name: "Run exercise" });
+  await expect(status).toContainText(/Python ready.*Startup \d+ ms/, {
+    timeout: 190_000,
+  });
+  const initial = await status.innerText();
+  await editor.fill("counter = 41\nprint(counter)");
+  await run.click();
+  await expect(terminal).toHaveText("41");
+  await expect(status).toContainText(/Last run \d+ ms/);
+  await editor.fill("print(counter + 1)");
+  await run.click();
+  await expect(terminal).toHaveText("42");
+  await expect(status).toContainText(initial);
+  await expect(status).toContainText(/Last run \d+ ms/);
+});

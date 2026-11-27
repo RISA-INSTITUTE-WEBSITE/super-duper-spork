@@ -205,6 +205,15 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           {python.version ? "Pyodide " + python.version : "Python"} · Browser runtime ·
           Isolated session
         </span>
+        <span role="status" aria-label="Python runtime status">
+          {python.phase === "ready"
+            ? "Python ready"
+            : python.phase === "failed"
+              ? "Python unavailable"
+              : "Starting Python…"}
+          {python.startupMs !== null && " · Startup " + python.startupMs + " ms"}
+          {python.lastRunMs !== null && " · Last run " + python.lastRunMs + " ms"}
+        </span>
         <span>{source.length}/20,000 characters · Ctrl/⌘ + Enter to run</span>
       </footer>
     </div>
