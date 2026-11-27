@@ -204,7 +204,9 @@ test("terminal prompts sequentially, echoes responses and preserves live Python 
   await expect(input).toHaveCount(0);
 });
 
-test("Python syntax colours follow all four themes without altering code", async ({ page }) => {
+test("Python syntax colours follow all four themes without altering code", async ({
+  page,
+}) => {
   await setLabSession(page, "admin");
   await page.goto("/workspace");
   const editor = page.getByRole("textbox", { name: "Editor" });
@@ -217,7 +219,15 @@ test("Python syntax colours follow all four themes without altering code", async
     await expect(editor).toHaveValue(source);
     await expect(highlighted).toHaveAttribute("aria-hidden", "true");
     const colors: string[] = [];
-    for (const kind of ["keyword", "comment", "function", "variable", "bracket-0", "string", "number"]) {
+    for (const kind of [
+      "keyword",
+      "comment",
+      "function",
+      "variable",
+      "bracket-0",
+      "string",
+      "number",
+    ]) {
       const token = highlighted.locator('[data-python-token="' + kind + '"]').first();
       await expect(token).toBeVisible();
       colors.push(await token.evaluate((element) => getComputedStyle(element).color));
@@ -225,6 +235,7 @@ test("Python syntax colours follow all four themes without altering code", async
     expect(new Set(colors).size).toBe(colors.length);
   }
   await editor.fill("print(12 * 9)");
-  await expect(highlighted.locator('[data-python-token="function"]')).toHaveText("print");
+  const call = highlighted.locator('[data-python-token="function"]');
+  await expect(call).toHaveText("print");
   await expect(editor).toHaveValue("print(12 * 9)");
 });

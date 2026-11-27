@@ -36,7 +36,8 @@ describe("Python syntax highlighting", () => {
       "🙂\t\n",
       "",
     ]) {
-      expect(highlightPython(source).map((token) => token.text).join("")).toBe(source);
+      const reconstructed = highlightPython(source).map((token) => token.text);
+      expect(reconstructed.join("")).toBe(source);
     }
     expect(highlightPython('"""multi\n# line"""')).toEqual([
       { kind: "string", text: '"""multi\n# line"""' },
