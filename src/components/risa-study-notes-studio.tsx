@@ -10,7 +10,7 @@ import {
 } from "@/app/admin/courses/[id]/content/study-notes/[topicId]/actions";
 import { RisaStudyNoteMarkdown } from "@/components/risa-study-note-markdown";
 import { prepareStudyNoteImage } from "@/lib/risa-note-image-preparation";
-import { studyNoteTemplate, validStudyNote } from "@/lib/risa-study-note-format";
+import { pythonStudioFence, studyNoteTemplate, validStudyNote } from "@/lib/risa-study-note-format";
 import type { StudyNote } from "@/lib/risa-study-notes";
 
 const primaryButton =
@@ -185,6 +185,19 @@ export function RisaStudyNotesStudio({
           >
             Insert Image
           </button>
+          <button
+            type="button"
+            className={secondaryButton}
+            disabled={busy || preview}
+            onClick={() => {
+              rememberCursor();
+              const { start, end } = cursor.current;
+              setMarkdown((old) => old.slice(0, start) + pythonStudioFence + old.slice(end));
+              setNotice("Python block inserted. Add code inside the fence and preview.");
+            }}
+          >
+            Insert Python Studio
+          </button>
           <input
             ref={imageInput}
             type="file"
@@ -195,7 +208,7 @@ export function RisaStudyNotesStudio({
         </div>
         {preview ? (
           <div className="min-w-0 rounded-xl border border-slate-200 p-4">
-            <RisaStudyNoteMarkdown text={markdown} />
+            <RisaStudyNoteMarkdown text={markdown} allowPython />
           </div>
         ) : (
           <label className="block text-sm font-bold">

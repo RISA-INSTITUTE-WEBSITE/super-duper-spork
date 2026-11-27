@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ProgrammingIDE } from "@/components/risa-programming-ide";
+import { PythonStudio } from "@/components/risa-programming-ide";
 import { runWorkspace, workspaceActivities } from "@/lib/risa-workspace";
 
 export function RisaPracticalWorkspace() {
@@ -31,17 +31,7 @@ export function RisaPracticalWorkspace() {
         ))}
       </div>
       {activity.id === "programming" ? (
-        <ProgrammingIDE
-          source={source}
-          onSourceChange={(value) => {
-            setSource(value);
-            setOutput("");
-          }}
-          onReset={() => {
-            setSource(activity.starter);
-            setOutput("");
-          }}
-        />
+        <PythonStudio />
       ) : (
         <>
           <h2 className="mt-6 text-xl font-bold">{activity.label} workspace</h2>
