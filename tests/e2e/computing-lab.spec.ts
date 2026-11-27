@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+import { setLabSession } from "../fixtures/lab-session";
+
 test("computing lab supports binary and logic practice", async ({ page }) => {
+  await setLabSession(page, "admin");
   await page.goto("/computing-lab");
   await expect(page.getByRole("heading", { name: "RISA Computing Lab" })).toBeVisible();
 

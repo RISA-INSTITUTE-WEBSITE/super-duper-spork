@@ -1,12 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-test("Labs navigation opens four working domain laboratories", async ({ page }) => {
-  await page.goto("/");
-  await page
-    .getByRole("navigation", { name: "Primary navigation" })
-    .getByRole("link", { name: "Labs", exact: true })
-    .click();
-  await expect(page).toHaveURL(/\/labs$/);
+import { setLabSession } from "../fixtures/lab-session";
+
+test.beforeEach(async ({ page }) => {
+  await setLabSession(page, "admin");
+});
+
+test("administrator preview opens four working domain laboratories", async ({ page }) => {
+  await page.goto("/admin/labs");
+  await expect(page).toHaveURL(/\/admin\/labs$/);
   for (const title of ["Computing", "Physics", "Cloud & DevOps", "Ethical Hacking"]) {
     await expect(
       page.getByRole("link", { name: "Open " + title + " Lab" }),

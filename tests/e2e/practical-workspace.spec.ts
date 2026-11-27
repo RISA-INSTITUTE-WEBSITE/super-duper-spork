@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test";
 
+import { setLabSession } from "../fixtures/lab-session";
+
 test("practical workspace runs safe local exercises", async ({ page }) => {
   test.setTimeout(240_000);
+  await setLabSession(page, "admin");
   await page.goto("/workspace");
   await page.getByRole("button", { name: "Run exercise" }).click();
   await expect(page.locator("pre")).toHaveText("40", { timeout: 130_000 });
@@ -26,6 +29,7 @@ test("staff and practical submissions require sign in", async ({ page }) => {
 test("programming studio examples, keyboard shortcut and console controls", async ({
   page,
 }) => {
+  await setLabSession(page, "admin");
   await page.goto("/workspace");
   await expect(
     page.getByRole("heading", { name: "RISA Programming Studio" }),
@@ -52,7 +56,9 @@ test("programming studio examples, keyboard shortcut and console controls", asyn
 test("programming studio switches themes without losing code or console output", async ({
   page,
 }) => {
+  await setLabSession(page, "admin");
   await page.goto("/workspace");
+  test.setTimeout(240_000);
   const studio = page.locator(".risa-programming-ide");
   const selector = page.getByRole("combobox", { name: "Color theme" });
   const editor = page.getByRole("textbox", { name: "Editor" });
@@ -69,7 +75,7 @@ test("programming studio switches themes without losing code or console output",
     await expect(studio).toHaveAttribute("data-theme", theme);
     await expect(editor).toHaveCSS("background-color", color);
     await expect(editor).toHaveValue("print(12 * 9)");
-    await expect(studio.locator("pre")).toHaveText("108");
+    await expect(studio.locator("pre")).toHaveText("108", { timeout: 130_000 });
   }
 });
 
@@ -77,6 +83,7 @@ test("real Python supports functions, stdin, imports and isolated execution", as
   page,
 }) => {
   test.setTimeout(300_000);
+  await setLabSession(page, "admin");
   await page.goto("/workspace");
   const editor = page.getByRole("textbox", { name: "Editor", exact: true });
   const console = page.locator(".risa-programming-ide pre");
@@ -106,9 +113,10 @@ test("real Python supports functions, stdin, imports and isolated execution", as
 });
 
 test("Python sandbox is narrowly scoped and has no application connectivity", async ({
-  request,
+  page,
 }) => {
-  const response = await request.get("/python-sandbox.html");
+  await setLabSession(page, "admin");
+  const response = await page.request.get("/python-sandbox.html");
   expect(response.ok()).toBeTruthy();
   const policy = response.headers()["content-security-policy"];
   expect(policy).toContain("sandbox allow-scripts");
@@ -118,7 +126,7 @@ test("Python sandbox is narrowly scoped and has no application connectivity", as
   expect(policy).not.toContain("'unsafe-eval'");
   expect(policy).not.toContain("'unsafe-inline'");
   expect(policy).not.toContain("connect-src 'self'");
-  const normal = await request.get("/workspace");
+  const normal = await page.request.get("/workspace");
   expect(normal.headers()["content-security-policy"]).not.toContain("'wasm-unsafe-eval'");
 });
 
@@ -126,6 +134,7 @@ test("library manager installs compatible packages without overwriting editor", 
   page,
 }) => {
   test.setTimeout(360_000);
+  await setLabSession(page, "admin");
   await page.goto("/workspace");
   const editor = page.getByRole("textbox", { name: "Editor", exact: true });
   const output = page.locator(".risa-programming-ide pre");
