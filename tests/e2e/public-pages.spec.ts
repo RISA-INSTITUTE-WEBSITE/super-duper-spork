@@ -313,7 +313,9 @@ test("course creation is unavailable to unauthenticated visitors", async ({ page
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
 });
 
-test("central study notes studio requires administrator authentication", async ({ page }) => {
+test("central study notes studio requires administrator authentication", async ({
+  page,
+}) => {
   await page.goto("/admin/study-notes");
   await expect(page).toHaveURL(/\/students\/login\/?$/);
 });
