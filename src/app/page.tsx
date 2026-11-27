@@ -93,12 +93,9 @@ export default async function HomePage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-2xl">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-700">
-                Real RISA courses
-              </p>
               <h2
                 id="courses-heading"
-                className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
+                className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
               >
                 Explore our courses
               </h2>
@@ -107,7 +104,7 @@ export default async function HomePage() {
               href="/programmes"
               className="inline-flex w-fit items-center gap-2 text-sm font-bold text-blue-800 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700"
             >
-              View all courses <ArrowIcon />
+              More <ArrowIcon />
             </Link>
           </div>
 
@@ -124,7 +121,11 @@ export default async function HomePage() {
               published by RISA administration.
             </p>
           ) : (
-            <RisaProgrammeCards programmes={courses} modules={modules} />
+            <RisaProgrammeCards
+              programmes={courses.slice(0, 3)}
+              modules={modules}
+              showDescriptions={false}
+            />
           )}
         </div>
       </section>
