@@ -44,7 +44,9 @@ export async function changeLecturerAssignment(
   assignment: LecturerAssignment,
   remove: boolean,
 ): Promise<boolean> {
-  if (![assignment.lecturer_id, assignment.course_id].every((id) => uuidPattern.test(id))) {
+  if (
+    ![assignment.lecturer_id, assignment.course_id].every((id) => uuidPattern.test(id))
+  ) {
     return false;
   }
   const filter = remove
