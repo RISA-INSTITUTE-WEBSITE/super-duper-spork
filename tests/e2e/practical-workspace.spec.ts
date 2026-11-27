@@ -121,3 +121,30 @@ test("Python sandbox is narrowly scoped and has no application connectivity", as
   const normal = await request.get("/workspace");
   expect(normal.headers()["content-security-policy"]).not.toContain("'wasm-unsafe-eval'");
 });
+
+test("library manager installs compatible packages without overwriting editor", async ({
+  page,
+}) => {
+  test.setTimeout(360_000);
+  await page.goto("/workspace");
+  const editor = page.getByRole("textbox", { name: "Editor", exact: true });
+  const output = page.locator(".risa-programming-ide pre");
+  await editor.fill("import pandas as pd\nprint(pd.Series([2, 4, 6]).mean())");
+  await page.getByText("Python libraries", { exact: true }).click();
+  await page.getByLabel("Suggested library").selectOption("pandas");
+  await page.getByRole("button", { name: "Install library", exact: true }).click();
+  await expect(output).toContainText("Installed: pandas", { timeout: 130_000 });
+  await expect(editor).toHaveValue(
+    "import pandas as pd\nprint(pd.Series([2, 4, 6]).mean())",
+  );
+  await page.getByRole("button", { name: "Run exercise" }).click();
+  await expect(output).toHaveText("4.0", { timeout: 130_000 });
+  await page.getByRole("button", { name: "List installed libraries" }).click();
+  await expect(output).toContainText("pandas", { timeout: 130_000 });
+  await page
+    .getByLabel("Package name or exact version")
+    .fill("https://example.org/pkg.whl");
+  await expect(
+    page.getByRole("button", { name: "Install library", exact: true }),
+  ).toBeDisabled();
+});

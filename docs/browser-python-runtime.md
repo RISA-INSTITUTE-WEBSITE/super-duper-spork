@@ -50,3 +50,20 @@ browser resources. Do not enter confidential information.
 
 Regression tests cover actual Python features, packages, input, cancellation,
 and the scoped response policy. Browser execution depends on CDN availability.
+
+## Library manager
+
+Open Python libraries in the Programming Studio sidebar. Choose a suggested
+package or enter any package name, optionally with an exact version. Install
+library runs micropip in the same interpreter as the editor. List installed
+libraries prints the session package inventory. Installation errors remain in
+the console and the editor source is not replaced. The suggestions include
+data analysis, machine learning, mathematics, statistics, visualization and
+applied sciences. They do not restrict the package names learners can request.
+
+Packages are downloaded on demand, not all preloaded. The pinned Pyodide
+package repository and compatible PyPI wheels are supported by the runtime;
+native-only wheels and GPU runtimes are not guaranteed. Installation and
+imports are subject to the existing session timeout and network policy.
+The library manager does not introduce a new package source or server execution.
+See https://pyodide.org/en/stable/usage/loading-packages.html for compatibility.

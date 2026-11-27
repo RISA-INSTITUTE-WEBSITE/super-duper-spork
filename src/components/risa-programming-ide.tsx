@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 
+import { PythonLibraryManager } from "./risa-python-library-manager";
 import { useBrowserPython } from "./use-browser-python";
 
 const themes = [
@@ -148,6 +149,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
             Import supported libraries directly. For compatible PyPI packages, use import
             micropip and await micropip.install(...). Do not enter secrets.
           </p>
+          <PythonLibraryManager running={python.running} onExecute={python.run} />
           <p className="mt-6 text-[11px] font-bold uppercase tracking-widest text-[color:var(--ide-muted)]">
             Starter examples
           </p>
