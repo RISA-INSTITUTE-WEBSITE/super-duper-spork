@@ -6,9 +6,11 @@ import { modulesForProgramme, type RisaProgramme } from "@/lib/risa-programmes";
 export function RisaProgrammeCards({
   programmes,
   modules,
+  showDescriptions = true,
 }: {
   programmes: RisaProgramme[];
   modules: RisaCourse[];
+  showDescriptions?: boolean;
 }) {
   return (
     <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
@@ -28,9 +30,11 @@ export function RisaProgrammeCards({
                 {programme.title}
               </h2>
             </div>
-            <p className="mt-4 flex-1 text-sm leading-7 text-slate-600">
-              {programme.description}
-            </p>
+            {showDescriptions && (
+              <p className="mt-4 flex-1 text-sm leading-7 text-slate-600">
+                {programme.description}
+              </p>
+            )}
             <p className="mt-4 text-sm font-bold text-[#286518]">
               {count} {count === 1 ? "module" : "modules"}
             </p>
