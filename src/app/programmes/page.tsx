@@ -55,7 +55,11 @@ export default async function ProgrammesPage() {
             </p>
           </div>
         ) : (
-          <RisaProgrammeCards programmes={courses} modules={modules} showDescriptions={false} />
+          <RisaProgrammeCards
+            programmes={courses}
+            modules={modules}
+            showDescriptions={false}
+          />
         )}
 
         <div className="mt-12 flex flex-col gap-4 rounded-2xl border border-[#dce8e6] bg-white/80 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
