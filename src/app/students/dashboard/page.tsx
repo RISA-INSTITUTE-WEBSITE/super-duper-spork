@@ -215,6 +215,10 @@ export default async function StudentDashboardPage() {
           className="h-auto max-h-[75%] w-[min(76vw,28rem)] max-w-full object-contain opacity-[0.14] sm:w-[min(64vw,30rem)] sm:opacity-[0.12]"
         />
       </div>
+      <div className="my-6 flex flex-wrap gap-4 text-sm font-bold text-[#286518]">
+        <Link href="/students/practicals">My practical submissions →</Link>
+        <Link href="/lecturers">Lecturer dashboard →</Link>
+      </div>
       <section
         aria-labelledby="welcome-heading"
         className="risa-science-glass relative z-10 flex flex-wrap items-center justify-between gap-5 rounded-[1.75rem] p-6 sm:p-8"
