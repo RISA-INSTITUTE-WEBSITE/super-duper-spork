@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 
-const executionLimit = 120_000;
+const executionLimit = 180_000;
 type PythonRun = { type: "run"; id: string; code: string; stdin: string };
 
 function pythonResult(data: unknown, id: string): string | null {
@@ -28,6 +28,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
   const [output, setOutput] = useState("");
   const [running, setRunning] = useState(false);
   const [stdin, setStdin] = useState("");
+  const [version, setVersion] = useState("");
 
   const finish = useCallback((message: string) => {
     if (timer.current !== null) {
@@ -43,6 +44,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
     (message = "Execution stopped. Python session reset.") => {
       finish(message);
       loaded.current = false;
+      setVersion("");
       setGeneration((value) => value + 1);
     },
     [finish],
@@ -53,15 +55,33 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       if (event.source !== frame.current?.contentWindow || event.origin !== "null") {
         return;
       }
+      const data = event.data;
+      if (data?.type === "frame-ready") {
+        loaded.current = true;
+        if (active.current) {
+          frame.current?.contentWindow?.postMessage(active.current, "*");
+        }
+        return;
+      }
       const request = active.current;
       if (!request) {
         return;
       }
-      if (event.data?.type === "runtime-error") {
-        stop("Python could not start. Check your network connection and try again.");
+      if (data?.type === "runtime-error") {
+        const detail = typeof data.detail === "string" ? data.detail.slice(0, 1000) : "";
+        stop("Python startup failed. " + detail + " Retry after checking your connection.");
         return;
       }
-      const result = pythonResult(event.data, request.id);
+      if (data?.type === "runtime-status") {
+        if (typeof data.version === "string") {
+          setVersion(data.version.slice(0, 40));
+        }
+        if (typeof data.message === "string") {
+          setOutput(data.message.slice(0, 200));
+        }
+        return;
+      }
+      const result = pythonResult(data, request.id);
       if (result !== null) {
         finish(result);
       }
@@ -98,13 +118,6 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
     }
   }
 
-  function frameLoaded() {
-    loaded.current = true;
-    if (active.current) {
-      dispatch(active.current);
-    }
-  }
-
   return {
     generation,
     output,
@@ -113,7 +126,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
     setStdin,
     run,
     stop,
-    frameLoaded,
+    version,
     clear: () => setOutput(""),
   };
 }

@@ -82,7 +82,6 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           sandbox="allow-scripts"
           title="Isolated Python runtime"
           hidden
-          onLoad={python.frameLoaded}
         />
       )}
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--ide-border)] bg-[var(--ide-panel)] px-4 py-3 sm:px-5">
@@ -170,7 +169,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           <div className="flex items-center justify-between gap-2 border-b border-[color:var(--ide-border)] bg-[var(--ide-panel)]">
             <div className="flex items-center gap-2 border-t-2 border-[color:var(--ide-accent)] bg-[var(--ide-editor)] px-4 py-3 font-mono text-xs">
               <span className="font-bold text-[color:var(--ide-token)]">PY</span>
-              main.py
+              main.py — write Python code here
             </div>
             <button
               type="button"
@@ -197,6 +196,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
             </div>
             <textarea
               aria-label="Editor"
+              placeholder="Write or paste Python code here, then select Run exercise."
               value={source}
               onChange={(event) => onSourceChange(event.target.value)}
               onScroll={(event) => {
@@ -220,7 +220,12 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           </div>
           <label className="block border-t border-[color:var(--ide-border)] p-4 text-xs font-semibold">
             Standard input (one response per line, before running)
+            <span className="mt-1 block font-normal text-[color:var(--ide-muted)]">
+              Only type answers to input() prompts here. Leave empty if not needed.
+            </span>
             <textarea
+              aria-label="Standard input (one response per line, before running)"
+              placeholder="Example: 100, then Enter, then 15. Do not paste Python code here."
               value={python.stdin}
               onChange={(event) => python.setStdin(event.target.value)}
               maxLength={6000}
@@ -254,7 +259,10 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
         </div>
       </div>
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--ide-border)] bg-[var(--ide-panel)] px-4 py-2 text-[11px] text-[color:var(--ide-muted)]">
-        <span>Python 3.14 · Browser runtime · Isolated session</span>
+        <span>
+          {python.version ? "Pyodide " + python.version : "Python"} · Browser runtime ·
+          Isolated session
+        </span>
         <span>{source.length}/20,000 characters · Ctrl/⌘ + Enter to run</span>
       </footer>
     </div>

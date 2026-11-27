@@ -3,11 +3,11 @@ import { expect, test } from "@playwright/test";
 import { setLabSession } from "../fixtures/lab-session";
 
 test("practical workspace runs safe local exercises", async ({ page }) => {
-  test.setTimeout(240_000);
+  test.setTimeout(420_000);
   await setLabSession(page, "admin");
   await page.goto("/workspace");
   await page.getByRole("button", { name: "Run exercise" }).click();
-  await expect(page.locator("pre")).toHaveText("40", { timeout: 130_000 });
+  await expect(page.locator("pre")).toHaveText("40", { timeout: 190_000 });
   await page.getByRole("button", { name: "Linux terminal" }).click();
   await page.getByRole("button", { name: "Run exercise" }).click();
   await expect(page.locator("pre")).toContainText("RISA practice workspace");
@@ -29,6 +29,7 @@ test("staff and practical submissions require sign in", async ({ page }) => {
 test("programming studio examples, keyboard shortcut and console controls", async ({
   page,
 }) => {
+  test.setTimeout(420_000);
   await setLabSession(page, "admin");
   await page.goto("/workspace");
   await expect(
@@ -38,10 +39,10 @@ test("programming studio examples, keyboard shortcut and console controls", asyn
   await page.getByRole("button", { name: "Addition", exact: true }).click();
   await expect(editor).toHaveValue("print(12 + 7)");
   await page.getByRole("button", { name: "Run exercise" }).click();
-  await expect(page.locator("pre")).toHaveText("19", { timeout: 130_000 });
+  await expect(page.locator("pre")).toHaveText("19", { timeout: 190_000 });
   await editor.fill("print(12 * 9)");
   await editor.press("Control+Enter");
-  await expect(page.locator("pre")).toHaveText("108", { timeout: 130_000 });
+  await expect(page.locator("pre")).toHaveText("108", { timeout: 190_000 });
   await page.getByRole("button", { name: "Clear output" }).click();
   await expect(page.locator("pre")).toContainText("Ready.");
   await expect(editor).toHaveValue("print(12 * 9)");
@@ -58,7 +59,7 @@ test("programming studio switches themes without losing code or console output",
 }) => {
   await setLabSession(page, "admin");
   await page.goto("/workspace");
-  test.setTimeout(240_000);
+  test.setTimeout(420_000);
   const studio = page.locator(".risa-programming-ide");
   const selector = page.getByRole("combobox", { name: "Color theme" });
   const editor = page.getByRole("textbox", { name: "Editor" });
@@ -75,14 +76,14 @@ test("programming studio switches themes without losing code or console output",
     await expect(studio).toHaveAttribute("data-theme", theme);
     await expect(editor).toHaveCSS("background-color", color);
     await expect(editor).toHaveValue("print(12 * 9)");
-    await expect(studio.locator("pre")).toHaveText("108", { timeout: 130_000 });
+    await expect(studio.locator("pre")).toHaveText("108", { timeout: 190_000 });
   }
 });
 
 test("real Python supports functions, stdin, imports and isolated execution", async ({
   page,
 }) => {
-  test.setTimeout(300_000);
+  test.setTimeout(420_000);
   await setLabSession(page, "admin");
   await page.goto("/workspace");
   const editor = page.getByRole("textbox", { name: "Editor", exact: true });
@@ -92,16 +93,16 @@ test("real Python supports functions, stdin, imports and isolated execution", as
     "def square(n):\n    return n ** 2\nprint([square(n) for n in range(4)])",
   );
   await run.click();
-  await expect(console).toHaveText("[0, 1, 4, 9]", { timeout: 130_000 });
+  await expect(console).toHaveText("[0, 1, 4, 9]", { timeout: 190_000 });
   await page
     .getByLabel("Standard input (one response per line, before running)")
     .fill("RISA");
   await editor.fill("import math\nprint(input(), math.sqrt(81))");
   await run.click();
-  await expect(console).toContainText("RISA 9.0", { timeout: 130_000 });
+  await expect(console).toContainText("RISA 9.0", { timeout: 190_000 });
   await editor.fill("import numpy as np\nprint(int(np.sum(np.arange(5))))");
   await run.click();
-  await expect(console).toHaveText("10", { timeout: 130_000 });
+  await expect(console).toHaveText("10", { timeout: 190_000 });
   await expect(page.locator('iframe[title="Isolated Python runtime"]')).toHaveAttribute(
     "sandbox",
     "allow-scripts",
@@ -133,7 +134,7 @@ test("Python sandbox is narrowly scoped and has no application connectivity", as
 test("library manager installs compatible packages without overwriting editor", async ({
   page,
 }) => {
-  test.setTimeout(360_000);
+  test.setTimeout(420_000);
   await setLabSession(page, "admin");
   await page.goto("/workspace");
   const editor = page.getByRole("textbox", { name: "Editor", exact: true });
@@ -142,14 +143,14 @@ test("library manager installs compatible packages without overwriting editor", 
   await page.getByText("Python libraries", { exact: true }).click();
   await page.getByLabel("Suggested library").selectOption("pandas");
   await page.getByRole("button", { name: "Install library", exact: true }).click();
-  await expect(output).toContainText("Installed: pandas", { timeout: 130_000 });
+  await expect(output).toContainText("Installed: pandas", { timeout: 190_000 });
   await expect(editor).toHaveValue(
     "import pandas as pd\nprint(pd.Series([2, 4, 6]).mean())",
   );
   await page.getByRole("button", { name: "Run exercise" }).click();
-  await expect(output).toHaveText("4.0", { timeout: 130_000 });
+  await expect(output).toHaveText("4.0", { timeout: 190_000 });
   await page.getByRole("button", { name: "List installed libraries" }).click();
-  await expect(output).toContainText("pandas", { timeout: 130_000 });
+  await expect(output).toContainText("pandas", { timeout: 190_000 });
   await page
     .getByLabel("Package name or exact version")
     .fill("https://example.org/pkg.whl");
