@@ -88,9 +88,9 @@ export function PythonLibraryManager({
         List installed libraries
       </button>
       <p className="mt-3 text-xs leading-5 text-[color:var(--ide-muted)]">
-        Results appear in the console without replacing your code. Reset or Stop
-        discards installed libraries. Some packages require native Python or a GPU.
-        Plot rendering is not yet available. Install only packages you trust.
+        Results appear in the console without replacing your code. Reset or Stop discards
+        installed libraries. Some packages require native Python or a GPU. Plot rendering
+        is not yet available. Install only packages you trust.
       </p>
     </details>
   );
