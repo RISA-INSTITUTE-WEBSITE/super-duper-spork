@@ -2,6 +2,8 @@
 
 import { useRef, useState } from "react";
 
+import { useBrowserPython } from "./use-browser-python";
+
 const themes = [
   { id: "dark-plus", label: "Dark+" },
   { id: "light-plus", label: "Light+" },
@@ -46,26 +48,24 @@ const examples = [
   { label: "Area of a rectangle", code: "print(8 * 5)" },
   { label: "Addition", code: "print(12 + 7)" },
   { label: "Division", code: "print(24 / 6)" },
+  { label: "Functions & loops", code: "def square(x):\n    return x * x\n\nfor n in range(1, 6):\n    print(square(n))" },
+  { label: "Math library", code: "import math\nprint(math.sqrt(81))" },
+  { label: "NumPy", code: "import numpy as np\nprint(np.arange(5) ** 2)" },
 ];
 
 type ProgrammingIDEProps = {
   source: string;
-  output: string;
   onSourceChange: (value: string) => void;
-  onRun: () => void;
   onReset: () => void;
-  onClear: () => void;
 };
 
 export function ProgrammingIDE({
   source,
-  output,
   onSourceChange,
-  onRun,
   onReset,
-  onClear,
 }: ProgrammingIDEProps) {
   const [theme, setTheme] = useState<StudioTheme>("dark-plus");
+  const python = useBrowserPython();
   const gutter = useRef<HTMLDivElement>(null);
   const lineCount = Math.max(12, source.split("\n").length);
   return (
@@ -73,6 +73,17 @@ export function ProgrammingIDE({
       data-theme={theme}
       className="risa-programming-ide mt-6 overflow-hidden rounded-2xl border border-[color:var(--ide-border)] bg-[var(--ide-editor)] text-[color:var(--ide-fg)] shadow-xl"
     >
+      {python.generation > 0 && (
+        <iframe
+          key={python.generation}
+          ref={python.frame}
+          src="/python-sandbox.html"
+          sandbox="allow-scripts"
+          title="Isolated Python runtime"
+          hidden
+          onLoad={python.frameLoaded}
+        />
+      )}
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-[color:var(--ide-border)] bg-[var(--ide-panel)] px-4 py-3 sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[var(--ide-hover)] font-mono text-lg font-bold text-[color:var(--ide-token)]">
@@ -89,8 +100,9 @@ export function ProgrammingIDE({
           <ThemeSelector theme={theme} onChange={setTheme} />
           <button
             type="button"
-            onClick={onRun}
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--ide-accent)] px-4 py-2 text-sm font-bold text-[color:var(--ide-button-fg)] hover:bg-[var(--ide-button-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ide-focus)]"
+            disabled={python.running}
+            onClick={() => python.run(source)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--ide-accent)] px-4 py-2 text-sm font-bold text-[color:var(--ide-button-fg)] hover:bg-[var(--ide-button-hover)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ide-focus)] disabled:opacity-50"
           >
             <svg
               aria-hidden="true"
@@ -101,6 +113,14 @@ export function ProgrammingIDE({
               <path d="M4 2.5v11l9-5.5z" />
             </svg>
             Run exercise
+          </button>
+          <button
+            type="button"
+            disabled={!python.running}
+            onClick={() => python.stop()}
+            className="min-h-11 rounded-lg border border-[color:var(--ide-border)] px-3 text-sm font-bold disabled:opacity-50"
+          >
+            Stop
           </button>
         </div>
       </header>
@@ -148,7 +168,10 @@ export function ProgrammingIDE({
             </div>
             <button
               type="button"
-              onClick={onReset}
+              onClick={() => {
+                onReset();
+                python.stop("");
+              }}
               className="mr-3 rounded-md px-3 py-2 text-xs font-semibold text-[color:var(--ide-fg)] hover:bg-[var(--ide-hover)]"
             >
               Reset
@@ -178,10 +201,10 @@ export function ProgrammingIDE({
               onKeyDown={(event) => {
                 if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
                   event.preventDefault();
-                  onRun();
+                  python.run(source);
                 }
               }}
-              maxLength={2000}
+              maxLength={20000}
               spellCheck={false}
               autoCapitalize="off"
               autoCorrect="off"
@@ -189,6 +212,16 @@ export function ProgrammingIDE({
               className="h-72 min-w-0 flex-1 resize-none overflow-auto bg-[var(--ide-editor)] p-4 font-mono text-sm leading-6 text-[color:var(--ide-code)] caret-[var(--ide-code)] focus:outline-2 focus:outline-inset focus:outline-[var(--ide-focus)] sm:h-80"
             />
           </div>
+          <label className="block border-t border-[color:var(--ide-border)] p-4 text-xs font-semibold">
+            Standard input (one response per line, before running)
+            <textarea
+              value={python.stdin}
+              onChange={(event) => python.setStdin(event.target.value)}
+              maxLength={6000}
+              rows={2}
+              className="mt-2 w-full rounded border border-[color:var(--ide-border)] bg-[var(--ide-editor)] p-2 font-mono text-sm"
+            />
+          </label>
           <section
             aria-label="Console"
             className="border-t border-[color:var(--ide-border)]"
@@ -199,7 +232,7 @@ export function ProgrammingIDE({
               </h3>
               <button
                 type="button"
-                onClick={onClear}
+                onClick={python.clear}
                 className="rounded-md px-2 py-2 text-xs font-medium text-[color:var(--ide-fg)] hover:bg-[var(--ide-hover)]"
               >
                 Clear output
@@ -209,14 +242,14 @@ export function ProgrammingIDE({
               aria-live="polite"
               className="min-h-28 max-h-48 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-sm leading-6 text-[color:var(--ide-token)]"
             >
-              {output || "Ready. Run your exercise to see the result."}
+              {python.output || "Ready. Run your exercise to see the result."}
             </pre>
           </section>
         </div>
       </div>
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--ide-border)] bg-[var(--ide-panel)] px-4 py-2 text-[11px] text-[color:var(--ide-muted)]">
-        <span>Python-style arithmetic simulator · No external execution</span>
-        <span>{source.length}/2,000 characters · Ctrl/⌘ + Enter to run</span>
+        <span>Python 3.14 · Browser runtime · Isolated session</span>
+        <span>{source.length}/20,000 characters · Ctrl/⌘ + Enter to run</span>
       </footer>
     </div>
   );

@@ -33,17 +33,14 @@ export function RisaPracticalWorkspace() {
       {activity.id === "programming" ? (
         <ProgrammingIDE
           source={source}
-          output={output}
           onSourceChange={(value) => {
             setSource(value);
             setOutput("");
           }}
-          onRun={() => setOutput(runWorkspace(activity.id, source))}
           onReset={() => {
             setSource(activity.starter);
             setOutput("");
           }}
-          onClear={() => setOutput("")}
         />
       ) : (
         <>

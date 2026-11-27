@@ -14,8 +14,8 @@ export default function WorkspacePage() {
         <header>
           <h1 className="text-4xl font-bold">RISA Practical Workspace</h1>
           <p className="mt-3 text-slate-600">
-            Experiment, inspect the output and explain your results. These introductory
-            exercises use a restricted simulator rather than a full language runtime.
+            Experiment, inspect the output and explain your results. Programming runs real
+            Python in an isolated browser runtime; the other workspaces remain simulations.
           </p>
         </header>
         <RisaPracticalWorkspace />

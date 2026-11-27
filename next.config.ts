@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 import { contentSecurityPolicy } from "./src/lib/risa-security-policy";
+import { pythonSandboxPolicy } from "./src/python-sandbox/runtime";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -59,6 +60,13 @@ const nextConfig: NextConfig = {
       {
         source: "/:path*",
         headers: [...securityHeaders],
+      },
+      {
+        source: "/python-sandbox.html",
+        headers: [
+          { key: "Content-Security-Policy", value: pythonSandboxPolicy },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        ],
       },
       ...coepProtectedRoutes.map((source) => ({
         source,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const executionLimit = 120_000;
 type PythonRun = { type: "run"; id: string; code: string; stdin: string };
@@ -15,7 +15,7 @@ export function useBrowserPython() {
   const [running, setRunning] = useState(false);
   const [stdin, setStdin] = useState("");
 
-  function finish(message: string) {
+  const finish = useCallback((message: string) => {
     if (timer.current !== null) {
       clearTimeout(timer.current);
       timer.current = null;
@@ -23,13 +23,13 @@ export function useBrowserPython() {
     active.current = null;
     setOutput(message);
     setRunning(false);
-  }
+  }, []);
 
-  function stop(message = "Execution stopped. Python session reset.") {
+  const stop = useCallback((message = "Execution stopped. Python session reset.") => {
     finish(message);
     loaded.current = false;
     setGeneration((value) => value + 1);
-  }
+  }, [finish]);
 
   useEffect(() => {
     function receive(event: MessageEvent) {
@@ -56,7 +56,7 @@ export function useBrowserPython() {
         clearTimeout(timer.current);
       }
     };
-  }, []);
+  }, [finish, stop]);
 
   function dispatch(request: PythonRun) {
     frame.current?.contentWindow?.postMessage(request, "*");
@@ -74,7 +74,9 @@ export function useBrowserPython() {
       () => stop("Execution timed out. Python session reset."),
       executionLimit,
     );
-    if (loaded.current) {
+    if (generation === 0) {
+      setGeneration(1);
+    } else if (loaded.current) {
       dispatch(request);
     }
   }

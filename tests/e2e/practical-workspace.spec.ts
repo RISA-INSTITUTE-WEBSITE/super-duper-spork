@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 test("practical workspace runs safe local exercises", async ({ page }) => {
+  test.setTimeout(240_000);
   await page.goto("/workspace");
   await page.getByRole("button", { name: "Run exercise" }).click();
-  await expect(page.locator("pre")).toHaveText("40");
+  await expect(page.locator("pre")).toHaveText("40", { timeout: 130_000 });
   await page.getByRole("button", { name: "Linux terminal" }).click();
   await page.getByRole("button", { name: "Run exercise" }).click();
   await expect(page.locator("pre")).toContainText("RISA practice workspace");
@@ -33,10 +34,10 @@ test("programming studio examples, keyboard shortcut and console controls", asyn
   await page.getByRole("button", { name: "Addition", exact: true }).click();
   await expect(editor).toHaveValue("print(12 + 7)");
   await page.getByRole("button", { name: "Run exercise" }).click();
-  await expect(page.locator("pre")).toHaveText("19");
+  await expect(page.locator("pre")).toHaveText("19", { timeout: 130_000 });
   await editor.fill("print(12 * 9)");
   await editor.press("Control+Enter");
-  await expect(page.locator("pre")).toHaveText("108");
+  await expect(page.locator("pre")).toHaveText("108", { timeout: 130_000 });
   await page.getByRole("button", { name: "Clear output" }).click();
   await expect(page.locator("pre")).toContainText("Ready.");
   await expect(editor).toHaveValue("print(12 * 9)");
