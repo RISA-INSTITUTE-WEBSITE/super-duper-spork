@@ -151,7 +151,12 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
       return;
     }
     frame.current?.contentWindow?.postMessage(
-      { type: "input", id: active.current.id, sequence: waiting.current, value: value.slice(0, 1000) },
+      {
+        type: "input",
+        id: active.current.id,
+        sequence: waiting.current,
+        value: value.slice(0, 1000),
+      },
       "*",
     );
     waiting.current = null;

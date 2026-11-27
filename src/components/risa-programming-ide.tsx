@@ -229,7 +229,8 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
             inputSequence={python.inputSequence}
             onInput={python.sendInput}
             onClear={python.clear}
-          />       </div>
+          />
+        </div>
       </div>
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--ide-border)] bg-[var(--ide-panel)] px-4 py-2 text-[11px] text-[color:var(--ide-muted)]">
         <span>

@@ -71,21 +71,22 @@ const boot = async () => {
       stderr: () => {},
     });
     runtime.registerJsModule("_risa_terminal", { requestLine });
-    runtime.runPython(${JSON.stringify([
-"import builtins as _builtins",
-"import sys as _sys",
-"from pyodide.ffi import run_sync as _run_sync, can_run_sync as _can_run_sync",
-"from _risa_terminal import requestLine as _request_line",
-"def _terminal_input(prompt=''):",
-"    if not _can_run_sync():",
-"        raise RuntimeError('Interactive input requires a JSPI-capable browser. Update Chrome or Edge and retry.')",
-"    _sys.stdout.flush()",
-"    _sys.stderr.flush()",
-"    value = _run_sync(_request_line(str(prompt)))",
-"    if value is None:",
-"        raise EOFError('Terminal input limit reached')",
-"    return str(value)",
-"_builtins.input = _terminal_input"
+    runtime.runPython(${JSON.stringify(
+      [
+        "import builtins as _builtins",
+        "import sys as _sys",
+        "from pyodide.ffi import run_sync as _run_sync, can_run_sync as _can_run_sync",
+        "from _risa_terminal import requestLine as _request_line",
+        "def _terminal_input(prompt=''):",
+        "    if not _can_run_sync():",
+        "        raise RuntimeError('Interactive input requires a JSPI-capable browser. Update Chrome or Edge and retry.')",
+        "    _sys.stdout.flush()",
+        "    _sys.stderr.flush()",
+        "    value = _run_sync(_request_line(str(prompt)))",
+        "    if value is None:",
+        "        raise EOFError('Terminal input limit reached')",
+        "    return str(value)",
+        "_builtins.input = _terminal_input"
 ].join("\n"))});
     self.postMessage({ type: "ready", version: runtime.version });
   } catch (error) {
@@ -109,8 +110,8 @@ self.onmessage = async ({ data }) => {
   };
   try {
     runtime.setStdin({ error: true });
-    runtime.setStdout({ write: write(stdoutDecoder) });
-    runtime.setStderr({ write: write(stderrDecoder) });
+    runtime.setStdout({ write: write(stdoutDecoder), isatty: true });
+    runtime.setStderr({ write: write(stderrDecoder), isatty: true });
     await runtime.loadPackagesFromImports(data.code, {
       messageCallback: () => {},
       errorCallback: (error) => append(String(error) + "\\n"),
