@@ -6,16 +6,17 @@ test("practical workspace runs safe local exercises", async ({ page }) => {
   test.setTimeout(420_000);
   await setLabSession(page, "admin");
   await page.goto("/workspace");
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("textbox", { name: "Editor" }).fill("print(8 * 5)");
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(page.locator("pre")).toHaveText("40", { timeout: 190_000 });
   await page.getByRole("button", { name: "Linux terminal" }).click();
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run exercise", exact: true }).click();
   await expect(page.locator("pre")).toContainText("RISA practice workspace");
   await page.getByRole("button", { name: "Database" }).click();
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run exercise", exact: true }).click();
   await expect(page.locator("pre")).toContainText("2 rows");
   await page.getByRole("button", { name: "Physics" }).click();
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run exercise", exact: true }).click();
   await expect(page.locator("pre")).toHaveText("5");
 });
 
@@ -26,7 +27,7 @@ test("staff and practical submissions require sign in", async ({ page }) => {
   }
 });
 
-test("programming studio examples, keyboard shortcut and console controls", async ({
+test("blank programming studio, keyboard shortcut and terminal controls", async ({
   page,
 }) => {
   test.setTimeout(420_000);
@@ -36,9 +37,9 @@ test("programming studio examples, keyboard shortcut and console controls", asyn
     page.getByRole("heading", { name: "RISA Programming Studio" }),
   ).toBeVisible();
   const editor = page.getByRole("textbox", { name: "Editor" });
-  await page.getByRole("button", { name: "Addition", exact: true }).click();
-  await expect(editor).toHaveValue("print(12 + 7)");
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await expect(editor).toHaveValue("");
+  await editor.fill("print(12 + 7)");
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(page.locator("pre")).toHaveText("19", { timeout: 190_000 });
   await editor.fill("print(12 * 9)");
   await editor.press("Control+Enter");
@@ -47,7 +48,7 @@ test("programming studio examples, keyboard shortcut and console controls", asyn
   await expect(page.locator("pre")).toContainText("Ready.");
   await expect(editor).toHaveValue("print(12 * 9)");
   await page.getByRole("button", { name: "Reset", exact: true }).click();
-  await expect(editor).toHaveValue("print(8 * 5)");
+  await expect(editor).toHaveValue("");
   await page.getByRole("button", { name: "Linux terminal" }).click();
   await expect(
     page.getByRole("heading", { name: "RISA Programming Studio" }),
@@ -65,7 +66,7 @@ test("programming studio switches themes without losing code or console output",
   const editor = page.getByRole("textbox", { name: "Editor" });
   await expect(studio).toHaveAttribute("data-theme", "dark-plus");
   await editor.fill("print(12 * 9)");
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   for (const [theme, color] of [
     ["light-plus", "rgb(255, 255, 255)"],
     ["monokai", "rgb(39, 40, 34)"],
@@ -91,7 +92,7 @@ test("real Python supports functions, stdin, imports and isolated execution", as
   await page.goto("/workspace");
   const editor = page.getByRole("textbox", { name: "Editor", exact: true });
   const console = page.locator(".risa-programming-ide pre");
-  const run = page.getByRole("button", { name: "Run exercise" });
+  const run = page.getByRole("button", { name: "Run", exact: true });
   await editor.fill(
     "def square(n):\n    return n ** 2\nprint([square(n) for n in range(4)])",
   );
@@ -151,7 +152,7 @@ test("library manager installs compatible packages without overwriting editor", 
   await expect(editor).toHaveValue(
     "import pandas as pd\nprint(pd.Series([2, 4, 6]).mean())",
   );
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(output).toHaveText("4.0", { timeout: 190_000 });
   await page.getByRole("button", { name: "List installed libraries" }).click();
   await expect(output).toContainText("pandas", { timeout: 190_000 });
@@ -176,7 +177,7 @@ test("terminal prompts sequentially, echoes responses and preserves live Python 
   await editor.fill(
     'print("Starting")\nbill = float(input("Bill: "))\ntip = float(input("Tip: "))\npeople = int(input("People: "))\nprint(f"Each: {bill * (1 + tip / 100) / people:.2f}")',
   );
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(transcript).toContainText("Starting", { timeout: 190_000 });
   await expect(input).toBeFocused({ timeout: 190_000 });
   await expect(transcript).toContainText("Bill:");
@@ -197,7 +198,7 @@ test("terminal prompts sequentially, echoes responses and preserves live Python 
   expect((await transcript.innerText()).match(/Starting/g)).toHaveLength(1);
   await expect(page.getByLabel(/Standard input/)).toHaveCount(0);
   await editor.fill('input("Waiting: ")');
-  await page.getByRole("button", { name: "Run exercise" }).click();
+  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(input).toBeVisible();
   await page.getByRole("button", { name: "Stop", exact: true }).click();
   await expect(transcript).toContainText("Execution stopped");
@@ -249,7 +250,7 @@ test("Python prewarms before Run and reuses the interpreter for subsequent comma
   const status = page.getByRole("status", { name: "Python runtime status" });
   const editor = page.getByRole("textbox", { name: "Editor" });
   const terminal = page.getByRole("region", { name: "Terminal" }).locator("pre");
-  const run = page.getByRole("button", { name: "Run exercise" });
+  const run = page.getByRole("button", { name: "Run", exact: true });
   await expect(status).toContainText(/Python ready.*Startup \d+ ms/, {
     timeout: 190_000,
   });

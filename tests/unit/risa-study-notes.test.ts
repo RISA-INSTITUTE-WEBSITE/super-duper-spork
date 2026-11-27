@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   extractMarkdownChecklist,
   normalizeMathDelimiters,
+  pythonStudioFence,
   studyNoteTemplate,
   taskKey,
   validStudyNote,
@@ -49,6 +50,18 @@ describe("Edu-ca-te note formatting", () => {
       "$a=b$ \n$$\nF=ma\n$$\n",
     );
     expect(normalizeMathDelimiters("$x$")).toBe("$x$");
+  });
+
+  it("preserves Python fenced code while normalizing surrounding math", () => {
+    const code = String.raw`print(r"\(x\)")`;
+    const block = "```python-run\n" + code + "\n```";
+    const note = String.raw`\(a=b\)` + "\n\n" + block + "\n\n" + String.raw`\[F=ma\]`;
+    expect(normalizeMathDelimiters(note)).toContain(block);
+    expect(normalizeMathDelimiters(note)).toContain("$a=b$");
+    expect(normalizeMathDelimiters(note)).toContain("$\nF=ma\n$");
+    expect(normalizeMathDelimiters(pythonStudioFence)).toBe(pythonStudioFence);
+    expect(normalizeMathDelimiters("~~~python-run\n" + code)).toContain(code);
+    expect(normalizeMathDelimiters("````python\n```\n" + code + "\n````")).toContain(code);
   });
 
   it("tracks checklist text and position", () => {
