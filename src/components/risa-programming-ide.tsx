@@ -117,7 +117,9 @@ export function ProgrammingIDE({
             expression again.
           </p>
           <div className="mt-5 rounded-lg border border-[color:var(--ide-border)] bg-[var(--ide-editor)] p-3">
-            <p className="text-xs font-bold text-[color:var(--ide-token)]">Your challenge</p>
+            <p className="text-xs font-bold text-[color:var(--ide-token)]">
+              Your challenge
+            </p>
             <p className="mt-2 text-xs leading-5 text-[color:var(--ide-fg)]">
               Find the area of a rectangle measuring 12 m by 9 m.
             </p>
@@ -187,7 +189,10 @@ export function ProgrammingIDE({
               className="h-72 min-w-0 flex-1 resize-none overflow-auto bg-[var(--ide-editor)] p-4 font-mono text-sm leading-6 text-[color:var(--ide-code)] caret-[var(--ide-code)] focus:outline-2 focus:outline-inset focus:outline-[var(--ide-focus)] sm:h-80"
             />
           </div>
-          <section aria-label="Console" className="border-t border-[color:var(--ide-border)]">
+          <section
+            aria-label="Console"
+            className="border-t border-[color:var(--ide-border)]"
+          >
             <div className="flex items-center justify-between bg-[var(--ide-panel)] px-4 py-2">
               <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[color:var(--ide-fg)]">
                 Output console

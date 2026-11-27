@@ -91,8 +91,8 @@ export function RisaPracticalWorkspace() {
             </button>
           </div>
           <p className="mt-4 text-xs text-slate-600">
-            Restricted educational simulation. Copy your code, output and explanation into the
-            submission form when ready.
+            Restricted educational simulation. Copy your code, output and explanation into
+            the submission form when ready.
           </p>
         </>
       )}
