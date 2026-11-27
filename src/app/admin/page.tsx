@@ -141,6 +141,18 @@ export default async function RisaAdminPage() {
 
       <section className="mt-12 grid gap-5 lg:grid-cols-2">
         <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
+          <h2 className="text-xl font-bold">Study Notes Studio</h2>
+          <p className="mt-3 text-sm text-slate-600">
+            Create, preview and publish Markdown and LaTeX study notes.
+          </p>
+          <Link
+            href="/admin/study-notes"
+            className="mt-5 inline-flex font-bold text-[#286518]"
+          >
+            Open Study Notes Studio →
+          </Link>
+        </article>
+        <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
           <h2 className="text-xl font-bold">Institutional policies</h2>
           <p className="mt-3 text-sm text-slate-600">
             Create drafts, update policy documents and publish approved policies.
