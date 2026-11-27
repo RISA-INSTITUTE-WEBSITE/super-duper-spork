@@ -460,6 +460,16 @@ body:has(.risa-hero) .risa-navbar,
 
 /* Programming Studio workbench palettes, inspired by VS Code built-in themes. */
 .risa-programming-ide[data-theme="dark-plus"] {
+  --python-keyword: #c586c0;
+  --python-comment: #6a9955;
+  --python-string: #ce9178;
+  --python-number: #b5cea8;
+  --python-function: #dcdcaa;
+  --python-variable: #9cdcfe;
+  --python-bracket-0: #ffd700;
+  --python-bracket-1: #da70d6;
+  --python-bracket-2: #87cefa;
+  --python-operator: #d4d4d4;
   --ide-editor: #1e1e1e;
   --ide-sidebar: #252526;
   --ide-panel: #333333;
@@ -476,6 +486,16 @@ body:has(.risa-hero) .risa-navbar,
 }
 
 .risa-programming-ide[data-theme="light-plus"] {
+  --python-keyword: #800080;
+  --python-comment: #008000;
+  --python-string: #a31515;
+  --python-number: #098658;
+  --python-function: #795e26;
+  --python-variable: #001080;
+  --python-bracket-0: #825000;
+  --python-bracket-1: #af00db;
+  --python-bracket-2: #005cc5;
+  --python-operator: #333333;
   --ide-editor: #ffffff;
   --ide-sidebar: #f3f3f3;
   --ide-panel: #eeeeee;
@@ -492,6 +512,16 @@ body:has(.risa-hero) .risa-navbar,
 }
 
 .risa-programming-ide[data-theme="monokai"] {
+  --python-keyword: #f92672;
+  --python-comment: #a6a28c;
+  --python-string: #e6db74;
+  --python-number: #ae81ff;
+  --python-function: #a6e22e;
+  --python-variable: #66d9ef;
+  --python-bracket-0: #f4bf75;
+  --python-bracket-1: #f92672;
+  --python-bracket-2: #ae81ff;
+  --python-operator: #f8f8f2;
   --ide-editor: #272822;
   --ide-sidebar: #1e1f1c;
   --ide-panel: #34352e;
@@ -508,6 +538,16 @@ body:has(.risa-hero) .risa-navbar,
 }
 
 .risa-programming-ide[data-theme="high-contrast"] {
+  --python-keyword: #ff8cff;
+  --python-comment: #7fff7f;
+  --python-string: #ffb6a0;
+  --python-number: #d0ff70;
+  --python-function: #ffff00;
+  --python-variable: #70eaff;
+  --python-bracket-0: #ffffff;
+  --python-bracket-1: #ff8cff;
+  --python-bracket-2: #70eaff;
+  --python-operator: #eeeeee;
   --ide-editor: #000000;
   --ide-sidebar: #000000;
   --ide-panel: #000000;
@@ -521,4 +561,106 @@ body:has(.risa-hero) .risa-navbar,
   --ide-button-hover: #ffff00;
   --ide-focus: #ffff00;
   --ide-hover: #292929;
+}
+
+/* Python lexical highlighting overlays the native editable textarea.
+   Both layers have identical metrics and scroll positions. */
+.risa-python-editor {
+  background: var(--ide-editor);
+}
+
+.risa-python-editor-layer {
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  padding: 16px;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  font-weight: 400;
+  font-variant-ligatures: none;
+  letter-spacing: normal;
+  line-height: 24px;
+  tab-size: 4;
+  white-space: pre;
+  overflow: scroll;
+  scrollbar-gutter: stable;
+}
+
+.risa-python-highlight {
+  pointer-events: none;
+  user-select: none;
+  scrollbar-color: transparent transparent;
+  color: var(--ide-code);
+}
+
+.risa-python-editor-input {
+  background: transparent;
+  color: transparent;
+  caret-color: var(--ide-code);
+}
+
+.risa-python-editor-input::placeholder {
+  color: var(--ide-muted);
+}
+
+.risa-python-editor-input::selection {
+  background: color-mix(in srgb, var(--ide-focus) 35%, transparent);
+  color: transparent;
+}
+
+.risa-python-highlight [data-python-token="keyword"] {
+  color: var(--python-keyword);
+}
+
+.risa-python-highlight [data-python-token="comment"] {
+  color: var(--python-comment);
+}
+
+.risa-python-highlight [data-python-token="string"] {
+  color: var(--python-string);
+}
+
+.risa-python-highlight [data-python-token="number"] {
+  color: var(--python-number);
+}
+
+.risa-python-highlight [data-python-token="function"] {
+  color: var(--python-function);
+}
+
+.risa-python-highlight [data-python-token="variable"] {
+  color: var(--python-variable);
+}
+
+.risa-python-highlight [data-python-token="bracket-0"] {
+  color: var(--python-bracket-0);
+}
+
+.risa-python-highlight [data-python-token="bracket-1"] {
+  color: var(--python-bracket-1);
+}
+
+.risa-python-highlight [data-python-token="bracket-2"] {
+  color: var(--python-bracket-2);
+}
+
+.risa-python-highlight [data-python-token="operator"] {
+  color: var(--python-operator);
+}
+
+@media (forced-colors: active) {
+  .risa-python-highlight {
+    visibility: hidden;
+  }
+
+  .risa-python-editor-input {
+    color: CanvasText;
+    caret-color: CanvasText;
+    background: Canvas;
+  }
+
+  .risa-python-editor-input::selection {
+    color: HighlightText;
+    background: Highlight;
+  }
 }
