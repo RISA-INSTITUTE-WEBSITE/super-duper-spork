@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 
 const executionLimit = 120_000;
 type PythonRun = { type: "run"; id: string; code: string; stdin: string };
@@ -20,8 +20,7 @@ function pythonResult(data: unknown, id: string): string | null {
   return message.output.slice(0, 20100) || "Completed with no output.";
 }
 
-export function useBrowserPython() {
-  const frame = useRef<HTMLIFrameElement>(null);
+export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
   const loaded = useRef(false);
   const active = useRef<PythonRun | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -74,7 +73,7 @@ export function useBrowserPython() {
         clearTimeout(timer.current);
       }
     };
-  }, [finish, stop]);
+  }, [finish, frame, stop]);
 
   function dispatch(request: PythonRun) {
     frame.current?.contentWindow?.postMessage(request, "*");
@@ -107,7 +106,6 @@ export function useBrowserPython() {
   }
 
   return {
-    frame,
     generation,
     output,
     running,

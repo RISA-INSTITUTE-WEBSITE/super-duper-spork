@@ -64,7 +64,8 @@ type ProgrammingIDEProps = {
 
 export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingIDEProps) {
   const [theme, setTheme] = useState<StudioTheme>("dark-plus");
-  const python = useBrowserPython();
+  const frame = useRef<HTMLIFrameElement>(null);
+  const python = useBrowserPython(frame);
   const gutter = useRef<HTMLDivElement>(null);
   const lineCount = Math.max(12, source.split("\n").length);
   return (
@@ -75,7 +76,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
       {python.generation > 0 && (
         <iframe
           key={python.generation}
-          ref={python.frame}
+          ref={frame}
           src="/python-sandbox.html"
           sandbox="allow-scripts"
           title="Isolated Python runtime"
