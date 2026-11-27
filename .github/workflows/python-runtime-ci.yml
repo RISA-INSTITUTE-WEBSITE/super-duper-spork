@@ -8,6 +8,9 @@ on:
       - "src/components/use-browser-python.ts"
       - "src/components/risa-programming-ide.tsx"
       - "tests/e2e/practical-workspace.spec.ts"
+      - "tests/e2e/markdown-python-studio.spec.ts"
+      - "src/components/risa-study-note-code-block.tsx"
+      - "src/components/risa-markdown-presenter.tsx"
       - ".github/workflows/python-runtime-ci.yml"
 
 permissions:
@@ -26,7 +29,7 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test tests/e2e/practical-workspace.spec.ts --workers=2
+      - run: npx playwright test tests/e2e/practical-workspace.spec.ts tests/e2e/markdown-python-studio.spec.ts --workers=2
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

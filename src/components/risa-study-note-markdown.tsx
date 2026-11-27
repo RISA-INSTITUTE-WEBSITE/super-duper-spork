@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+
+import { StudyNoteCodeBlock } from "./risa-study-note-code-block";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -85,9 +87,11 @@ function OutcomesProgress({ done, total }: { done: number; total: number }) {
 export function RisaStudyNoteMarkdown({
   text,
   checklistStorageKey,
+  allowPython = false,
 }: {
   text: string;
   checklistStorageKey?: string;
+  allowPython?: boolean;
 }) {
   const normalized = useMemo(() => normalizeMathDelimiters(text), [text]);
   const tasks = useMemo(() => extractMarkdownChecklist(normalized), [normalized]);
@@ -191,10 +195,10 @@ export function RisaStudyNoteMarkdown({
             }
             return <li {...props}>{children}</li>;
           },
-          pre: ({ children }) => (
-            <pre className="my-4 overflow-x-auto rounded-xl bg-slate-100 p-4 text-sm">
+          pre: ({ node, children }) => (
+            <StudyNoteCodeBlock node={node} allowPython={allowPython}>
               {children}
-            </pre>
+            </StudyNoteCodeBlock>
           ),
           blockquote: ({ children }) => (
             <blockquote className="my-3 border-l-4 border-slate-300 pl-4 text-slate-700">

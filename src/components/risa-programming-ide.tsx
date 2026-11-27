@@ -47,22 +47,6 @@ function ThemeSelector({
   );
 }
 
-const examples = [
-  { label: "Area of a rectangle", code: "print(8 * 5)" },
-  { label: "Addition", code: "print(12 + 7)" },
-  { label: "Division", code: "print(24 / 6)" },
-  {
-    label: "Functions & loops",
-    code: "def square(x):\n    return x * x\n\nfor n in range(1, 6):\n    print(square(n))",
-  },
-  { label: "Math library", code: "import math\nprint(math.sqrt(81))" },
-  {
-    label: "Interactive input",
-    code: 'name = input("Your name: ")\nprint("Hello,", name)',
-  },
-  { label: "NumPy", code: "import numpy as np\nprint(np.arange(5) ** 2)" },
-];
-
 type ProgrammingIDEProps = {
   source: string;
   onSourceChange: (value: string) => void;
@@ -97,7 +81,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           <div>
             <h2 className="text-base font-bold">RISA Programming Studio</h2>
             <p className="text-xs text-[color:var(--ide-muted)]">
-              CS102 · Programming fundamentals
+              General-purpose Python workspace
             </p>
           </div>
         </div>
@@ -117,7 +101,7 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
             >
               <path d="M4 2.5v11l9-5.5z" />
             </svg>
-            Run exercise
+            Run
           </button>
           <button
             type="button"
@@ -129,52 +113,22 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
           </button>
         </div>
       </header>
-      <div className="grid min-w-0 lg:grid-cols-[240px_minmax(0,1fr)]">
+      <div className="grid min-w-0 lg:grid-cols-[208px_minmax(0,1fr)]">
         <aside className="border-b border-[color:var(--ide-border)] bg-[var(--ide-sidebar)] p-4 lg:border-b-0 lg:border-r">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--ide-muted)]">
-            Exercise 01
-          </p>
-          <h3 className="mt-3 text-sm font-bold text-[color:var(--ide-fg)]">
-            Arithmetic operations
+          <h3 className="text-sm font-bold text-[color:var(--ide-fg)]">
+            Libraries &amp; environment
           </h3>
-          <p className="mt-2 text-sm leading-6 text-[color:var(--ide-fg)]">
-            Calculate the area of a rectangle. Change the two dimensions and run the
-            expression again.
-          </p>
-          <div className="mt-5 rounded-lg border border-[color:var(--ide-border)] bg-[var(--ide-editor)] p-3">
-            <p className="text-xs font-bold text-[color:var(--ide-token)]">
-              Your challenge
-            </p>
-            <p className="mt-2 text-xs leading-5 text-[color:var(--ide-fg)]">
-              Find the area of a rectangle measuring 12 m by 9 m.
-            </p>
-          </div>
           <p className="mt-5 text-xs leading-5 text-[color:var(--ide-muted)]">
             Import supported libraries directly. For compatible PyPI packages, use import
             micropip and await micropip.install(...). Do not enter secrets.
           </p>
           <PythonLibraryManager running={python.running} onExecute={python.run} />
-          <p className="mt-6 text-[11px] font-bold uppercase tracking-widest text-[color:var(--ide-muted)]">
-            Starter examples
-          </p>
-          <div className="mt-2 grid gap-2">
-            {examples.map((example) => (
-              <button
-                key={example.label}
-                type="button"
-                onClick={() => onSourceChange(example.code)}
-                className="rounded-lg border border-[color:var(--ide-border)] px-3 py-2 text-left text-xs font-medium text-[color:var(--ide-fg)] hover:border-[color:var(--ide-focus)] hover:bg-[var(--ide-hover)]"
-              >
-                {example.label}
-              </button>
-            ))}
-          </div>
         </aside>
         <div className="min-w-0">
           <div className="flex items-center justify-between gap-2 border-b border-[color:var(--ide-border)] bg-[var(--ide-panel)]">
             <div className="flex items-center gap-2 border-t-2 border-[color:var(--ide-accent)] bg-[var(--ide-editor)] px-4 py-3 font-mono text-xs">
               <span className="font-bold text-[color:var(--ide-token)]">PY</span>
-              main.py — write Python code here
+              main.py
             </div>
             <button
               type="button"
@@ -218,5 +172,18 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
         <span>{source.length}/20,000 characters · Ctrl/⌘ + Enter to run</span>
       </footer>
     </div>
+  );
+}
+
+/** A module-independent studio. Each mount owns its code and isolated runtime. */
+export function PythonStudio({ initialCode = "" }: { initialCode?: string }) {
+  const [source, setSource] = useState(initialCode);
+
+  return (
+    <ProgrammingIDE
+      source={source}
+      onSourceChange={setSource}
+      onReset={() => setSource(initialCode)}
+    />
   );
 }

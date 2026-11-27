@@ -4,6 +4,7 @@ import { setLabSession } from "../fixtures/lab-session";
 
 const pages = [
   "/admin/labs",
+  "/admin/labs/presenter",
   "/labs",
   "/labs/physics",
   "/labs/devops",
