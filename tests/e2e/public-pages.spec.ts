@@ -73,6 +73,17 @@ test("homepage course preview links to the full catalogue and shows at most thre
   await expect(page).toHaveURL(/\/programmes\/?$/);
 });
 
+test("popular domains preview at most four modules per domain", async ({ page }) => {
+  await page.goto("/");
+  const section = page.locator('section[aria-labelledby="popular-modules-heading"]');
+  for (const row of await section.getByRole("region").all()) {
+    expect(await row.getByRole("listitem").count()).toBeLessThanOrEqual(4);
+  }
+  for (const link of await section.getByRole("link", { name: /^View More/ }).all()) {
+    await expect(link).toHaveAttribute("href", /^\/programmes\/[^/]+$/);
+  }
+});
+
 test("primary navigation works", async ({ page }) => {
   // QA-E2E-02: visitors can reach the learning-pathway listing.
   await page.goto("/");
