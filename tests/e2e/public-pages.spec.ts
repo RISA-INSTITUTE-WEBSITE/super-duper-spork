@@ -69,6 +69,10 @@ test("homepage course preview links to the full catalogue and shows at most thre
     "/programmes",
   );
   await expect(section.getByText("View all courses")).toHaveCount(0);
+  const more = section.getByRole("link", { name: "More", exact: true });
+  await expect(more.locator("svg")).toBeVisible();
+  await expect(more).toHaveText("");
+  expect((await more.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(64);
   await section.getByRole("link", { name: "More", exact: true }).click();
   await expect(page).toHaveURL(/\/programmes\/?$/);
 });
@@ -81,6 +85,9 @@ test("popular domains preview at most four modules per domain", async ({ page })
   }
   for (const link of await section.getByRole("link", { name: /^View More/ }).all()) {
     await expect(link).toHaveAttribute("href", /^\/programmes\/[^/]+$/);
+    await expect(link.locator("svg")).toBeVisible();
+    await expect(link).toHaveText("");
+    expect((await link.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(64);
   }
 });
 
