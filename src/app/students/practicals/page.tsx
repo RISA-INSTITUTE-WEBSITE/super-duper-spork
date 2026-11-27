@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { submitPracticalAction } from "./actions";
-import { requireLearningSession } from "@/lib/risa-staff-session";
+import { requireAdminSession } from "@/lib/risa-staff-session";
 import { getPracticalSubmissions } from "@/lib/risa-lecturers";
 import { getEnrolledCourses } from "@/lib/student-learning-api";
 import { workspaceActivities } from "@/lib/risa-workspace";
@@ -19,7 +19,7 @@ export default async function StudentPracticalsPage({
 }: {
   searchParams: Promise<{ result?: string }>;
 }) {
-  const { token, identity } = await requireLearningSession();
+  const { token, identity } = await requireAdminSession();
   const [courses, submissions, { result }] = await Promise.all([
     getEnrolledCourses(token, identity.id),
     getPracticalSubmissions(token, { studentId: identity.id }),

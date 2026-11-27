@@ -141,6 +141,15 @@ export default async function RisaAdminPage() {
 
       <section className="mt-12 grid gap-5 lg:grid-cols-2">
         <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
+          <h2 className="text-xl font-bold">Labs — private preview</h2>
+          <p className="mt-3 text-sm text-slate-600">
+            Review and develop the laboratories before releasing them to learners.
+          </p>
+          <Link href="/admin/labs" className="mt-5 inline-flex font-bold text-[#286518]">
+            Open lab preview →
+          </Link>
+        </article>
+        <article className="risa-glass-card rounded-[1.5rem] p-7 sm:p-8">
           <h2 className="text-xl font-bold">Lecturer management</h2>
           <p className="mt-3 text-sm text-slate-600">
             Assign lecturers to modules and manage teaching permissions.

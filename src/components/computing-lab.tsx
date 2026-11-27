@@ -285,7 +285,7 @@ export function ComputingLab() {
       <section className="border-b border-blue-100 bg-gradient-to-br from-white to-blue-100">
         <div className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-16">
           <Link
-            href="/labs"
+            href="/admin/labs"
             className="mb-5 inline-block font-bold text-[#286518] hover:underline"
           >
             ← All laboratories

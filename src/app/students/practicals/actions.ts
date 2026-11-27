@@ -3,11 +3,11 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-import { requireLearningSession } from "@/lib/risa-staff-session";
+import { requireAdminSession } from "@/lib/risa-staff-session";
 import { submitPractical } from "@/lib/risa-lecturers";
 
 export async function submitPracticalAction(form: FormData) {
-  const { token, identity } = await requireLearningSession();
+  const { token, identity } = await requireAdminSession();
   const saved = await submitPractical(token, {
     student_id: identity.id,
     course_id: String(form.get("courseId") ?? ""),

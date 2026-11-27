@@ -19,10 +19,22 @@ export default defineConfig({
     },
   ],
   // Browser tests must exercise a production-mode server, not the dev server.
-  webServer: {
-    command: "./node_modules/.bin/next start --hostname 127.0.0.1",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: "node tests/fixtures/lab-auth-server.mjs",
+      url: "http://127.0.0.1:3001",
+      reuseExistingServer: false,
+      timeout: 30_000,
+    },
+    {
+      command: "./node_modules/.bin/next start --hostname 127.0.0.1",
+      url: "http://127.0.0.1:3000",
+      reuseExistingServer: false,
+      timeout: 120_000,
+      env: {
+        RISA_SUPABASE_URL: "http://127.0.0.1:3001",
+        RISA_SUPABASE_PUBLISHABLE_KEY: "fixture-public-key",
+      },
+    },
+  ],
 });

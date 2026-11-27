@@ -1,14 +1,20 @@
 import Link from "next/link";
 
+import { requireAdminSession } from "@/lib/risa-staff-session";
 import { RisaPracticalWorkspace } from "@/components/risa-practical-workspace";
 
-export const metadata = { title: "Practical Workspace | RISA" };
+export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "Practical Workspace | RISA",
+  robots: { index: false, follow: false },
+};
 
-export default function WorkspacePage() {
+export default async function WorkspacePage() {
+  await requireAdminSession();
   return (
     <main id="main-content" className="flex-1 bg-slate-50">
       <div className="mx-auto max-w-6xl space-y-6 px-5 py-10 sm:px-8">
-        <Link href="/labs" className="font-bold text-[#286518] hover:underline">
+        <Link href="/admin/labs" className="font-bold text-[#286518] hover:underline">
           ← Virtual laboratories
         </Link>
         <header>
@@ -23,8 +29,7 @@ export default function WorkspacePage() {
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="text-xl font-bold">Submit evidence for review</h2>
           <p className="mt-2 text-sm text-slate-600">
-            Registered, enrolled learners can submit their practical work to a module
-            lecturer.
+            Preview the practical evidence submission workflow before learner release.
           </p>
           <Link
             href="/students/practicals"
