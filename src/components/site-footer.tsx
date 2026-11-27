@@ -46,6 +46,9 @@ export function SiteFooter() {
               <Link href="/about" className={footerLinkClass}>
                 About RISA
               </Link>
+              <Link href="/policies" className={footerLinkClass}>
+                Policies
+              </Link>
               <Link href="/contact" className={footerLinkClass}>
                 Contact
               </Link>
