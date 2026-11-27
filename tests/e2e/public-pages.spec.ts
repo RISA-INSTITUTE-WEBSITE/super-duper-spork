@@ -67,7 +67,7 @@ test("latest updates sit between the four-photo hero and course areas", async ({
 test("latest updates rotate every five seconds and can be paused", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.goto("/");
-  const carousel = page.getByRole("region", { name: "Latest deals and updates" });
+  const carousel = page.getByRole("region", { name: "Latest updates on RISA" });
   await expect(carousel.locator("img")).toHaveCount(3);
   await expect(carousel.getByRole("img")).toHaveCount(1);
   await expect(carousel.getByRole("button", { name: "Show update 2" })).toHaveAttribute(
