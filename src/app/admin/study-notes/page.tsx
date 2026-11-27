@@ -4,9 +4,16 @@ import { notFound, redirect } from "next/navigation";
 
 import { RisaStudyNotesStudio } from "@/components/risa-study-notes-studio";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
-import { getRisaAdminCourses } from "@/lib/risa-course-admin";
-import { getStructuredCurriculum, groupModuleTopics } from "@/lib/risa-module-sections";
-import { getRisaProgrammes, modulesForProgramme } from "@/lib/risa-programmes";
+import { getRisaAdminCourses, type RisaCourse } from "@/lib/risa-course-admin";
+import {
+  getStructuredCurriculum,
+  groupModuleTopics,
+} from "@/lib/risa-module-sections";
+import {
+  getRisaProgrammes,
+  modulesForProgramme,
+  type RisaProgramme,
+} from "@/lib/risa-programmes";
 import { getTopicStudyNotes } from "@/lib/risa-study-notes";
 import { getStudentIdentity } from "@/lib/student-auth-api";
 import { studentCookieNames } from "@/lib/student-session";
@@ -23,12 +30,153 @@ const buttonClass =
 
 async function requireAdministrator(): Promise<string> {
   const token = (await cookies()).get(studentCookieNames.access)?.value;
-  if (!token) redirect("/students/login");
+  if (!token) {
+    redirect("/students/login");
+  }
   const identity = await getStudentIdentity(token);
   if (!identity || !(await isRisaAdministrator(token, identity.id))) {
     notFound();
   }
   return token;
+}
+
+function ModuleSelector({
+  programmes,
+  modules,
+  selected,
+}: {
+  programmes: RisaProgramme[];
+  modules: RisaCourse[];
+  selected?: RisaCourse;
+}) {
+  const unassigned = modules.filter(
+    (module) => !programmes.some((programme) => programme.slug === module.programme_slug),
+  );
+  return (
+    <form action="/admin/study-notes" method="get" className="space-y-3">
+      <label className="block text-sm font-bold">
+        Course / Module
+        <select
+          name="module"
+          defaultValue={selected?.id ?? ""}
+          className={selectClass}
+          required
+        >
+          <option value="">Select a module</option>
+          {programmes.map((programme) => (
+            <optgroup key={programme.slug} label={programme.title}>
+              {modulesForProgramme(modules, programme.slug).map((module) => (
+                <option key={module.id} value={module.id}>
+                  {module.code} · {module.title}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+          {unassigned.length > 0 && (
+            <optgroup label="Unassigned modules">
+              {unassigned.map((module) => (
+                <option key={module.id} value={module.id}>
+                  {module.code} · {module.title}
+                </option>
+              ))}
+            </optgroup>
+          )}
+        </select>
+      </label>
+      <button type="submit" className={buttonClass}>
+        Load topics
+      </button>
+    </form>
+  );
+}
+
+function TopicSelector({
+  selected,
+  curriculum,
+  topicId,
+}: {
+  selected: RisaCourse;
+  curriculum: NonNullable<Awaited<ReturnType<typeof getStructuredCurriculum>>>;
+  topicId?: string;
+}) {
+  const groups = groupModuleTopics(curriculum.sections, curriculum.topics);
+  return (
+    <form action="/admin/study-notes" method="get" className="space-y-3">
+      <input type="hidden" name="module" value={selected.id} />
+      <label className="block text-sm font-bold">
+        Section / Topic
+        <select
+          name="topic"
+          defaultValue={topicId ?? ""}
+          className={selectClass}
+          required
+        >
+          <option value="">Select a topic</option>
+          {groups.map((group) => (
+            <optgroup key={group.id} label={group.title}>
+              {group.topics.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.title}
+                  {item.is_published ? "" : " (Draft)"}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </label>
+      <button
+        type="submit"
+        className={buttonClass}
+        disabled={!curriculum.topics.length}
+      >
+        Open editor
+      </button>
+      {!curriculum.topics.length && (
+        <p className="text-sm text-slate-600">
+          No topics yet.{" "}
+          <Link
+            href={"/admin/courses/" + selected.id + "/content"}
+            className="font-bold text-[#286518] hover:underline"
+          >
+            Create a topic
+          </Link>
+        </p>
+      )}
+    </form>
+  );
+}
+
+function WorkspaceSelection({
+  programmes,
+  modules,
+  selected,
+  curriculum,
+  topicId,
+}: {
+  programmes: RisaProgramme[] | null;
+  modules: RisaCourse[] | null;
+  selected?: RisaCourse;
+  curriculum: Awaited<ReturnType<typeof getStructuredCurriculum>>;
+  topicId?: string;
+}) {
+  if (!programmes || !modules) {
+    return (
+      <p role="status" className="mt-5 text-slate-600">
+        Curriculum information is temporarily unavailable.
+      </p>
+    );
+  }
+  return (
+    <section className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-5">
+      <ModuleSelector programmes={programmes} modules={modules} selected={selected} />
+      {selected && !curriculum && (
+        <p role="status">Topics are temporarily unavailable.</p>
+      )}
+      {selected && curriculum && (
+        <TopicSelector selected={selected} curriculum={curriculum} topicId={topicId} />
+      )}
+    </section>
+  );
 }
 
 export default async function AdminStudyNotesPage({
@@ -48,11 +196,6 @@ export default async function AdminStudyNotesPage({
     : null;
   const topic = curriculum?.topics.find((item) => item.id === query.topic);
   const notes = topic ? await getTopicStudyNotes(token, topic.id, true) : null;
-  const groups = groupModuleTopics(curriculum?.sections ?? [], curriculum?.topics ?? []);
-  const unassigned = modules?.filter(
-    (module) =>
-      !programmes?.some((programme) => programme.slug === module.programme_slug),
-  );
 
   return (
     <main
@@ -63,95 +206,13 @@ export default async function AdminStudyNotesPage({
         ← Administration Centre
       </Link>
       <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Study Notes Studio</h1>
-      {!programmes || !modules ? (
-        <p role="status" className="mt-5 text-slate-600">
-          Curriculum information is temporarily unavailable.
-        </p>
-      ) : (
-        <section className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-5">
-          <form action="/admin/study-notes" method="get" className="space-y-3">
-            <label className="block text-sm font-bold">
-              Course / Module
-              <select
-                name="module"
-                defaultValue={selected?.id ?? ""}
-                className={selectClass}
-                required
-              >
-                <option value="">Select a module</option>
-                {programmes.map((programme) => (
-                  <optgroup key={programme.slug} label={programme.title}>
-                    {modulesForProgramme(modules, programme.slug).map((module) => (
-                      <option key={module.id} value={module.id}>
-                        {module.code} · {module.title}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-                {!!unassigned?.length && (
-                  <optgroup label="Unassigned modules">
-                    {unassigned.map((module) => (
-                      <option key={module.id} value={module.id}>
-                        {module.code} · {module.title}
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
-            </label>
-            <button type="submit" className={buttonClass}>
-              Load topics
-            </button>
-          </form>
-          {selected && !curriculum && (
-            <p role="status">Topics are temporarily unavailable.</p>
-          )}
-          {selected && curriculum && (
-            <form action="/admin/study-notes" method="get" className="space-y-3">
-              <input type="hidden" name="module" value={selected.id} />
-              <label className="block text-sm font-bold">
-                Section / Topic
-                <select
-                  name="topic"
-                  defaultValue={topic?.id ?? ""}
-                  className={selectClass}
-                  required
-                >
-                  <option value="">Select a topic</option>
-                  {groups.map((group) => (
-                    <optgroup key={group.id} label={group.title}>
-                      {group.topics.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.title}
-                          {item.is_published ? "" : " (Draft)"}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="submit"
-                className={buttonClass}
-                disabled={!curriculum.topics.length}
-              >
-                Open editor
-              </button>
-              {!curriculum.topics.length && (
-                <p className="text-sm text-slate-600">
-                  No topics yet.{" "}
-                  <Link
-                    href={"/admin/courses/" + selected.id + "/content"}
-                    className="font-bold text-[#286518] hover:underline"
-                  >
-                    Create a topic
-                  </Link>
-                </p>
-              )}
-            </form>
-          )}
-        </section>
-      )}
+      <WorkspaceSelection
+        programmes={programmes}
+        modules={modules}
+        selected={selected}
+        curriculum={curriculum}
+        topicId={query.topic}
+      />
       {selected && topic && notes && (
         <RisaStudyNotesStudio
           key={topic.id}
