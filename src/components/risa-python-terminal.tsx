@@ -55,10 +55,7 @@ export function PythonTerminal({
   }, [output, inputSequence]);
 
   return (
-    <section
-      aria-label="Terminal"
-      className="border-t border-[color:var(--ide-border)]"
-    >
+    <section aria-label="Terminal" className="border-t border-[color:var(--ide-border)]">
       <div className="flex items-center justify-between bg-[var(--ide-panel)] px-4 py-2">
         <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[color:var(--ide-fg)]">
           Terminal

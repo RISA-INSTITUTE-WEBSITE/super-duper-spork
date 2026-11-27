@@ -57,7 +57,7 @@ const examples = [
   { label: "Math library", code: "import math\nprint(math.sqrt(81))" },
   {
     label: "Interactive input",
-    code: "name = input(\"Your name: \")\nprint(\"Hello,\", name)",
+    code: 'name = input("Your name: ")\nprint("Hello,", name)',
   },
   { label: "NumPy", code: "import numpy as np\nprint(np.arange(5) ** 2)" },
 ];

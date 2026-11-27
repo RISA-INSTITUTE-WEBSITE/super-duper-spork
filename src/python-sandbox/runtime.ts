@@ -86,8 +86,9 @@ const boot = async () => {
         "    if value is None:",
         "        raise EOFError('Terminal input limit reached')",
         "    return str(value)",
-        "_builtins.input = _terminal_input"
-].join("\n"))});
+        "_builtins.input = _terminal_input",
+      ].join("\n"),
+    )});
     self.postMessage({ type: "ready", version: runtime.version });
   } catch (error) {
     self.postMessage({ type: "boot-error", detail: String(error).slice(0, 500) });
