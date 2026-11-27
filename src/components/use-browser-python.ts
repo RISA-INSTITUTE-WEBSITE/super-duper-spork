@@ -62,9 +62,7 @@ export function useBrowserPython(frame: RefObject<HTMLIFrameElement | null>) {
 
     function reportError(data: { detail?: unknown }) {
       const detail = typeof data.detail === "string" ? data.detail.slice(0, 1000) : "";
-      stop(
-        "Python startup failed. " + detail + " Retry after checking your connection.",
-      );
+      stop("Python startup failed. " + detail + " Retry after checking your connection.");
     }
 
     function receiveRunMessage(
