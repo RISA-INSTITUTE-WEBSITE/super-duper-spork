@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { RisaOrbitLink } from "@/components/risa-orbit-link";
 import { risaThumbnailUrl, type RisaCourse } from "@/lib/risa-course-admin";
 import { modulesForProgramme, type RisaProgramme } from "@/lib/risa-programmes";
 
@@ -70,13 +71,10 @@ function DomainRow({
           {programme.title}
         </h3>
         {published.length > 4 && (
-          <Link
+          <RisaOrbitLink
             href={"/programmes/" + programme.slug}
-            aria-label={"View More " + programme.title + " modules"}
-            className="text-sm font-bold text-[#286518] underline-offset-4 hover:underline"
-          >
-            View More <span aria-hidden="true">→</span>
-          </Link>
+            label={"View More " + programme.title + " modules"}
+          />
         )}
       </div>
       <div
