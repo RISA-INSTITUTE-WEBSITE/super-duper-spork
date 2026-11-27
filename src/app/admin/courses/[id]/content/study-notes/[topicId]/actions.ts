@@ -42,6 +42,7 @@ async function authorizedTopic(
 function refresh(courseId: string, topicId: string) {
   revalidatePath("/admin/courses/" + courseId + "/content/study-notes/" + topicId);
   revalidatePath("/students/courses/" + courseId);
+  revalidatePath("/admin/study-notes");
 }
 
 export async function saveStudyNoteAction(courseId: string, draft: StudyNoteDraft) {
