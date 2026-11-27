@@ -44,7 +44,12 @@ export function ProgrammingIDE({
           onClick={onRun}
           className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-[#78eb29] px-4 py-2 text-sm font-bold text-[#122608] hover:bg-[#a6f66d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
         >
-          <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4" fill="currentColor">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className="size-4"
+            fill="currentColor"
+          >
             <path d="M4 2.5v11l9-5.5z" />
           </svg>
           Run exercise
