@@ -442,3 +442,21 @@ test("homepage entrance respects reduced-motion preferences", async ({ page }) =
   await expect(page.locator("header.risa-navbar")).toHaveCSS("animation-name", "none");
   await expect(page.locator(".risa-hero-photo").first()).toHaveCSS("opacity", "1");
 });
+
+test("Applied Physics curriculum previews", async ({ page }) => {
+  await page.goto("/programmes");
+  await page.getByRole("link", { name: "Explore Applied Physics pathways →" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Applied Physics pathways",
+  );
+  await expect(page.getByRole("article")).toHaveCount(12);
+  await page.getByRole("link", { name: /Computational Sciences/ }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Applied Physics in Computational Sciences",
+  );
+  await expect(page.getByRole("heading", { name: "Level 3" })).toBeVisible();
+  await expect(page.getByText("PHY304 · Optional")).toBeVisible();
+  await expect(page.getByText(/Q6 — Computational Quantum Mechanics/)).toBeVisible();
+  const response = await page.goto("/programmes/physics/pathways/ap99");
+  expect(response?.status()).toBe(404);
+});

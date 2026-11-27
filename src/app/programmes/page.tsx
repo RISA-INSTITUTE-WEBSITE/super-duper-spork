@@ -52,6 +52,19 @@ export default async function ProgrammesPage() {
           </div>
         </div>
 
+        <div className="mt-8 rounded-2xl border border-[#dce8e6] bg-white p-6">
+          <h2 className="text-xl font-bold">Applied Physics career pathways</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">
+            Explore 12 proposed specialisations and their shared curriculum.
+          </p>
+          <Link
+            href="/programmes/physics/pathways"
+            className="mt-4 inline-flex font-bold text-[#286518] hover:underline"
+          >
+            Explore Applied Physics pathways →
+          </Link>
+        </div>
+
         {courses === null || modules === null ? (
           <p
             role="status"

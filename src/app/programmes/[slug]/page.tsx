@@ -47,6 +47,14 @@ export default async function ProgrammePage({
         <h1 className="mt-3 text-4xl font-bold">{programme.title}</h1>
         <p className="mt-4 leading-7 text-slate-600">{programme.description}</p>
       </header>
+      {slug === "physics" && (
+        <Link
+          href="/programmes/physics/pathways"
+          className="mt-6 inline-flex font-bold text-[#286518] hover:underline"
+        >
+          Explore Applied Physics pathways →
+        </Link>
+      )}
       <h2 className="mt-9 text-2xl font-bold">Modules</h2>
       <p className="mt-2 text-sm text-slate-600">
         Explore modules in teaching order. Full lessons require approved module access.

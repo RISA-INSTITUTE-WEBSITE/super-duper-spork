@@ -40,6 +40,14 @@ export function RisaProgrammeCards({
             >
               Explore modules →
             </Link>
+            {programme.slug === "physics" && (
+              <Link
+                href="/programmes/physics/pathways"
+                className="mt-4 text-center text-sm font-bold text-[#286518] hover:underline"
+              >
+                Explore 12 Applied Physics pathways →
+              </Link>
+            )}
           </article>
         );
       })}

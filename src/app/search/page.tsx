@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { getPublicRisaCourses } from "@/lib/risa-course-admin";
+import { physicsPathwayHref, physicsPathways } from "@/lib/risa-physics-pathways";
 import { getRisaProgrammes } from "@/lib/risa-programmes";
 
 export const dynamic = "force-dynamic";
@@ -57,6 +58,13 @@ export default async function SearchPage({
   ]);
   const entries = [
     ...pages,
+    ...physicsPathways.map((pathway) => ({
+      href: physicsPathwayHref(pathway.code),
+      title: pathway.title,
+      description: "Proposed curriculum. Research direction: " + pathway.research,
+      keywords: "applied physics pathway " + pathway.code,
+      category: "Pathway",
+    })),
     ...(programmes ?? []).map((programme) => ({
       href: "/programmes/" + programme.slug,
       title: programme.title,
