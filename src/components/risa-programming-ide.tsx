@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 
+import { PythonEditor } from "./risa-python-editor";
 import { PythonLibraryManager } from "./risa-python-library-manager";
 import { PythonTerminal } from "./risa-python-terminal";
 import { useBrowserPython } from "./use-browser-python";
@@ -72,8 +73,6 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
   const [theme, setTheme] = useState<StudioTheme>("dark-plus");
   const frame = useRef<HTMLIFrameElement>(null);
   const python = useBrowserPython(frame);
-  const gutter = useRef<HTMLDivElement>(null);
-  const lineCount = Math.max(12, source.split("\n").length);
   return (
     <div
       data-theme={theme}
@@ -187,42 +186,11 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
               Reset
             </button>
           </div>
-          <div className="flex min-w-0">
-            <div
-              aria-hidden="true"
-              ref={gutter}
-              className="h-72 w-11 shrink-0 overflow-hidden border-r border-[color:var(--ide-border)] py-4 text-right font-mono text-sm leading-6 text-[color:var(--ide-muted)] sm:h-80"
-            >
-              {Array.from({ length: lineCount }, (_, index) => (
-                <div key={index} className="pr-3">
-                  {index + 1}
-                </div>
-              ))}
-            </div>
-            <textarea
-              aria-label="Editor"
-              placeholder="Write or paste Python code here, then select Run exercise."
-              value={source}
-              onChange={(event) => onSourceChange(event.target.value)}
-              onScroll={(event) => {
-                if (gutter.current) {
-                  gutter.current.scrollTop = event.currentTarget.scrollTop;
-                }
-              }}
-              onKeyDown={(event) => {
-                if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
-                  event.preventDefault();
-                  python.run(source);
-                }
-              }}
-              maxLength={20000}
-              spellCheck={false}
-              autoCapitalize="off"
-              autoCorrect="off"
-              wrap="off"
-              className="h-72 min-w-0 flex-1 resize-none overflow-auto bg-[var(--ide-editor)] p-4 font-mono text-sm leading-6 text-[color:var(--ide-code)] caret-[var(--ide-code)] focus:outline-2 focus:outline-inset focus:outline-[var(--ide-focus)] sm:h-80"
-            />
-          </div>
+          <PythonEditor
+            source={source}
+            onSourceChange={onSourceChange}
+            onRun={() => python.run(source)}
+          />
           <PythonTerminal
             output={python.output}
             running={python.running}
