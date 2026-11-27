@@ -429,9 +429,7 @@ test("institutional footer preserves navigation and stacks correctly on mobile",
   await expect(
     footer.getByRole("heading", { name: "Development status" }),
   ).toHaveCount(0);
-  await expect(page.getByText("Website in development", { exact: false })).toHaveCount(
-    0,
-  );
+  await expect(page.getByText("Website in development", { exact: false })).toHaveCount(0);
 
   for (const [name, href] of [
     ["Programmes", "/programmes"],
