@@ -106,7 +106,9 @@ export const pythonSandboxPolicy = [
   "form-action 'none'",
   "frame-ancestors 'self'",
   "sandbox allow-scripts",
-  "script-src 'sha256-" + bridgeHash + "' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net/pyodide/v314.0.8/full/",
+  "script-src 'sha256-" +
+    bridgeHash +
+    "' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net/pyodide/v314.0.8/full/",
   "worker-src blob:",
   "connect-src https://cdn.jsdelivr.net/pyodide/v314.0.8/full/ https://pypi.org https://files.pythonhosted.org",
 ].join("; ");

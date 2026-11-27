@@ -81,10 +81,14 @@ test("real Python supports functions, stdin, imports and isolated execution", as
   const editor = page.getByRole("textbox", { name: "Editor", exact: true });
   const console = page.locator(".risa-programming-ide pre");
   const run = page.getByRole("button", { name: "Run exercise" });
-  await editor.fill("def square(n):\n    return n ** 2\nprint([square(n) for n in range(4)])");
+  await editor.fill(
+    "def square(n):\n    return n ** 2\nprint([square(n) for n in range(4)])",
+  );
   await run.click();
   await expect(console).toHaveText("[0, 1, 4, 9]", { timeout: 130_000 });
-  await page.getByLabel("Standard input (one response per line, before running)").fill("RISA");
+  await page
+    .getByLabel("Standard input (one response per line, before running)")
+    .fill("RISA");
   await editor.fill("import math\nprint(input(), math.sqrt(81))");
   await run.click();
   await expect(console).toContainText("RISA 9.0", { timeout: 130_000 });

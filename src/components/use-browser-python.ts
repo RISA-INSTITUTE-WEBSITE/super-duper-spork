@@ -5,6 +5,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const executionLimit = 120_000;
 type PythonRun = { type: "run"; id: string; code: string; stdin: string };
 
+function pythonResult(data: unknown, id: string): string | null {
+  if (!data || typeof data !== "object") {
+    return null;
+  }
+  const message = data as { type?: unknown; id?: unknown; output?: unknown };
+  if (
+    message.type !== "result" ||
+    message.id !== id ||
+    typeof message.output !== "string"
+  ) {
+    return null;
+  }
+  return message.output.slice(0, 20100) || "Completed with no output.";
+}
+
 export function useBrowserPython() {
   const frame = useRef<HTMLIFrameElement>(null);
   const loaded = useRef(false);
@@ -25,11 +40,14 @@ export function useBrowserPython() {
     setRunning(false);
   }, []);
 
-  const stop = useCallback((message = "Execution stopped. Python session reset.") => {
-    finish(message);
-    loaded.current = false;
-    setGeneration((value) => value + 1);
-  }, [finish]);
+  const stop = useCallback(
+    (message = "Execution stopped. Python session reset.") => {
+      finish(message);
+      loaded.current = false;
+      setGeneration((value) => value + 1);
+    },
+    [finish],
+  );
 
   useEffect(() => {
     function receive(event: MessageEvent) {
@@ -42,11 +60,11 @@ export function useBrowserPython() {
       }
       if (event.data?.type === "runtime-error") {
         stop("Python could not start. Check your network connection and try again.");
-      } else if (event.data?.type === "result" && event.data.id === request.id) {
-        const result = event.data.output;
-        if (typeof result === "string") {
-          finish(result.slice(0, 20100) || "Completed with no output.");
-        }
+        return;
+      }
+      const result = pythonResult(event.data, request.id);
+      if (result !== null) {
+        finish(result);
       }
     }
     window.addEventListener("message", receive);

@@ -48,7 +48,10 @@ const examples = [
   { label: "Area of a rectangle", code: "print(8 * 5)" },
   { label: "Addition", code: "print(12 + 7)" },
   { label: "Division", code: "print(24 / 6)" },
-  { label: "Functions & loops", code: "def square(x):\n    return x * x\n\nfor n in range(1, 6):\n    print(square(n))" },
+  {
+    label: "Functions & loops",
+    code: "def square(x):\n    return x * x\n\nfor n in range(1, 6):\n    print(square(n))",
+  },
   { label: "Math library", code: "import math\nprint(math.sqrt(81))" },
   { label: "NumPy", code: "import numpy as np\nprint(np.arange(5) ** 2)" },
 ];
@@ -59,11 +62,7 @@ type ProgrammingIDEProps = {
   onReset: () => void;
 };
 
-export function ProgrammingIDE({
-  source,
-  onSourceChange,
-  onReset,
-}: ProgrammingIDEProps) {
+export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingIDEProps) {
   const [theme, setTheme] = useState<StudioTheme>("dark-plus");
   const python = useBrowserPython();
   const gutter = useRef<HTMLDivElement>(null);
@@ -145,8 +144,8 @@ export function ProgrammingIDE({
             </p>
           </div>
           <p className="mt-5 text-xs leading-5 text-[color:var(--ide-muted)]">
-            Import supported libraries directly. For compatible PyPI packages, use
-            import micropip and await micropip.install(...). Do not enter secrets.
+            Import supported libraries directly. For compatible PyPI packages, use import
+            micropip and await micropip.install(...). Do not enter secrets.
           </p>
           <p className="mt-6 text-[11px] font-bold uppercase tracking-widest text-[color:var(--ide-muted)]">
             Starter examples
