@@ -1,0 +1,168 @@
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
+
+import { RisaStudyNotesStudio } from "@/components/risa-study-notes-studio";
+import { isRisaAdministrator } from "@/lib/risa-admin-api";
+import { getRisaAdminCourses } from "@/lib/risa-course-admin";
+import { getStructuredCurriculum, groupModuleTopics } from "@/lib/risa-module-sections";
+import { getRisaProgrammes, modulesForProgramme } from "@/lib/risa-programmes";
+import { getTopicStudyNotes } from "@/lib/risa-study-notes";
+import { getStudentIdentity } from "@/lib/student-auth-api";
+import { studentCookieNames } from "@/lib/student-session";
+
+export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "Study Notes Studio | RISA",
+  robots: { index: false, follow: false },
+};
+
+const selectClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white p-3";
+const buttonClass =
+  "min-h-11 rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white";
+
+async function requireAdministrator(): Promise<string> {
+  const token = (await cookies()).get(studentCookieNames.access)?.value;
+  if (!token) redirect("/students/login");
+  const identity = await getStudentIdentity(token);
+  if (!identity || !(await isRisaAdministrator(token, identity.id))) {
+    notFound();
+  }
+  return token;
+}
+
+export default async function AdminStudyNotesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ module?: string; topic?: string }>;
+}) {
+  const token = await requireAdministrator();
+  const query = await searchParams;
+  const [programmes, modules] = await Promise.all([
+    getRisaProgrammes(token),
+    getRisaAdminCourses(token),
+  ]);
+  const selected = modules?.find((module) => module.id === query.module);
+  const curriculum = selected
+    ? await getStructuredCurriculum(token, selected.id, true)
+    : null;
+  const topic = curriculum?.topics.find((item) => item.id === query.topic);
+  const notes = topic ? await getTopicStudyNotes(token, topic.id, true) : null;
+  const groups = groupModuleTopics(curriculum?.sections ?? [], curriculum?.topics ?? []);
+  const unassigned = modules?.filter(
+    (module) =>
+      !programmes?.some((programme) => programme.slug === module.programme_slug),
+  );
+
+  return (
+    <main
+      id="main-content"
+      className="mx-auto w-full max-w-6xl flex-1 px-5 py-10 sm:px-8"
+    >
+      <Link href="/admin" className="font-bold text-[#286518] hover:underline">
+        ← Administration Centre
+      </Link>
+      <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Study Notes Studio</h1>
+      {!programmes || !modules ? (
+        <p role="status" className="mt-5 text-slate-600">
+          Curriculum information is temporarily unavailable.
+        </p>
+      ) : (
+        <section className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-5">
+          <form action="/admin/study-notes" method="get" className="space-y-3">
+            <label className="block text-sm font-bold">
+              Course / Module
+              <select
+                name="module"
+                defaultValue={selected?.id ?? ""}
+                className={selectClass}
+                required
+              >
+                <option value="">Select a module</option>
+                {programmes.map((programme) => (
+                  <optgroup key={programme.slug} label={programme.title}>
+                    {modulesForProgramme(modules, programme.slug).map((module) => (
+                      <option key={module.id} value={module.id}>
+                        {module.code} · {module.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+                {!!unassigned?.length && (
+                  <optgroup label="Unassigned modules">
+                    {unassigned.map((module) => (
+                      <option key={module.id} value={module.id}>
+                        {module.code} · {module.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </label>
+            <button type="submit" className={buttonClass}>
+              Load topics
+            </button>
+          </form>
+          {selected && !curriculum && (
+            <p role="status">Topics are temporarily unavailable.</p>
+          )}
+          {selected && curriculum && (
+            <form action="/admin/study-notes" method="get" className="space-y-3">
+              <input type="hidden" name="module" value={selected.id} />
+              <label className="block text-sm font-bold">
+                Section / Topic
+                <select
+                  name="topic"
+                  defaultValue={topic?.id ?? ""}
+                  className={selectClass}
+                  required
+                >
+                  <option value="">Select a topic</option>
+                  {groups.map((group) => (
+                    <optgroup key={group.id} label={group.title}>
+                      {group.topics.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                          {item.is_published ? "" : " (Draft)"}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="submit"
+                className={buttonClass}
+                disabled={!curriculum.topics.length}
+              >
+                Open editor
+              </button>
+              {!curriculum.topics.length && (
+                <p className="text-sm text-slate-600">
+                  No topics yet.{" "}
+                  <Link
+                    href={"/admin/courses/" + selected.id + "/content"}
+                    className="font-bold text-[#286518] hover:underline"
+                  >
+                    Create a topic
+                  </Link>
+                </p>
+              )}
+            </form>
+          )}
+        </section>
+      )}
+      {selected && topic && notes && (
+        <RisaStudyNotesStudio
+          key={topic.id}
+          courseId={selected.id}
+          topicId={topic.id}
+          topicTitle={selected.code + " · " + topic.title}
+          notes={notes}
+          embedded
+        />
+      )}
+      {topic && !notes && <p role="status">Study notes are temporarily unavailable.</p>}
+    </main>
+  );
+}
