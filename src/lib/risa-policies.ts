@@ -19,6 +19,22 @@ export function isPolicySlug(slug: string): boolean {
   return slug.length <= 100 && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
 }
 
+function validEffectiveDate(date: string): boolean {
+  if (!date) {
+    return true;
+  }
+  const parsed = new Date(date + "T00:00:00Z");
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+    Number.isFinite(parsed.getTime()) &&
+    parsed.toISOString().slice(0, 10) === date
+  );
+}
+
+function validLengths(fields: [string, number, number][]): boolean {
+  return fields.every(([value, min, max]) => value.length >= min && value.length <= max);
+}
+
 export function validatePolicy(form: FormData): PolicyInput | null {
   const field = (key: string) => String(form.get(key) ?? "").trim();
   const slug = field("slug");
@@ -28,26 +44,16 @@ export function validatePolicy(form: FormData): PolicyInput | null {
   const body = field("body");
   const date = field("effectiveDate");
   const status = field("status");
-  if (date) {
-    const parsed = new Date(date + "T00:00:00Z");
-    if (
-      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
-      !Number.isFinite(parsed.getTime()) ||
-      parsed.toISOString().slice(0, 10) !== date
-    ) {
-      return null;
-    }
-  }
+  const lengths: [string, number, number][] = [
+    [title, 2, 160],
+    [category, 2, 80],
+    [version, 1, 40],
+    [body, 1, 50000],
+  ];
   if (
     !isPolicySlug(slug) ||
-    title.length < 2 ||
-    title.length > 160 ||
-    category.length < 2 ||
-    category.length > 80 ||
-    version.length < 1 ||
-    version.length > 40 ||
-    body.length < 1 ||
-    body.length > 50000 ||
+    !validLengths(lengths) ||
+    !validEffectiveDate(date) ||
     !["draft", "published"].includes(status)
   ) {
     return null;
@@ -64,7 +70,9 @@ export function validatePolicy(form: FormData): PolicyInput | null {
 }
 
 async function readRows<T>(response: Response | null): Promise<T[] | null> {
-  if (!response?.ok) return null;
+  if (!response?.ok) {
+    return null;
+  }
   try {
     const rows: unknown = await response.json();
     return Array.isArray(rows) ? (rows as T[]) : null;
@@ -86,7 +94,9 @@ export async function getPolicy(
   slug: string,
   token?: string,
 ): Promise<Policy | null | undefined> {
-  if (!isPolicySlug(slug)) return undefined;
+  if (!isPolicySlug(slug)) {
+    return undefined;
+  }
   const path =
     "/rest/v1/risa_policies?select=" + fields + ",body&slug=eq." + slug + "&limit=1";
   const response = token

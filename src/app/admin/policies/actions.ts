@@ -9,7 +9,9 @@ import { savePolicy, validatePolicy } from "@/lib/risa-policies";
 export async function savePolicyAction(formData: FormData) {
   const { token } = await requireAdminSession();
   const policy = validatePolicy(formData);
-  if (!policy) redirect("/admin/policies?result=invalid");
+  if (!policy) {
+    redirect("/admin/policies?result=invalid");
+  }
   const editing = formData.get("mode") === "edit";
   const saved = await savePolicy(token, policy, editing);
   if (!saved) {

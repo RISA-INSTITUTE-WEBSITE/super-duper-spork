@@ -14,7 +14,9 @@ export default async function PolicyPage({
 }) {
   const { slug } = await params;
   const policy = await getPolicy(slug);
-  if (policy === undefined) notFound();
+  if (policy === undefined) {
+    notFound();
+  }
   if (policy === null) {
     return (
       <main id="main-content" className="mx-auto max-w-5xl flex-1 px-5 py-12">
