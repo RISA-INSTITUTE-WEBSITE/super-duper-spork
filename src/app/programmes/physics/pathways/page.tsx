@@ -28,7 +28,10 @@ export default function PhysicsPathwaysPage() {
       </header>
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {physicsPathways.map((pathway) => (
-          <article key={pathway.code} className="risa-glass-card flex flex-col rounded-2xl p-6">
+          <article
+            key={pathway.code}
+            className="risa-glass-card flex flex-col rounded-2xl p-6"
+          >
             <p className="font-mono text-sm font-bold text-[#286518]">{pathway.code}</p>
             <h2 className="mt-3 text-xl font-bold">{pathway.title}</h2>
             <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">

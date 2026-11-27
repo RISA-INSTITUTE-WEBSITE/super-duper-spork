@@ -23,8 +23,9 @@ describe("Applied Physics curriculum preview", () => {
 
   it("keeps a single shared module register and optional PHY304", () => {
     expect(new Set(physicsModules.map((m) => m.code)).size).toBe(21);
-    expect([1, 2, 3].map((level) => physicsModules.filter((m) => m.level === level).length))
-      .toEqual([6, 7, 8]);
+    expect(
+      [1, 2, 3].map((level) => physicsModules.filter((m) => m.level === level).length),
+    ).toEqual([6, 7, 8]);
     expect(physicsModules.filter((m) => m.optional).map((m) => m.code)).toEqual([
       "PHY304",
     ]);

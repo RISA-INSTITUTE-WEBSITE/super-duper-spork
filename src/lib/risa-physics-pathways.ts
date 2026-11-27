@@ -216,7 +216,7 @@ export const physicsPathways = [
       PHY306: "S2",
     },
     research: "Automated data acquisition",
-  }
+  },
 ] as const;
 
 export const physicsModules = [
@@ -345,7 +345,7 @@ export const physicsModules = [
     title: "Independent Physics Research Project",
     level: 3,
     optional: false,
-  }
+  },
 ] as const;
 
 const packageNames: Record<string, string> = {

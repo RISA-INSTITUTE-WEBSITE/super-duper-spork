@@ -36,8 +36,8 @@ export default async function PhysicsPathwayPage({
         <h1 className="mt-3 text-4xl font-bold">{pathway.title}</h1>
         <p className="mt-4 leading-7 text-slate-600">
           Curriculum proposal under academic review. All core modules are shared;
-          elective recommendations are flexible and subject to academic approval.
-          This pathway does not confer accreditation or professional registration.
+          elective recommendations are flexible and subject to academic approval. This
+          pathway does not confer accreditation or professional registration.
         </p>
       </header>
       {published === null && (
@@ -60,7 +60,10 @@ export default async function PhysicsPathwayPage({
                   ([key]) => key === module.code || key.startsWith(module.code + " "),
                 );
                 return (
-                  <li key={module.code} className="rounded-xl border border-slate-200 bg-white p-5">
+                  <li
+                    key={module.code}
+                    className="rounded-xl border border-slate-200 bg-white p-5"
+                  >
                     <p className="font-mono text-sm font-bold text-[#286518]">
                       {module.code} · {module.optional ? "Optional" : "Compulsory"}
                     </p>
