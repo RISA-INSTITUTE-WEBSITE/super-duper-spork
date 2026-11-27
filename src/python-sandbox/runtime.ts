@@ -16,6 +16,52 @@ function workerSource(legacy: boolean) {
   return `
 let runtime;
 let busy = false;
+let pendingInput;
+let runId;
+let inputCount = 0;
+let inputSize = 0;
+let output = "";
+let truncated = false;
+let streamTimer;
+const send = (message) => self.postMessage({ ...message, id: runId });
+function flush() {
+  clearTimeout(streamTimer);
+  streamTimer = undefined;
+  send({ type: "terminal-output", output });
+}
+function append(value) {
+  if (output.length >= 20000) { truncated = true; return; }
+  const text = String(value);
+  if (text.length > 20000 - output.length) truncated = true;
+  output += text.slice(0, 20000 - output.length);
+  if (streamTimer === undefined) streamTimer = setTimeout(flush, 40);
+}
+function requestLine(prompt) {
+  if (pendingInput || inputCount >= 100 || inputSize >= 6000) {
+    return Promise.reject(new Error("Terminal input limit reached."));
+  }
+  inputCount += 1;
+  append(prompt);
+  flush();
+  return new Promise((resolve) => {
+    pendingInput = { resolve, sequence: inputCount };
+    send({ type: "terminal-input", sequence: inputCount });
+  });
+}
+function acceptLine(data) {
+  if (!pendingInput || data.id !== runId || data.sequence !== pendingInput.sequence) return;
+  if (typeof data.value !== "string" || data.value.length > 1000 || /[\\r\\n]/.test(data.value)) return;
+  const { resolve } = pendingInput;
+  pendingInput = undefined;
+  inputSize += data.value.length + 1;
+  if (inputSize > 6000) {
+    resolve(null);
+    return;
+  }
+  append(data.value + "\\n");
+  flush();
+  resolve(data.value);
+}
 const boot = async () => {
   try {
     ${loader}
@@ -24,38 +70,65 @@ const boot = async () => {
       stdout: () => {},
       stderr: () => {},
     });
+    runtime.registerJsModule("_risa_terminal", { requestLine });
+    runtime.runPython(${JSON.stringify(
+      [
+        "import builtins as _builtins",
+        "import sys as _sys",
+        "from pyodide.ffi import run_sync as _run_sync, can_run_sync as _can_run_sync",
+        "from _risa_terminal import requestLine as _request_line",
+        "def _terminal_input(prompt=''):",
+        "    if not _can_run_sync():",
+        "        raise RuntimeError('Interactive input requires a JSPI-capable browser. Update Chrome or Edge and retry.')",
+        "    _sys.stdout.flush()",
+        "    _sys.stderr.flush()",
+        "    value = _run_sync(_request_line(str(prompt)))",
+        "    if value is None:",
+        "        raise EOFError('Terminal input limit reached')",
+        "    return str(value)",
+        "_builtins.input = _terminal_input",
+      ].join("\n"),
+    )});
     self.postMessage({ type: "ready", version: runtime.version });
   } catch (error) {
     self.postMessage({ type: "boot-error", detail: String(error).slice(0, 500) });
   }
 };
 self.onmessage = async ({ data }) => {
+  if (data?.type === "input") { acceptLine(data); return; }
   if (!runtime || busy || data?.type !== "run") return;
   busy = true;
-  let output = "";
-  let truncated = false;
-  const append = (value) => {
-    if (output.length >= 20000) { truncated = true; return; }
-    const line = String(value) + "\\n";
-    if (line.length > 20000 - output.length) truncated = true;
-    output += line.slice(0, 20000 - output.length);
+  runId = data.id;
+  inputCount = 0;
+  inputSize = 0;
+  output = "";
+  truncated = false;
+  const stdoutDecoder = new TextDecoder();
+  const stderrDecoder = new TextDecoder();
+  const write = (decoder) => (buffer) => {
+    append(decoder.decode(buffer, { stream: true }));
+    return buffer.length;
   };
   try {
-    const input = data.stdin === "" ? [] : data.stdin.split("\\n");
-    runtime.setStdin({ stdin: () => input.shift() ?? null });
-    runtime.setStdout({ batched: append });
-    runtime.setStderr({ batched: append });
+    runtime.setStdin({ error: true });
+    runtime.setStdout({ write: write(stdoutDecoder), isatty: true });
+    runtime.setStderr({ write: write(stderrDecoder), isatty: true });
     await runtime.loadPackagesFromImports(data.code, {
       messageCallback: () => {},
-      errorCallback: append,
+      errorCallback: (error) => append(String(error) + "\\n"),
     });
     const result = await runtime.runPythonAsync(data.code);
     if (result !== undefined && result !== null) {
-      try { append(result); } finally { result?.destroy?.(); }
+      try { append(String(result) + "\\n"); } finally { result?.destroy?.(); }
     }
   } catch (error) {
-    append(error);
+    append(String(error) + "\\n");
   } finally {
+    append(stdoutDecoder.decode());
+    append(stderrDecoder.decode());
+    clearTimeout(streamTimer);
+    streamTimer = undefined;
+    pendingInput = undefined;
     self.postMessage({
       type: "result",
       id: data.id,
@@ -77,6 +150,7 @@ const bridge = `
   let worker;
   let workerUrl;
   let pending;
+  let inputSequence;
   let ready = false;
   let legacy = false;
   let bootTimer;
@@ -89,6 +163,7 @@ const bridge = `
     worker = undefined;
     workerUrl = undefined;
     ready = false;
+    inputSequence = undefined;
   }
   function fail(detail) {
     const wasReady = ready;
@@ -120,9 +195,15 @@ const bridge = `
           ready = true;
           send({ type: "runtime-status", message: "Python ready. Running code…", version: String(data.version).slice(0, 40) });
           if (pending) current.postMessage(pending);
+        } else if (ready && data?.type === "terminal-output" && data.id === pending?.id && typeof data.output === "string") {
+          send({ type: "terminal-output", id: data.id, output: data.output.slice(0, 20000) });
+        } else if (ready && data?.type === "terminal-input" && data.id === pending?.id && Number.isInteger(data.sequence) && data.sequence > 0 && data.sequence <= 100 && inputSequence === undefined) {
+          inputSequence = data.sequence;
+          send({ type: "terminal-input", id: data.id, sequence: data.sequence });
         } else if (ready && data?.type === "result" && data.id === pending?.id && typeof data.output === "string") {
           send({ type: "result", id: data.id, output: data.output.slice(0, 20100) });
           pending = undefined;
+          inputSequence = undefined;
         }
       };
       current.onerror = (event) => {
@@ -135,10 +216,16 @@ const bridge = `
   addEventListener("message", (event) => {
     if (event.source !== parent || event.origin !== parentOrigin) return;
     const data = event.data;
+    if (data?.type === "input") {
+      if (!ready || !pending || data.id !== pending.id || data.sequence !== inputSequence || inputSequence === undefined) return;
+      if (typeof data.value !== "string" || data.value.length > 1000 || /[\\r\\n]/.test(data.value)) return;
+      inputSequence = undefined;
+      worker.postMessage({ type: "input", id: data.id, sequence: data.sequence, value: data.value });
+      return;
+    }
     if (pending || data?.type !== "run" || typeof data.id !== "string") return;
     if (typeof data.code !== "string" || data.code.length > 20000) return;
-    if (typeof data.stdin !== "string" || data.stdin.length > 6000) return;
-    pending = { type: "run", id: data.id, code: data.code, stdin: data.stdin };
+    pending = { type: "run", id: data.id, code: data.code };
     if (!worker) createWorker();
     else if (ready) worker.postMessage(pending);
   });

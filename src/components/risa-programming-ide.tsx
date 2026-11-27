@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import { PythonLibraryManager } from "./risa-python-library-manager";
+import { PythonTerminal } from "./risa-python-terminal";
 import { useBrowserPython } from "./use-browser-python";
 
 const themes = [
@@ -54,6 +55,10 @@ const examples = [
     code: "def square(x):\n    return x * x\n\nfor n in range(1, 6):\n    print(square(n))",
   },
   { label: "Math library", code: "import math\nprint(math.sqrt(81))" },
+  {
+    label: "Interactive input",
+    code: 'name = input("Your name: ")\nprint("Hello,", name)',
+  },
   { label: "NumPy", code: "import numpy as np\nprint(np.arange(5) ** 2)" },
 ];
 
@@ -218,44 +223,13 @@ export function ProgrammingIDE({ source, onSourceChange, onReset }: ProgrammingI
               className="h-72 min-w-0 flex-1 resize-none overflow-auto bg-[var(--ide-editor)] p-4 font-mono text-sm leading-6 text-[color:var(--ide-code)] caret-[var(--ide-code)] focus:outline-2 focus:outline-inset focus:outline-[var(--ide-focus)] sm:h-80"
             />
           </div>
-          <label className="block border-t border-[color:var(--ide-border)] p-4 text-xs font-semibold">
-            Standard input (one response per line, before running)
-            <span className="mt-1 block font-normal text-[color:var(--ide-muted)]">
-              Only type answers to input() prompts here. Leave empty if not needed.
-            </span>
-            <textarea
-              aria-label="Standard input (one response per line, before running)"
-              placeholder="Example: 100, then Enter, then 15. Do not paste Python code here."
-              value={python.stdin}
-              onChange={(event) => python.setStdin(event.target.value)}
-              maxLength={6000}
-              rows={2}
-              className="mt-2 w-full rounded border border-[color:var(--ide-border)] bg-[var(--ide-editor)] p-2 font-mono text-sm"
-            />
-          </label>
-          <section
-            aria-label="Console"
-            className="border-t border-[color:var(--ide-border)]"
-          >
-            <div className="flex items-center justify-between bg-[var(--ide-panel)] px-4 py-2">
-              <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[color:var(--ide-fg)]">
-                Output console
-              </h3>
-              <button
-                type="button"
-                onClick={python.clear}
-                className="rounded-md px-2 py-2 text-xs font-medium text-[color:var(--ide-fg)] hover:bg-[var(--ide-hover)]"
-              >
-                Clear output
-              </button>
-            </div>
-            <pre
-              aria-live="polite"
-              className="min-h-28 max-h-48 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-sm leading-6 text-[color:var(--ide-token)]"
-            >
-              {python.output || "Ready. Run your exercise to see the result."}
-            </pre>
-          </section>
+          <PythonTerminal
+            output={python.output}
+            running={python.running}
+            inputSequence={python.inputSequence}
+            onInput={python.sendInput}
+            onClear={python.clear}
+          />
         </div>
       </div>
       <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--ide-border)] bg-[var(--ide-panel)] px-4 py-2 text-[11px] text-[color:var(--ide-muted)]">
