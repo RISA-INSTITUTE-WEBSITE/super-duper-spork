@@ -37,25 +37,52 @@ test("vision, mission, and philosophy are on the About page", async ({ page }) =
   ).toBeVisible();
 });
 
-test("course areas come directly after the four-photo hero", async ({ page }) => {
+test("latest updates sit between the four-photo hero and course areas", async ({
+  page,
+}) => {
   await page.goto("/");
   const sections = page.locator("main > section");
 
-  await expect(sections).toHaveCount(4);
+  await expect(sections).toHaveCount(5);
   await expect(sections.nth(0)).toHaveClass(/risa-hero/);
   await expect(sections.nth(0).locator(".risa-hero-photo")).toHaveCount(4);
-  await expect(sections.nth(1)).toHaveAttribute("aria-labelledby", "courses-heading");
-  await expect(sections.nth(2)).toHaveAttribute(
+  await expect(sections.nth(1)).toHaveAttribute(
+    "aria-labelledby",
+    "latest-updates-heading",
+  );
+  await expect(sections.nth(2)).toHaveAttribute("aria-labelledby", "courses-heading");
+  await expect(sections.nth(3)).toHaveAttribute(
     "aria-labelledby",
     "popular-modules-heading",
   );
-  await expect(sections.nth(3)).toHaveAttribute("aria-labelledby", "next-heading");
+  await expect(sections.nth(4)).toHaveAttribute("aria-labelledby", "next-heading");
   await expect(
-    sections.nth(2).getByRole("heading", { name: "Modules from our popular domains" }),
+    sections.nth(3).getByRole("heading", { name: "Modules from our popular domains" }),
   ).toBeVisible();
   await expect(
-    sections.nth(1).getByRole("heading", { name: "Explore our courses" }),
+    sections.nth(2).getByRole("heading", { name: "Explore our courses" }),
   ).toBeVisible();
+});
+
+test("latest updates rotate every five seconds and can be paused", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const carousel = page.getByRole("region", { name: "Latest deals and updates" });
+  await expect(carousel.locator("img")).toHaveCount(3);
+  await expect(carousel.getByRole("img")).toHaveCount(1);
+  await expect(carousel.getByRole("button", { name: "Show update 2" })).toHaveAttribute(
+    "aria-current",
+    "true",
+    { timeout: 8000 },
+  );
+  await carousel.getByRole("button", { name: "Pause updates" }).click();
+  await carousel.getByRole("button", { name: "Show update 3" }).click();
+  await expect(carousel.getByRole("button", { name: "Show update 3" })).toHaveAttribute(
+    "aria-current",
+    "true",
+  );
+  await expect(carousel.getByRole("img")).toHaveCount(1);
+  await expect(carousel.getByRole("button", { name: "Resume updates" })).toBeVisible();
 });
 
 test("homepage course preview links to the full catalogue and shows at most three cards", async ({
