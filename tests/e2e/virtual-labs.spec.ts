@@ -51,5 +51,12 @@ test("defensive access exercise provides feedback and advances", async ({ page }
 
 test("unknown laboratories return not found", async ({ page }) => {
   const response = await page.goto("/labs/unknown");
-  expect(response?.status()).toBe(404);
+  // Next.js can stream notFound() after sending HTTP 200 headers.
+  expect([200, 404]).toContain(response?.status());
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute(
+    "content",
+    /noindex/,
+  );
+  await expect(page.getByRole("link", { name: "Return home" })).toBeVisible();
 });

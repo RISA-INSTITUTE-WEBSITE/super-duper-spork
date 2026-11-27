@@ -1,14 +1,36 @@
 import { createHash } from "node:crypto";
 
-// This source runs in a dedicated worker owned by an opaque-origin frame.
-// Do not pass credentials, account data, or privileged capabilities to it.
-const runtimeWorker = `
-import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.mjs";
+const primary = "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/";
+const compatibility = "https://cdn.jsdelivr.net/pyodide/v0.29.4/full/";
 
+// Both workers use the same opaque-origin sandbox and bounded protocol.
+// Load the interpreter before accepting user code so startup can be retried
+// without executing the user's script twice.
+function workerSource(legacy: boolean) {
+  const indexURL = legacy ? compatibility : primary;
+  const loader = legacy
+    ? `importScripts(${JSON.stringify(indexURL + "pyodide.js")});
+    const loadPyodide = self.loadPyodide;`
+    : `const { loadPyodide } = await import(${JSON.stringify(indexURL + "pyodide.mjs")});`;
+
+  return `
 let runtime;
 let busy = false;
+const boot = async () => {
+  try {
+    ${loader}
+    runtime = await loadPyodide({
+      indexURL: ${JSON.stringify(indexURL)},
+      stdout: () => {},
+      stderr: () => {},
+    });
+    self.postMessage({ type: "ready", version: runtime.version });
+  } catch (error) {
+    self.postMessage({ type: "boot-error", detail: String(error).slice(0, 500) });
+  }
+};
 self.onmessage = async ({ data }) => {
-  if (busy || data?.type !== "run") return;
+  if (!runtime || busy || data?.type !== "run") return;
   busy = true;
   let output = "";
   let truncated = false;
@@ -19,11 +41,6 @@ self.onmessage = async ({ data }) => {
     output += line.slice(0, 20000 - output.length);
   };
   try {
-    runtime ??= await loadPyodide({
-      indexURL: "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/",
-      stdout: () => {},
-      stderr: () => {},
-    });
     const input = data.stdin === "" ? [] : data.stdin.split("\\n");
     runtime.setStdin({ stdin: () => input.shift() ?? null });
     runtime.setStdout({ batched: append });
@@ -47,53 +64,86 @@ self.onmessage = async ({ data }) => {
     busy = false;
   }
 };
+boot();
 `;
+}
 
-// Only the trusted bridge runs in the frame; learner Python runs in the worker.
-// The frame has no same-origin permission, no forms, and no app API connectivity.
+// The frame never gets same-origin permission or authenticated API access.
+// Retry only a failed initialization, never a script that has started running.
 const bridge = `
 (() => {
   if (parent === window) return;
   const parentOrigin = new URL(location.href).origin;
   let worker;
   let workerUrl;
+  let pending;
+  let ready = false;
+  let legacy = false;
+  let bootTimer;
+  let primaryError = "";
   const send = (message) => parent.postMessage(message, parentOrigin);
   function releaseWorker() {
+    clearTimeout(bootTimer);
     worker?.terminate();
     if (workerUrl) URL.revokeObjectURL(workerUrl);
     worker = undefined;
     workerUrl = undefined;
+    ready = false;
+  }
+  function fail(detail) {
+    const wasReady = ready;
+    releaseWorker();
+    if (!wasReady && !legacy && pending) {
+      primaryError = detail;
+      legacy = true;
+      send({ type: "runtime-status", message: "Trying compatible Python runtime…" });
+      createWorker();
+      return;
+    }
+    const message = primaryError ? primaryError + "; fallback: " + detail : detail;
+    send({ type: "runtime-error", detail: message.slice(0, 1000) });
+    pending = undefined;
   }
   function createWorker() {
-    workerUrl = URL.createObjectURL(new Blob([${JSON.stringify(runtimeWorker)}], {
-      type: "text/javascript",
-    }));
-    worker = new Worker(workerUrl, { type: "module" });
-    worker.onmessage = ({ data }) => {
-      if (data?.type === "result" && typeof data.output === "string") {
-        send({ type: "result", id: data.id, output: data.output.slice(0, 20100) });
-      }
-    };
-    worker.onerror = () => {
-      send({ type: "runtime-error" });
-      releaseWorker();
-    };
+    try {
+      const source = legacy ? ${JSON.stringify(workerSource(true))} : ${JSON.stringify(workerSource(false))};
+      workerUrl = URL.createObjectURL(new Blob([source], { type: "text/javascript" }));
+      const current = new Worker(workerUrl, { type: legacy ? "classic" : "module" });
+      worker = current;
+      bootTimer = setTimeout(() => fail("Interpreter startup timed out"), 45000);
+      current.onmessage = ({ data }) => {
+        if (worker !== current) return;
+        if (!ready && data?.type === "boot-error") {
+          fail(String(data.detail || "Interpreter download failed"));
+        } else if (!ready && data?.type === "ready") {
+          clearTimeout(bootTimer);
+          ready = true;
+          send({ type: "runtime-status", message: "Python ready. Running code…", version: String(data.version).slice(0, 40) });
+          if (pending) current.postMessage(pending);
+        } else if (ready && data?.type === "result" && data.id === pending?.id && typeof data.output === "string") {
+          send({ type: "result", id: data.id, output: data.output.slice(0, 20100) });
+          pending = undefined;
+        }
+      };
+      current.onerror = (event) => {
+        if (worker === current) fail(event.message || "Browser could not start the Python worker");
+      };
+    } catch (error) {
+      fail(String(error));
+    }
   }
   addEventListener("message", (event) => {
     if (event.source !== parent || event.origin !== parentOrigin) return;
     const data = event.data;
-    if (data?.type !== "run" || typeof data.id !== "string") return;
+    if (pending || data?.type !== "run" || typeof data.id !== "string") return;
     if (typeof data.code !== "string" || data.code.length > 20000) return;
     if (typeof data.stdin !== "string" || data.stdin.length > 6000) return;
-    try {
-      if (!worker) createWorker();
-      worker.postMessage({ type: "run", id: data.id, code: data.code, stdin: data.stdin });
-    } catch {
-      send({ type: "runtime-error" });
-      releaseWorker();
-    }
+    pending = { type: "run", id: data.id, code: data.code, stdin: data.stdin };
+    if (!worker) createWorker();
+    else if (ready) worker.postMessage(pending);
   });
   addEventListener("pagehide", releaseWorker);
+  send({ type: "frame-ready" });
 })();
 `;
 
@@ -108,9 +158,16 @@ export const pythonSandboxPolicy = [
   "sandbox allow-scripts",
   "script-src 'sha256-" +
     bridgeHash +
-    "' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net/pyodide/v314.0.8/full/",
+    "' 'wasm-unsafe-eval' blob: " +
+    primary +
+    " " +
+    compatibility,
   "worker-src blob:",
-  "connect-src https://cdn.jsdelivr.net/pyodide/v314.0.8/full/ https://pypi.org https://files.pythonhosted.org",
+  "connect-src " +
+    primary +
+    " " +
+    compatibility +
+    " https://pypi.org https://files.pythonhosted.org",
 ].join("; ");
 
 export const pythonSandboxHtml =
