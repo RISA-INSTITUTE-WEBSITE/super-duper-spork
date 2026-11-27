@@ -216,7 +216,6 @@ export default async function StudentDashboardPage() {
         />
       </div>
       <div className="my-6 flex flex-wrap gap-4 text-sm font-bold text-[#286518]">
-        <Link href="/students/practicals">My practical submissions →</Link>
         <Link href="/lecturers">Lecturer dashboard →</Link>
       </div>
       <section

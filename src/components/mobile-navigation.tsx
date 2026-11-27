@@ -9,7 +9,6 @@ import { HeaderProfileLink, type HeaderUser } from "@/components/header-profile-
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/programmes", label: "Programmes" },
-  { href: "/labs", label: "Labs" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ] as const;

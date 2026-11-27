@@ -11,7 +11,6 @@ import {
   InlineYouTubePlayer,
   YouTubeLessonThumbnail,
 } from "@/components/risa-video-media";
-import { labDomains } from "@/lib/risa-virtual-labs";
 import { StudentPracticeQuiz } from "@/components/student-practice-quiz";
 import type {
   CourseCurriculum,
@@ -186,25 +185,6 @@ function TopicBanner({
   );
 }
 
-function TopicPracticalActivity({ slug }: { slug?: string }) {
-  const lab = labDomains.find((item) => item.slug === slug);
-  if (!lab) {
-    return null;
-  }
-  return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-5">
-      <h3 className="text-xl font-bold">Practical activity</h3>
-      <p className="mt-2 text-sm text-slate-600">{lab.description}</p>
-      <Link
-        href={lab.href}
-        className="mt-4 inline-flex rounded-xl bg-[#286518] px-4 py-3 font-bold text-white"
-      >
-        Open {lab.title} →
-      </Link>
-    </section>
-  );
-}
-
 export function TopicDetails({
   topic,
   curriculum,
@@ -288,7 +268,6 @@ export function TopicDetails({
         </Link>
       )}
 
-      <TopicPracticalActivity slug={topic.practical_lab_slug} />
       <section aria-labelledby="risa-topic-playlist-heading" className="space-y-4">
         <div className="flex items-center gap-3">
           <span
