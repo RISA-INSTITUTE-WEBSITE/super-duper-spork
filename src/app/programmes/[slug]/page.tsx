@@ -40,12 +40,8 @@ export default async function ProgrammePage({
       <Link href="/programmes" className="font-bold text-[#286518]">
         ← All courses
       </Link>
-      <header className="mt-6 rounded-2xl bg-white p-6 shadow-sm sm:p-9">
-        <p className="text-xs font-bold uppercase tracking-widest text-[#286518]">
-          RISA course
-        </p>
-        <h1 className="mt-3 text-4xl font-bold">{programme.title}</h1>
-        <p className="mt-4 leading-7 text-slate-600">{programme.description}</p>
+      <header className="mt-5 rounded-xl bg-white px-5 py-4 shadow-sm sm:px-6">
+        <h1 className="text-2xl font-bold sm:text-3xl">{programme.title}</h1>
       </header>
       {slug === "physics" && (
         <Link
@@ -55,22 +51,18 @@ export default async function ProgrammePage({
           Explore Applied Physics pathways →
         </Link>
       )}
-      <h2 className="mt-9 text-2xl font-bold">Modules</h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Explore modules in teaching order. Full lessons require approved module access.
-      </p>
-      <ol className="mt-5 grid gap-4">
+      <h2 className="mt-6 text-2xl font-bold">Modules</h2>
+      <ol className="mt-4 grid gap-3">
         {orderedModules.map((module) => (
           <li
             key={module.id}
-            className="rounded-2xl border border-slate-200 bg-white p-5"
+            className="rounded-xl border border-slate-200 bg-white px-5 py-4"
           >
             <p className="font-mono text-sm font-bold text-[#286518]">{module.code}</p>
             <h3 className="mt-2 text-xl font-bold">{module.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{module.description}</p>
             <Link
               href={"/students/courses/" + module.id}
-              className="mt-4 inline-flex font-bold text-[#286518] underline-offset-4 hover:underline"
+              className="mt-3 inline-flex font-bold text-[#286518] underline-offset-4 hover:underline"
             >
               Preview module →
             </Link>
