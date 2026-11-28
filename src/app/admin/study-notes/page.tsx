@@ -3,7 +3,10 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { RisaStudyNotesStudio } from "@/components/risa-study-notes-studio";
-import { RisaStudioNavigation, RisaStudioSelect } from "@/components/risa-studio-navigation";
+import {
+  RisaStudioNavigation,
+  RisaStudioSelect,
+} from "@/components/risa-studio-navigation";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import { getRisaAdminCourses, type RisaCourse } from "@/lib/risa-course-admin";
 import { getStructuredCurriculum, groupModuleTopics } from "@/lib/risa-module-sections";
