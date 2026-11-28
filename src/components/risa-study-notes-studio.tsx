@@ -210,7 +210,9 @@ export function RisaStudyNotesStudio({
       {!embedded && <h1 className="text-3xl font-bold">Study Notes Studio</h1>}
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
         {!ready && (
-          <p className="mb-4 text-sm text-slate-600">Select a module and topic to edit.</p>
+          <p className="mb-4 text-sm text-slate-600">
+            Select a module and topic to edit.
+          </p>
         )}
         <label className="block text-sm font-bold">
           Note title
