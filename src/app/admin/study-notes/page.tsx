@@ -23,7 +23,7 @@ export const metadata = {
 
 const selectClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white p-3";
 const buttonClass =
-  "min-h-11 rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white";
+  "min-h-11 rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white disabled:opacity-50";
 
 async function requireAdministrator(): Promise<string> {
   const token = (await cookies()).get(studentCookieNames.access)?.value;
@@ -50,7 +50,7 @@ function ModuleSelector({
     (module) => !programmes.some((programme) => programme.slug === module.programme_slug),
   );
   return (
-    <form action="/admin/study-notes" method="get" className="space-y-3">
+    <form action="/admin/study-notes" method="get" className="min-w-0 space-y-3">
       <label className="block text-sm font-bold">
         Course / Module
         <select
@@ -92,20 +92,22 @@ function TopicSelector({
   curriculum,
   topicId,
 }: {
-  selected: RisaCourse;
-  curriculum: NonNullable<Awaited<ReturnType<typeof getStructuredCurriculum>>>;
+  selected?: RisaCourse;
+  curriculum: Awaited<ReturnType<typeof getStructuredCurriculum>>;
   topicId?: string;
 }) {
-  const groups = groupModuleTopics(curriculum.sections, curriculum.topics);
+  const groups = groupModuleTopics(curriculum?.sections ?? [], curriculum?.topics ?? []);
+  const canOpen = Boolean(selected && curriculum?.topics.length);
   return (
-    <form action="/admin/study-notes" method="get" className="space-y-3">
-      <input type="hidden" name="module" value={selected.id} />
+    <form action="/admin/study-notes" method="get" className="min-w-0 space-y-3">
+      <input type="hidden" name="module" value={selected?.id ?? ""} />
       <label className="block text-sm font-bold">
         Section / Topic
         <select
           name="topic"
           defaultValue={topicId ?? ""}
           className={selectClass}
+          disabled={!canOpen}
           required
         >
           <option value="">Select a topic</option>
@@ -121,10 +123,10 @@ function TopicSelector({
           ))}
         </select>
       </label>
-      <button type="submit" className={buttonClass} disabled={!curriculum.topics.length}>
+      <button type="submit" className={buttonClass} disabled={!canOpen}>
         Open editor
       </button>
-      {!curriculum.topics.length && (
+      {selected && curriculum && !curriculum.topics.length && (
         <p className="text-sm text-slate-600">
           No topics yet.{" "}
           <Link
@@ -160,13 +162,13 @@ function WorkspaceSelection({
     );
   }
   return (
-    <section className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-5">
+    <section className="mt-6 grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 md:grid-cols-2">
       <ModuleSelector programmes={programmes} modules={modules} selected={selected} />
+      <TopicSelector selected={selected} curriculum={curriculum} topicId={topicId} />
       {selected && !curriculum && (
-        <p role="status">Topics are temporarily unavailable.</p>
-      )}
-      {selected && curriculum && (
-        <TopicSelector selected={selected} curriculum={curriculum} topicId={topicId} />
+        <p role="status" className="md:col-span-2">
+          Topics are temporarily unavailable.
+        </p>
       )}
     </section>
   );
@@ -189,6 +191,10 @@ export default async function AdminStudyNotesPage({
     : null;
   const topic = curriculum?.topics.find((item) => item.id === query.topic);
   const notes = topic ? await getTopicStudyNotes(token, topic.id, true) : null;
+  const target =
+    selected && topic && notes
+      ? { courseId: selected.id, topicId: topic.id, notes }
+      : { courseId: "", topicId: "", notes: [] };
 
   return (
     <main
@@ -206,16 +212,7 @@ export default async function AdminStudyNotesPage({
         curriculum={curriculum}
         topicId={query.topic}
       />
-      {selected && topic && notes && (
-        <RisaStudyNotesStudio
-          key={topic.id}
-          courseId={selected.id}
-          topicId={topic.id}
-          topicTitle={selected.code + " · " + topic.title}
-          notes={notes}
-          embedded
-        />
-      )}
+      <RisaStudyNotesStudio key={target.topicId} {...target} embedded />
       {topic && !notes && <p role="status">Study notes are temporarily unavailable.</p>}
     </main>
   );
