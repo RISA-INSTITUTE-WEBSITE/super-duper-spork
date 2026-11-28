@@ -52,11 +52,7 @@ export default async function StudyNotesStudioPage({
       >
         Study Notes Studio workspace
       </Link>
-      <RisaStudyNotesStudio
-        courseId={id}
-        topicId={topicId}
-        notes={notes}
-      />
+      <RisaStudyNotesStudio courseId={id} topicId={topicId} notes={notes} />
     </main>
   );
 }
