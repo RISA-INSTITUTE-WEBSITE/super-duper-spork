@@ -1,5 +1,7 @@
 "use server";
 
+import { headers } from "next/headers";
+
 import { requireAdminSession } from "@/lib/risa-staff-session";
 import {
   executeLinux,
@@ -11,13 +13,18 @@ import {
   verifyLinuxSession,
 } from "@/lib/risa-linux-sandbox";
 
+async function runtimeSandboxConfig() {
+  const requestHeaders = await headers();
+  return sandboxConfig(requestHeaders.get("x-vercel-oidc-token"));
+}
+
 export async function startLinuxSession() {
   const { identity } = await requireAdminSession();
-  const config = sandboxConfig();
+  const config = await runtimeSandboxConfig();
   if (!config) {
     return {
       error:
-        "Linux runtime is not configured. Enable Vercel OIDC and set RISA_LINUX_SESSION_SECRET.",
+        "Linux runtime credentials are unavailable. Check the project OIDC and signing secret.",
     };
   }
   try {
@@ -37,7 +44,7 @@ export async function startLinuxSession() {
 
 export async function runLinuxCommand(session: string, command: string) {
   const { identity } = await requireAdminSession();
-  const config = sandboxConfig();
+  const config = await runtimeSandboxConfig();
   if (!config) {
     return { error: "Linux runtime is not configured." };
   }
@@ -61,7 +68,7 @@ export async function runLinuxCommand(session: string, command: string) {
 
 export async function endLinuxSession(session: string) {
   const { identity } = await requireAdminSession();
-  const config = sandboxConfig();
+  const config = await runtimeSandboxConfig();
   if (!config || typeof session !== "string") {
     return { error: "Invalid session." };
   }

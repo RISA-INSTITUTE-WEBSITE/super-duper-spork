@@ -7,8 +7,9 @@ than executing commands on the Next.js server.
 
 ## Deployment prerequisites
 
-- Enable Vercel OIDC for the RISA project; the server uses the deployment's
-  VERCEL_OIDC_TOKEN and its project/owner claims.
+- Enable Vercel OIDC for the RISA project; the server reads the function's
+  x-vercel-oidc-token request header at runtime, with VERCEL_OIDC_TOKEN as
+  the local-development fallback, and uses its project/owner claims.
 - Configure a server-only RISA_LINUX_SESSION_SECRET (at least 32 characters,
   generated randomly) in the appropriate deployment environments. Never use
   a NEXT_PUBLIC variable or commit it.
