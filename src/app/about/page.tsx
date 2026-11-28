@@ -18,8 +18,8 @@ export default function AboutPage() {
             About the Institution
           </h1>
           <p className="mt-6 max-w-4xl text-base leading-8 text-slate-600 sm:text-lg">
-            RISA Institute of Applied Sciences focuses on clear scientific foundations
-            and practical application.
+            RISA Institute of Applied Sciences focuses on clear scientific foundations and
+            practical application.
           </p>
         </div>
       </section>
