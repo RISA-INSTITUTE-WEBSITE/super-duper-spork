@@ -27,11 +27,13 @@ export function RisaStudyNotesStudio({
   topicId,
   topicTitle,
   notes,
+  embedded = false,
 }: {
   courseId: string;
   topicId: string;
   topicTitle: string;
   notes: StudyNote[];
+  embedded?: boolean;
 }) {
   const router = useRouter();
   const [editingId, setEditingId] = useState<string>();
@@ -143,7 +145,11 @@ export function RisaStudyNotesStudio({
   return (
     <div className="mt-6 space-y-6">
       <header className="rounded-3xl bg-gradient-to-br from-[#2814D1] to-[#5274C3] p-6 text-white sm:p-8">
-        <h1 className="text-2xl font-black">Study Notes Studio</h1>
+        {embedded ? (
+          <h2 className="text-2xl font-black">Lesson editor</h2>
+        ) : (
+          <h1 className="text-2xl font-black">Study Notes Studio</h1>
+        )}
         <p className="mt-3 font-semibold">{topicTitle}</p>
         <p className="mt-3 text-sm leading-7 text-indigo-100">
           Paste or write your original Markdown and LaTeX, preview the lesson, then save

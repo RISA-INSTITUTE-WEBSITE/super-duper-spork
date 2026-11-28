@@ -8,9 +8,10 @@ grey table headers and white body cells.
 
 ## Authoring
 
-Open Admin → Courses → the module → Manage module topics → Study Notes Studio
-on the desired topic. Paste or write Markdown, enter a title, preview it and
-save a draft or Save & Publish. Edit or delete existing notes from the Studio.
+Open Admin → Study Notes Studio. Choose a course/module, select a topic
+(grouped by section), and open the editor in the same workspace. The original
+Admin → Courses → module → Study Notes Studio route also remains available.
+Paste or write Markdown, enter a title, preview it and save a draft or Save & Publish. Edit or delete existing notes from the Studio.
 Images can be inserted at the cursor, pasted or dropped; static diagrams
 are compressed below 220 KB and stored independently. Alt text can be edited
 in Markdown. Removing an image reference does not automatically delete its

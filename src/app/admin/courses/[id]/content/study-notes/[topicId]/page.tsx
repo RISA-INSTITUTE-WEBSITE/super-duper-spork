@@ -46,6 +46,12 @@ export default async function StudyNotesStudioPage({
       >
         ← Module content
       </Link>
+      <Link
+        href={"/admin/study-notes?module=" + id + "&topic=" + topicId}
+        className="ml-4 font-bold text-[#286518] hover:underline"
+      >
+        Study Notes Studio workspace
+      </Link>
       <RisaStudyNotesStudio
         courseId={id}
         topicId={topicId}
