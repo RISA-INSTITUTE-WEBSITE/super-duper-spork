@@ -45,8 +45,8 @@ export function verifyLinuxSession(
   }
 }
 
-export function sandboxConfig() {
-  const token = process.env.VERCEL_OIDC_TOKEN;
+export function sandboxConfig(requestToken?: string | null) {
+  const token = requestToken || process.env.VERCEL_OIDC_TOKEN;
   const secret = process.env.RISA_LINUX_SESSION_SECRET;
   if (!token || !secret || secret.length < 32) {
     return null;
