@@ -55,7 +55,6 @@ export default async function StudyNotesStudioPage({
       <RisaStudyNotesStudio
         courseId={id}
         topicId={topicId}
-        topicTitle={course.code + " · " + topic.title}
         notes={notes}
       />
     </main>
