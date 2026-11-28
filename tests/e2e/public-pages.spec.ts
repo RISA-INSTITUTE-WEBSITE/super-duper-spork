@@ -460,9 +460,9 @@ test("institutional footer preserves navigation and stacks correctly on mobile",
 
   await expect(footer.getByText("RISA Institute", { exact: true })).toBeVisible();
   await expect(footer.getByRole("heading", { name: "Explore" })).toBeVisible();
-  await expect(
-    footer.getByRole("heading", { name: "Development status" }),
-  ).toHaveCount(0);
+  await expect(footer.getByRole("heading", { name: "Development status" })).toHaveCount(
+    0,
+  );
   await expect(page.getByText("Website in development", { exact: false })).toHaveCount(0);
 
   for (const [name, href] of [

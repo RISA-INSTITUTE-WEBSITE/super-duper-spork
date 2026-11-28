@@ -17,7 +17,9 @@ export function RisaLatestUpdates() {
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused) {
+      return;
+    }
     const timer = window.setTimeout(() => {
       if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         setActive((index) => (index + 1) % slides.length);

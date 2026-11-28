@@ -22,16 +22,77 @@ const primaryButton =
 const secondaryButton =
   "min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-800 disabled:opacity-50";
 
+function EditorModeButtons({
+  preview,
+  setPreview,
+}: {
+  preview: boolean;
+  setPreview: (value: boolean) => void;
+}) {
+  const modeClass = (active: boolean) =>
+    "inline-flex size-11 items-center justify-center rounded-xl border focus-visible:outline-2 focus-visible:outline-[#155DFC] " +
+    (active
+      ? "border-[#155DFC] bg-blue-50 text-[#155DFC]"
+      : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50");
+
+  return (
+    <div className="ml-auto flex items-center gap-2">
+      <button
+        type="button"
+        className={modeClass(!preview)}
+        aria-label="Edit Markdown"
+        title="Edit Markdown"
+        aria-pressed={!preview}
+        onClick={() => setPreview(false)}
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-5"
+        >
+          <path d="m16 3 5 5-12 12-6 1 1-6L16 3Z" />
+          <path d="m13 6 5 5" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className={modeClass(preview)}
+        aria-label="Preview"
+        title="Preview"
+        aria-pressed={preview}
+        onClick={() => setPreview(true)}
+      >
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-5"
+        >
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export function RisaStudyNotesStudio({
   courseId,
   topicId,
-  topicTitle,
   notes,
   embedded = false,
 }: {
   courseId: string;
   topicId: string;
-  topicTitle: string;
   notes: StudyNote[];
   embedded?: boolean;
 }) {
@@ -46,6 +107,8 @@ export function RisaStudyNotesStudio({
   const editor = useRef<HTMLTextAreaElement>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   const cursor = useRef({ start: 0, end: 0 });
+  const ready = Boolean(courseId && topicId);
+  const blocked = busy || !ready;
 
   function startNew() {
     setEditingId(undefined);
@@ -85,7 +148,7 @@ export function RisaStudyNotesStudio({
   }
 
   async function save(published: boolean) {
-    if (!validStudyNote(title, markdown)) {
+    if (!ready || !validStudyNote(title, markdown)) {
       setNotice("Add a title and up to 70,000 characters of Markdown.");
       return;
     }
@@ -107,7 +170,7 @@ export function RisaStudyNotesStudio({
   }
 
   async function insertImage(file?: File) {
-    if (!file || busy) {
+    if (!file || blocked) {
       return;
     }
     rememberCursor();
@@ -144,26 +207,20 @@ export function RisaStudyNotesStudio({
 
   return (
     <div className="mt-6 space-y-6">
-      <header className="rounded-3xl bg-gradient-to-br from-[#2814D1] to-[#5274C3] p-6 text-white sm:p-8">
-        {embedded ? (
-          <h2 className="text-2xl font-black">Lesson editor</h2>
-        ) : (
-          <h1 className="text-2xl font-black">Study Notes Studio</h1>
-        )}
-        <p className="mt-3 font-semibold">{topicTitle}</p>
-        <p className="mt-3 text-sm leading-7 text-indigo-100">
-          Paste or write your original Markdown and LaTeX, preview the lesson, then save
-          and publish it independently of video lessons.
-        </p>
-      </header>
+      {!embedded && <h1 className="text-3xl font-bold">Study Notes Studio</h1>}
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
+        {!ready && (
+          <p className="mb-4 text-sm text-slate-600">
+            Select a module and topic to edit.
+          </p>
+        )}
         <label className="block text-sm font-bold">
           Note title
           <input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             maxLength={140}
-            disabled={busy}
+            disabled={blocked}
             className="mt-2 w-full rounded-xl border border-slate-300 p-3"
           />
         </label>
@@ -171,23 +228,7 @@ export function RisaStudyNotesStudio({
           <button
             type="button"
             className={secondaryButton}
-            aria-pressed={!preview}
-            onClick={() => setPreview(false)}
-          >
-            Edit Markdown
-          </button>
-          <button
-            type="button"
-            className={secondaryButton}
-            aria-pressed={preview}
-            onClick={() => setPreview(true)}
-          >
-            Preview
-          </button>
-          <button
-            type="button"
-            className={secondaryButton}
-            disabled={busy || preview}
+            disabled={blocked || preview}
             onClick={() => {
               rememberCursor();
               imageInput.current?.click();
@@ -198,7 +239,7 @@ export function RisaStudyNotesStudio({
           <button
             type="button"
             className={secondaryButton}
-            disabled={busy || preview}
+            disabled={blocked || preview}
             onClick={() => {
               rememberCursor();
               const { start, end } = cursor.current;
@@ -210,6 +251,7 @@ export function RisaStudyNotesStudio({
           >
             Insert Python Studio
           </button>
+          <EditorModeButtons preview={preview} setPreview={setPreview} />
           <input
             ref={imageInput}
             type="file"
@@ -248,7 +290,7 @@ export function RisaStudyNotesStudio({
                   void insertImage(file);
                 }
               }}
-              disabled={busy}
+              disabled={blocked}
               rows={20}
               maxLength={70000}
               className="mt-2 w-full rounded-xl border border-slate-300 p-4 font-mono text-sm leading-6"
@@ -262,7 +304,7 @@ export function RisaStudyNotesStudio({
         <div className="mt-5 flex flex-wrap gap-2">
           <button
             type="button"
-            disabled={busy}
+            disabled={blocked}
             onClick={() => void save(true)}
             className={primaryButton}
           >
@@ -270,7 +312,7 @@ export function RisaStudyNotesStudio({
           </button>
           <button
             type="button"
-            disabled={busy}
+            disabled={blocked}
             onClick={() => void save(false)}
             className={secondaryButton}
           >
@@ -278,7 +320,7 @@ export function RisaStudyNotesStudio({
           </button>
           <button
             type="button"
-            disabled={busy}
+            disabled={blocked}
             onClick={startNew}
             className={secondaryButton}
           >
@@ -304,7 +346,7 @@ export function RisaStudyNotesStudio({
               <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={blocked}
                   className={secondaryButton}
                   onClick={() => edit(note)}
                 >
@@ -314,7 +356,7 @@ export function RisaStudyNotesStudio({
                   <>
                     <button
                       type="button"
-                      disabled={busy}
+                      disabled={blocked}
                       className={secondaryButton}
                       onClick={() => void remove(note.id)}
                     >
@@ -322,7 +364,7 @@ export function RisaStudyNotesStudio({
                     </button>
                     <button
                       type="button"
-                      disabled={busy}
+                      disabled={blocked}
                       className={secondaryButton}
                       onClick={() => setDeleteId(undefined)}
                     >
@@ -332,7 +374,7 @@ export function RisaStudyNotesStudio({
                 ) : (
                   <button
                     type="button"
-                    disabled={busy}
+                    disabled={blocked}
                     className={secondaryButton}
                     onClick={() => setDeleteId(note.id)}
                   >
