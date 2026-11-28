@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { RisaStudyNotesStudio } from "@/components/risa-study-notes-studio";
+import { RisaStudioNavigation, RisaStudioSelect } from "@/components/risa-studio-navigation";
 import { isRisaAdministrator } from "@/lib/risa-admin-api";
 import { getRisaAdminCourses, type RisaCourse } from "@/lib/risa-course-admin";
 import { getStructuredCurriculum, groupModuleTopics } from "@/lib/risa-module-sections";
@@ -20,10 +21,6 @@ export const metadata = {
   title: "Study Notes Studio | RISA",
   robots: { index: false, follow: false },
 };
-
-const selectClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white p-3";
-const buttonClass =
-  "min-h-11 rounded-xl bg-[#286518] px-5 py-2 text-sm font-bold text-white disabled:opacity-50";
 
 async function requireAdministrator(): Promise<string> {
   const token = (await cookies()).get(studentCookieNames.access)?.value;
@@ -50,15 +47,10 @@ function ModuleSelector({
     (module) => !programmes.some((programme) => programme.slug === module.programme_slug),
   );
   return (
-    <form action="/admin/study-notes" method="get" className="min-w-0 space-y-3">
+    <div className="min-w-0 space-y-3">
       <label className="block text-sm font-bold">
         Course / Module
-        <select
-          name="module"
-          defaultValue={selected?.id ?? ""}
-          className={selectClass}
-          required
-        >
+        <RisaStudioSelect name="module" value={selected?.id ?? ""}>
           <option value="">Select a module</option>
           {programmes.map((programme) => (
             <optgroup key={programme.slug} label={programme.title}>
@@ -78,12 +70,9 @@ function ModuleSelector({
               ))}
             </optgroup>
           )}
-        </select>
+        </RisaStudioSelect>
       </label>
-      <button type="submit" className={buttonClass}>
-        Load topics
-      </button>
-    </form>
+    </div>
   );
 }
 
@@ -100,16 +89,14 @@ function TopicSelector({
   const groups = groupModuleTopics(sections, topics);
   const canOpen = topics.length > 0;
   return (
-    <form action="/admin/study-notes" method="get" className="min-w-0 space-y-3">
-      <input type="hidden" name="module" value={selected?.id ?? ""} />
+    <div className="min-w-0 space-y-3">
       <label className="block text-sm font-bold">
         Section / Topic
-        <select
+        <RisaStudioSelect
           name="topic"
-          defaultValue={topicId ?? ""}
-          className={selectClass}
+          value={topicId ?? ""}
+          moduleId={selected?.id}
           disabled={!canOpen}
-          required
         >
           <option value="">Select a topic</option>
           {groups.map((group) => (
@@ -122,11 +109,8 @@ function TopicSelector({
               ))}
             </optgroup>
           ))}
-        </select>
+        </RisaStudioSelect>
       </label>
-      <button type="submit" className={buttonClass} disabled={!canOpen}>
-        Open editor
-      </button>
       {selected && curriculum && !curriculum.topics.length && (
         <p className="text-sm text-slate-600">
           No topics yet.{" "}
@@ -138,7 +122,7 @@ function TopicSelector({
           </Link>
         </p>
       )}
-    </form>
+    </div>
   );
 }
 
@@ -206,15 +190,17 @@ export default async function AdminStudyNotesPage({
         ← Administration Centre
       </Link>
       <h1 className="mt-5 text-3xl font-bold sm:text-4xl">Study Notes Studio</h1>
-      <WorkspaceSelection
-        programmes={programmes}
-        modules={modules}
-        selected={selected}
-        curriculum={curriculum}
-        topicId={query.topic}
-      />
-      <RisaStudyNotesStudio key={target.topicId} {...target} embedded />
-      {topic && !notes && <p role="status">Study notes are temporarily unavailable.</p>}
+      <RisaStudioNavigation>
+        <WorkspaceSelection
+          programmes={programmes}
+          modules={modules}
+          selected={selected}
+          curriculum={curriculum}
+          topicId={topic?.id}
+        />
+        <RisaStudyNotesStudio key={target.topicId} {...target} embedded />
+        {topic && !notes && <p role="status">Study notes are temporarily unavailable.</p>}
+      </RisaStudioNavigation>
     </main>
   );
 }
