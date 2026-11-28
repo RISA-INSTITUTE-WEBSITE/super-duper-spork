@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { signOutStudent } from "@/app/students/actions";
+import { RefreshAdminButton } from "@/components/risa-admin-navigation";
 import { getStudentIdentity, isStudentAuthConfigured } from "@/lib/student-auth-api";
 import { getRisaAdminOverview, isRisaAdministrator } from "@/lib/risa-admin-api";
 import { studentCookieNames } from "@/lib/student-session";
@@ -19,15 +20,34 @@ export const metadata: Metadata = {
 function AdminMetric({
   label,
   value,
+  icon,
 }: {
   label: string;
   value: number | null;
+  icon: string;
 }) {
   return (
-    <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-      <p className="text-sm font-semibold text-[#286518]">{label}</p>
-      <p className="mt-3 font-heading text-4xl font-bold tabular-nums text-slate-950">
+    <article className="risa-glass-card min-w-0 rounded-2xl p-5">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="size-5 text-[#286518]"
+      >
+        <path d={icon} />
+      </svg>
+      <p
+        className="mt-4 font-heading text-3xl font-bold tabular-nums text-slate-950"
+        title={value === null ? "Count unavailable" : undefined}
+      >
         {value ?? "—"}
+      </p>
+      <p className="mt-1 text-xs font-bold tracking-wide text-slate-600 uppercase">
+        {label}
       </p>
     </article>
   );
@@ -58,37 +78,34 @@ export default async function RisaAdminPage() {
   return (
     <main
       id="main-content"
-      className="mx-auto w-full max-w-7xl flex-1 px-5 py-8 sm:px-8 lg:py-10"
+      className="mx-auto w-full max-w-7xl flex-1 px-5 pt-4 pb-12 sm:px-8"
     >
-      <section className="risa-science-glass relative overflow-hidden rounded-[2rem] p-6 sm:p-8">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-[#78eb29]/20 blur-3xl"
-        />
-        <div className="relative flex flex-wrap items-start justify-between gap-6">
+      <section className="rounded-2xl bg-gradient-to-br from-[#0a1610] to-[#102b1a] p-6 text-white sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-5">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#286518]">
-              RISA / Administration
+            <p className="text-xs font-bold tracking-widest text-[#a6ed87] uppercase">
+              RISA Management CMS
             </p>
-            <h1 className="mt-3 font-heading text-3xl font-bold text-slate-950 sm:text-4xl">
+            <h1 className="mt-2 font-heading text-2xl font-bold sm:text-3xl">
               Administration Centre
             </h1>
-            <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#eefce5] px-4 py-2 text-xs font-bold text-[#286518]">
-              <span aria-hidden="true" className="size-2 rounded-full bg-[#286518]" />
+            <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-[#d6f4c7]">
+              <span aria-hidden="true" className="size-2 rounded-full bg-[#78eb29]" />
               Administrator access verified
-            </div>
+            </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <RefreshAdminButton />
             <Link
               href="/students/dashboard"
-              className="inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
+              className="inline-flex min-h-10 items-center rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-white"
             >
               My Learning
             </Link>
             <form action={signOutStudent}>
               <button
                 type="submit"
-                className="min-h-11 rounded-xl border border-white bg-white/85 px-5 py-2 text-sm font-semibold text-[#286518] hover:bg-white focus-visible:outline-2 focus-visible:outline-[#286518]"
+                className="min-h-10 rounded-full border border-white/30 px-4 py-2 text-sm font-semibold text-white hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-white"
               >
                 Sign out
               </button>
@@ -97,100 +114,47 @@ export default async function RisaAdminPage() {
         </div>
       </section>
 
-      <section aria-labelledby="admin-overview-heading" className="mt-8">
+      <section aria-labelledby="admin-overview-heading" className="mt-7">
         <h2
           id="admin-overview-heading"
-          className="font-heading text-2xl font-bold text-slate-950 sm:text-3xl"
+          className="flex items-center gap-2 font-heading text-lg font-bold text-slate-950"
         >
-          Learning platform overview
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-5 text-[#286518]"
+          >
+            <path d="m3 17 6-6 4 4 8-9m-6 0h6v6" />
+          </svg>
+          Live platform statistics
         </h2>
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <AdminMetric
             label="Courses"
             value={overview.courses}
+            icon="M4 19V5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 1 0-4h14"
           />
           <AdminMetric
             label="Modules"
             value={overview.modules}
+            icon="m12 2 10 5-10 5L2 7zm-10 10 10 5 10-5M2 17l10 5 10-5"
           />
           <AdminMetric
             label="Enrolments"
             value={overview.enrolments}
+            icon="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8m11 2v6m-3-3h6"
           />
           <AdminMetric
             label="Course files"
             value={overview.materials}
+            icon="M6 2h8l5 5v15H6zM14 2v6h5M9 13h7m-7 4h7"
           />
         </div>
-      </section>
-
-      <section className="mt-8 grid gap-5 lg:grid-cols-2">
-        <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="text-xl font-bold">Study Notes Studio</h2>
-          <Link
-            href="/admin/study-notes"
-            className="mt-3 inline-flex font-bold text-[#286518]"
-          >
-            Open Study Notes Studio →
-          </Link>
-        </article>
-        <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="text-xl font-bold">Institutional policies</h2>
-          <Link
-            href="/admin/policies"
-            className="mt-3 inline-flex font-bold text-[#286518]"
-          >
-            Manage policies →
-          </Link>
-        </article>
-        <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="text-xl font-bold">Labs — private preview</h2>
-          <Link href="/admin/labs" className="mt-3 inline-flex font-bold text-[#286518]">
-            Open lab preview →
-          </Link>
-        </article>
-        <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="text-xl font-bold">Lecturer management</h2>
-          <Link
-            href="/admin/lecturers"
-            className="mt-3 inline-flex font-bold text-[#286518]"
-          >
-            Manage lecturers →
-          </Link>
-        </article>
-        <article className="risa-science-glass rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="font-heading text-xl font-bold text-slate-950">
-            Course administration
-          </h2>
-          <Link
-            href="/admin/courses"
-            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
-          >
-            Manage courses →
-          </Link>
-        </article>
-        <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="font-heading text-xl font-bold text-slate-950">
-            Enrolment requests
-          </h2>
-          <Link
-            href="/admin/enrolment-requests"
-            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#1d4f11]"
-          >
-            Review enrolment requests →
-          </Link>
-        </article>
-        <article className="risa-glass-card rounded-[1.5rem] p-5 sm:p-6">
-          <h2 className="font-heading text-xl font-bold text-slate-950">
-            Account and permissions
-          </h2>
-          <Link
-            href="/students/profile"
-            className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-[#286518] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1d4f11]"
-          >
-            Edit my profile
-          </Link>
-        </article>
       </section>
     </main>
   );
