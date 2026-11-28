@@ -222,7 +222,8 @@ jobs:
       # QA-IAC-01: run Checkov when Docker/Terraform/Kubernetes manifests exist.
       - name: Phase 4 - Infrastructure-as-code scan (when applicable)
         run: |
-          if find . -type f \( -name 'Dockerfile*' -o -name '*.tf' -o -name '*.tf.json' -o -name 'kustomization.yaml' \) -not -path './node_modules/*' | grep -q .; then
+          git ls-files > "$RUNNER_TEMP/risa-tracked-files"
+          if grep -Eq '(^|/)(Dockerfile[^/]*|[^/]+\.tf(\.json)?|kustomization\.ya?ml)$|(^|/)(k8s|kubernetes|infra|terraform)/.*\.ya?ml
             python3 -m pip install --quiet checkov
             checkov -d . --framework dockerfile,terraform,kubernetes --quiet --compact
           else
@@ -309,16 +310,155 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs:
-      [
-        changes,
-        code-quality,
-        security,
-        unit-tests,
-        build-browser,
-        infrastructure,
-        dynamic-security,
-        portability,
-      ]
+      - changes
+      - code-quality
+      - security
+      - unit-tests
+      - build-browser
+      - infrastructure
+      - dynamic-security
+      - portability
+    if: ${{ always() }}
+    steps:
+      - name: Verify all required jobs and applicable extended jobs
+        env:
+          SCOPE: ${{ needs.changes.result }}
+          CODE: ${{ needs.code-quality.result }}
+          SECURITY: ${{ needs.security.result }}
+          UNIT: ${{ needs.unit-tests.result }}
+          BUILD: ${{ needs.build-browser.result }}
+          IAC: ${{ needs.infrastructure.result }}
+          DAST: ${{ needs.dynamic-security.result }}
+          PORT: ${{ needs.portability.result }}
+          WANT_IAC: ${{ needs.changes.outputs.iac }}
+          WANT_DAST: ${{ needs.changes.outputs.dast }}
+          WANT_PORT: ${{ needs.changes.outputs.portability }}
+        run: |
+          set -euo pipefail
+          failed=0
+          echo '## RISA quality gate summary' >> "$GITHUB_STEP_SUMMARY"
+          required() {
+            printf -- '- %s: %s\n' "$1" "$2" >> "$GITHUB_STEP_SUMMARY"
+            if [[ "$2" != "success" ]]; then
+              echo "::error::$1 returned $2"
+              failed=1
+            fi
+          }
+          conditional() {
+            if [[ "$2" == "false" && "$3" == "skipped" ]]; then
+              printf -- '- %s: not applicable\n' "$1" >> "$GITHUB_STEP_SUMMARY"
+            else
+              required "$1" "$3"
+              if [[ "$2" != "true" ]]; then
+                echo "::error::$1 has an unexpected verification scope"
+                failed=1
+              fi
+            fi
+          }
+          required Scope "$SCOPE"
+          required Code "$CODE"
+          required Security "$SECURITY"
+          required Unit "$UNIT"
+          required Build-and-browser "$BUILD"
+          conditional IaC "$WANT_IAC" "$IAC"
+          conditional DAST "$WANT_DAST" "$DAST"
+          conditional Portability "$WANT_PORT" "$PORT"
+          exit "$failed"
+ "$RUNNER_TEMP/risa-tracked-files"; then
+            python3 -m pip install --quiet checkov
+            checkov -d . --framework dockerfile,terraform,kubernetes --quiet --compact
+          else
+            echo "No Docker/Terraform/Kubernetes deployment files yet; IaC scan not applicable."
+          fi
+
+  dynamic-security:
+    name: OWASP ZAP active security scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: changes
+    if: ${{ needs.changes.outputs.dast == 'true' }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Install dependencies
+        id: install
+        run: npm ci --no-audit --no-fund
+      - name: Production build for isolated security scan
+        run: npm run build
+      # Phase 5 - dynamic baseline and real-browser critical journeys.
+      # QA-DAST-01: scan an isolated localhost server with project ZAP rules.
+      # tests/security/run-zap.sh manages the server and Docker lifetime.
+      - name: Phase 5 - OWASP ZAP isolated active DAST scan
+        id: zap
+        run: bash tests/security/run-zap.sh
+
+      # Regression: DAST must not leave a local Next.js server occupying port 3000.
+      - name: Phase 5 - Verify scanner server cleanup
+        if: ${{ !cancelled() && steps.zap.outcome != 'skipped' }}
+        run: |
+          for attempt in $(seq 1 10); do
+            if ! curl --fail --silent --max-time 2 http://127.0.0.1:3000/ > /dev/null; then
+              echo "Local Next.js scanner server was cleaned up."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error title=Orphaned local server::Port 3000 is still used after the ZAP scan."
+          exit 1
+      # Persist the ZAP report for review even if a security check fails.
+      - name: Preserve DAST scan report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: risa-zap-report
+          path: zap-report.json
+          if-no-files-found: ignore
+
+  portability:
+    name: Node.js 24 portability
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: changes
+    if: ${{ needs.changes.outputs.portability == 'true' }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: "npm"
+      - name: Install dependencies
+        id: install
+        run: npm ci --no-audit --no-fund
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Unit coverage
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run test:coverage
+      - name: Production build
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run build
+
+  # Preserve the existing required status-check name in branch protection.
+  required-quality-gate:
+    name: RISA Required Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs:
+      - changes
+      - code-quality
+      - security
+      - unit-tests
+      - build-browser
+      - infrastructure
+      - dynamic-security
+      - portability
     if: ${{ always() }}
     steps:
       - name: Verify all required jobs and applicable extended jobs
