@@ -7,13 +7,17 @@ export function RisaProgrammeCards({
   programmes,
   modules,
   showDescriptions = true,
+  className = "mt-10",
 }: {
   programmes: RisaProgramme[];
   modules: RisaCourse[];
   showDescriptions?: boolean;
+  className?: string;
 }) {
   return (
-    <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+    <div
+      className={"grid min-w-0 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6 " + className}
+    >
       {programmes.map((programme) => {
         const count = modulesForProgramme(modules, programme.slug).length;
         return (
