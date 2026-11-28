@@ -16,7 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "hooks:install": "node scripts/quality/install-pre-commit.mjs"
   },
   "dependencies": {
     "katex": "0.16.25",
