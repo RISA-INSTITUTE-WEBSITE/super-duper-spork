@@ -139,7 +139,9 @@ export async function executeLinux(config: Config, id: string, command: string) 
   const status: { exitCode: number | null } = { exitCode: null };
   let truncated = false;
   function line(value: string) {
-    if (!value.trim()) return;
+    if (!value.trim()) {
+      return;
+    }
     const entry = JSON.parse(value);
     if (entry.stream === "error") {
       throw new Error("Sandbox command failed.");
