@@ -24,7 +24,9 @@ test("study notes studio automatically loads module-specific topics and notes", 
   ]);
   await topic.selectOption({ label: "Fixture functions" });
   await expect(publish).toBeEnabled();
-  await expect(page.getByRole("heading", { name: "Fixture functions note" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Fixture functions note" }),
+  ).toBeVisible();
 
   await module.selectOption({ label: "DVE101 · Fixture DevOps" });
   await expect(topic.locator("option")).toHaveText(["Select a topic", "Fixture Linux"]);
