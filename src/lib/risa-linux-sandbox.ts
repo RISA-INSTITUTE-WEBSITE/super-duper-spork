@@ -64,6 +64,8 @@ export function sandboxConfig(requestToken?: string | null) {
 
 type Config = NonNullable<ReturnType<typeof sandboxConfig>>;
 
+export class LinuxRuntimeError extends Error {}
+
 async function request(config: Config, path: string, body: object) {
   const url = new URL(path, "https://api.vercel.com");
   url.searchParams.set("teamId", config.team);
@@ -79,7 +81,7 @@ async function request(config: Config, path: string, body: object) {
   });
   if (!response.ok) {
     await response.body?.cancel();
-    throw new Error("Sandbox request failed (" + response.status + ").");
+    throw new LinuxRuntimeError("Sandbox request failed (HTTP " + response.status + ").");
   }
   return response;
 }
@@ -113,7 +115,7 @@ export async function stopLinux(config: Config, id: string) {
 // A separate Bash process handles each line; the guest filesystem and cwd survive.
 const shell = [
   "state=/tmp/risa-linux-cwd",
-  'if [ -r "$state" ]; then IFS= read -r previous < "$state"; cd -- "$previous" || cd /vercel/sandbox; fi',
+  'if [ -r "$state" ]; then IFS= read -r previous < "$state"; cd -- "$previous" || exit 1; fi',
   "trap 'pwd -P > \"$state\"' EXIT",
   'eval "$1"',
 ].join("\n");
@@ -122,7 +124,6 @@ export async function executeLinux(config: Config, id: string, command: string) 
   const response = await request(config, "/v2/sandboxes/sessions/" + id + "/cmd", {
     command: "bash",
     args: ["-c", shell, "risa-terminal", command],
-    cwd: "/vercel/sandbox",
     env: { TERM: "dumb" },
     sudo: false,
     wait: true,
@@ -130,7 +131,7 @@ export async function executeLinux(config: Config, id: string, command: string) 
     timeout: 10_000,
   });
   if (!response.body) {
-    throw new Error("No command response.");
+    throw new LinuxRuntimeError("Sandbox returned no command response.");
   }
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
@@ -144,7 +145,7 @@ export async function executeLinux(config: Config, id: string, command: string) 
     }
     const entry = JSON.parse(value);
     if (entry.stream === "error") {
-      throw new Error("Sandbox command failed.");
+      throw new LinuxRuntimeError("Sandbox could not complete the command.");
     }
     if (
       (entry.stream === "stdout" || entry.stream === "stderr") &&
@@ -173,7 +174,7 @@ export async function executeLinux(config: Config, id: string, command: string) 
         line(value);
       }
       if (pending.length > 256_000) {
-        throw new Error("Command output exceeded limit.");
+        throw new LinuxRuntimeError("Command output exceeded the safety limit.");
       }
     }
     line(pending + decoder.decode());
@@ -181,7 +182,7 @@ export async function executeLinux(config: Config, id: string, command: string) 
     await reader.cancel().catch(() => undefined);
   }
   if (status.exitCode === null) {
-    throw new Error("Command did not report an exit status.");
+    throw new LinuxRuntimeError("Command did not report an exit status.");
   }
   return {
     output: output + (truncated ? "\n[Output truncated]" : ""),
