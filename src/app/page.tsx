@@ -180,10 +180,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
-            <div
-              aria-hidden="true"
-              className="flex justify-center md:justify-end"
-            >
+            <div aria-hidden="true" className="flex justify-center md:justify-end">
               <Image
                 src="/risa-logo-animated.svg"
                 alt=""
