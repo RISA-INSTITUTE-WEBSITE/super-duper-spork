@@ -99,6 +99,11 @@ test("homepage course preview links to the full catalogue and shows at most thre
   const more = section.getByRole("link", { name: "More", exact: true });
   await expect(more.locator("svg")).toBeVisible();
   await expect(more).toHaveText("");
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const heading = section.getByRole("heading", { name: "Explore our courses" });
+  const headingBox = await heading.boundingBox();
+  const arrowBox = await more.boundingBox();
+  expect(arrowBox!.y).toBeGreaterThan(headingBox!.y + headingBox!.height);
   expect((await more.boundingBox())?.width ?? 0).toBeGreaterThanOrEqual(64);
   await section.getByRole("link", { name: "More", exact: true }).click();
   await expect(page).toHaveURL(/\/programmes\/?$/);
