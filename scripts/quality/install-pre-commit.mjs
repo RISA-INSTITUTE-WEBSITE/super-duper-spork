@@ -1,11 +1,5 @@
 import { execFileSync } from "node:child_process";
-import {
-  chmodSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 function git(args) {
@@ -15,10 +9,7 @@ function git(args) {
 function installHook() {
   const root = git(["rev-parse", "--show-toplevel"]);
   const source = resolve(root, ".githooks/pre-commit");
-  const destination = resolve(
-    root,
-    git(["rev-parse", "--git-path", "hooks/pre-commit"]),
-  );
+  const destination = resolve(root, git(["rev-parse", "--git-path", "hooks/pre-commit"]));
   const content = readFileSync(source, "utf8").replace(/\r\n/g, "\n");
   if (existsSync(destination)) {
     const existing = readFileSync(destination, "utf8");
