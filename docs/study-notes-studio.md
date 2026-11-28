@@ -9,8 +9,8 @@ grey table headers and white body cells.
 ## Authoring
 
 Open Admin → Study Notes Studio. The editor is immediately visible. Choose a
-course/module and load topics, then select a topic (grouped by section) and
-open the editor to enable authoring. The pencil and eye icons switch between
+course/module to load its topics automatically, then select a topic (grouped
+by section) to open the editor automatically. Save drafts before switching topics. The pencil and eye icons switch between
 Markdown editing and rendered preview. The original
 Admin → Courses → module → Study Notes Studio route also remains available.
 Paste or write Markdown, enter a title, preview it and save a draft or Save & Publish. Edit or delete existing notes from the Studio.
