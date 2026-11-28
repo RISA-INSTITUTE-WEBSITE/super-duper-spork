@@ -15,10 +15,16 @@ function git(args) {
 function installHook() {
   const root = git(["rev-parse", "--show-toplevel"]);
   const source = resolve(root, ".githooks/pre-commit");
-  const destination = resolve(root, git(["rev-parse", "--git-path", "hooks/pre-commit"]));
+  const destination = resolve(
+    root,
+    git(["rev-parse", "--git-path", "hooks/pre-commit"]),
+  );
   const content = readFileSync(source, "utf8").replace(/\r\n/g, "\n");
-  if (existsSync(destination) && readFileSync(destination, "utf8") !== content) {
-    throw new Error("An existing pre-commit hook was found. Integrate it manually.");
+  if (existsSync(destination)) {
+    const existing = readFileSync(destination, "utf8");
+    if (!existing.includes("# Installed by npm run hooks:install.")) {
+      throw new Error("An existing pre-commit hook was found. Integrate it manually.");
+    }
   }
   mkdirSync(dirname(destination), { recursive: true });
   writeFileSync(destination, content, { mode: 0o755 });
