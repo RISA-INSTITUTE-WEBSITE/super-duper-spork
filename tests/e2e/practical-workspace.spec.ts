@@ -10,8 +10,9 @@ test("practical workspace runs safe local exercises", async ({ page }) => {
   await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(page.locator("pre")).toHaveText("40", { timeout: 190_000 });
   await page.getByRole("button", { name: "Linux terminal" }).click();
-  await page.getByRole("button", { name: "Run exercise", exact: true }).click();
-  await expect(page.locator("pre")).toContainText("RISA practice workspace");
+  await expect(page.getByRole("button", { name: "Start session" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Linux command" })).toBeDisabled();
+  await expect(page.getByRole("region", { name: "Linux Terminal" })).toBeVisible();
   await page.getByRole("button", { name: "Database" }).click();
   await page.getByRole("button", { name: "Run exercise", exact: true }).click();
   await expect(page.locator("pre")).toContainText("2 rows");
