@@ -119,7 +119,7 @@ export default async function HomePage() {
               <RisaProgrammeCards
                 programmes={courses.slice(0, 3)}
                 modules={modules}
-                  showDescriptions={false}
+                showDescriptions={false}
                 className="mt-0"
               />
             )}
