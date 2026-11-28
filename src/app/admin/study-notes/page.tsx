@@ -15,7 +15,8 @@ import {
   modulesForProgramme,
   type RisaProgramme,
 } from "@/lib/risa-programmes";
-import { getTopicStudyNotes } from "@/lib/risa-study-notes";
+import { getTopicStudyNotes, type StudyNote } from "@/lib/risa-study-notes";
+import type { CourseTopic } from "@/lib/risa-course-curriculum";
 import { getStudentIdentity } from "@/lib/student-auth-api";
 import { studentCookieNames } from "@/lib/student-session";
 
@@ -162,6 +163,16 @@ function WorkspaceSelection({
   );
 }
 
+function editorTarget(
+  selected: RisaCourse | undefined,
+  topic: CourseTopic | undefined,
+  notes: StudyNote[] | null,
+) {
+  return selected && topic && notes
+    ? { courseId: selected.id, topicId: topic.id, notes }
+    : { courseId: "", topicId: "", notes: [] };
+}
+
 export default async function AdminStudyNotesPage({
   searchParams,
 }: {
@@ -179,10 +190,7 @@ export default async function AdminStudyNotesPage({
     : null;
   const topic = curriculum?.topics.find((item) => item.id === query.topic);
   const notes = topic ? await getTopicStudyNotes(token, topic.id, true) : null;
-  const target =
-    selected && topic && notes
-      ? { courseId: selected.id, topicId: topic.id, notes }
-      : { courseId: "", topicId: "", notes: [] };
+  const target = editorTarget(selected, topic, notes);
 
   return (
     <main
