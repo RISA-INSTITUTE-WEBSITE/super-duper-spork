@@ -96,8 +96,9 @@ function TopicSelector({
   curriculum: Awaited<ReturnType<typeof getStructuredCurriculum>>;
   topicId?: string;
 }) {
-  const groups = groupModuleTopics(curriculum?.sections ?? [], curriculum?.topics ?? []);
-  const canOpen = Boolean(selected && curriculum?.topics.length);
+  const { sections, topics } = curriculum ?? { sections: [], topics: [] };
+  const groups = groupModuleTopics(sections, topics);
+  const canOpen = topics.length > 0;
   return (
     <form action="/admin/study-notes" method="get" className="min-w-0 space-y-3">
       <input type="hidden" name="module" value={selected?.id ?? ""} />
