@@ -4,14 +4,46 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const tabs = [
-  { href: "/admin", label: "Overview", icon: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z" },
-  { href: "/admin/courses", label: "Courses & modules", icon: "M4 19V5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 1 0-4h14" },
-  { href: "/admin/study-notes", label: "Study Notes Studio", icon: "M12 6C9 3 5 3 2 4v15c4-1 7 0 10 2 3-2 6-3 10-2V4c-3-1-7-1-10 2zm0 0v15" },
-  { href: "/admin/lecturers", label: "Lecturers", icon: "M4 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8m8 4 3 3-3 3" },
-  { href: "/admin/enrolment-requests", label: "Enrolment requests", icon: "M9 11l3 3 7-7M20 12v7H4V3h12" },
-  { href: "/admin/policies", label: "Institutional policies", icon: "M6 2h8l5 5v15H6zM14 2v6h5M9 13h7m-7 4h7" },
-  { href: "/admin/labs", label: "Labs (private)", icon: "M9 3h6m-5 0v7L4 19a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M7 15h10" },
-  { href: "/students/profile", label: "Account", icon: "M20 21v-2a7 7 0 0 0-7-7h-2a7 7 0 0 0-7 7v2M12 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8" },
+  {
+    href: "/admin",
+    label: "Overview",
+    icon: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
+  },
+  {
+    href: "/admin/courses",
+    label: "Courses & modules",
+    icon: "M4 19V5a2 2 0 0 1 2-2h14v18H6a2 2 0 0 1 0-4h14",
+  },
+  {
+    href: "/admin/study-notes",
+    label: "Study Notes Studio",
+    icon: "M12 6C9 3 5 3 2 4v15c4-1 7 0 10 2 3-2 6-3 10-2V4c-3-1-7-1-10 2zm0 0v15",
+  },
+  {
+    href: "/admin/lecturers",
+    label: "Lecturers",
+    icon: "M4 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8m8 4 3 3-3 3",
+  },
+  {
+    href: "/admin/enrolment-requests",
+    label: "Enrolment requests",
+    icon: "M9 11l3 3 7-7M20 12v7H4V3h12",
+  },
+  {
+    href: "/admin/policies",
+    label: "Institutional policies",
+    icon: "M6 2h8l5 5v15H6zM14 2v6h5M9 13h7m-7 4h7",
+  },
+  {
+    href: "/admin/labs",
+    label: "Labs (private)",
+    icon: "M9 3h6m-5 0v7L4 19a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M7 15h10",
+  },
+  {
+    href: "/students/profile",
+    label: "Account",
+    icon: "M20 21v-2a7 7 0 0 0-7-7h-2a7 7 0 0 0-7 7v2M12 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8",
+  },
 ] as const;
 
 export function RisaAdminNavigation() {

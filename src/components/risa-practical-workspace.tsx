@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { LinuxTerminal } from "@/components/risa-linux-terminal";
 import { PythonStudio } from "@/components/risa-programming-ide";
 import { runWorkspace, workspaceActivities } from "@/lib/risa-workspace";
 
@@ -32,6 +33,8 @@ export function RisaPracticalWorkspace() {
       </div>
       {activity.id === "programming" ? (
         <PythonStudio />
+      ) : activity.id === "linux" ? (
+        <LinuxTerminal />
       ) : (
         <>
           <h2 className="mt-6 text-xl font-bold">{activity.label} workspace</h2>
