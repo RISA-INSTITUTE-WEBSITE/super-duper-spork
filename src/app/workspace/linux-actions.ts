@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { requireAdminSession } from "@/lib/risa-staff-session";
 import {
   executeLinux,
+  LinuxRuntimeError,
   sandboxConfig,
   sessionDuration,
   signLinuxSession,
@@ -61,8 +62,13 @@ export async function runLinuxCommand(session: string, command: string) {
   }
   try {
     return await executeLinux(config, id, command);
-  } catch {
-    return { error: "Command failed or session expired. Restart the session if needed." };
+  } catch (error) {
+    return {
+      error:
+        error instanceof LinuxRuntimeError
+          ? error.message
+          : "Command connection failed or timed out. Restart the session if needed.",
+    };
   }
 }
 

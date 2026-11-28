@@ -20,7 +20,9 @@ The session expires after five minutes; it uses one vCPU, no ports, no
 network access, no application secrets and no persistent snapshots.
 Every action checks current administrator membership and the server-signed
 session capability binds the VM to that administrator. Commands time out
-after ten seconds; output is truncated at 24,000 characters. End session
+after ten seconds; output is truncated at 24,000 characters. Commands start
+in the provider-selected working directory (for example /vercel), not a
+hard-coded path that may not exist in the runtime image. End session
 stops the VM; leaving the page relies on automatic expiry.
 
 ## Smoke test on a configured preview

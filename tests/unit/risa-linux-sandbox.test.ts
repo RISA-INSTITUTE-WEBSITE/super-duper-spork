@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  executeLinux,
   sandboxConfig,
   signLinuxSession,
   verifyLinuxSession,
@@ -74,5 +75,63 @@ describe("Linux runtime OIDC configuration", () => {
     expect(sandboxConfig("invalid")).toBeNull();
     vi.stubEnv("RISA_LINUX_SESSION_SECRET", "");
     expect(sandboxConfig(token)).toBeNull();
+  });
+});
+
+describe("Linux sandbox command execution", () => {
+  const config = {
+    token: "fixture",
+    secret: "a-test-secret-that-is-long-enough",
+    team: "team_fixture",
+    project: "prj_fixture",
+  };
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("uses the provider's actual working directory instead of a fixed image path", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        [
+          JSON.stringify({ command: { exitCode: null } }),
+          JSON.stringify({ stream: "stdout", data: "/vercel\n" }),
+          JSON.stringify({ command: { exitCode: 0 } }),
+        ].join("\n"),
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(executeLinux(config, "sbx_fixture", "pwd")).resolves.toEqual({
+      output: "/vercel\n",
+      exitCode: 0,
+    });
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body).not.toHaveProperty("cwd");
+    expect(body.args[1]).not.toContain("/vercel/sandbox");
+    expect(body.args[3]).toBe("pwd");
+  });
+
+  it("keeps Linux stderr and nonzero exit codes rather than hiding them", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          [
+            JSON.stringify({ stream: "stderr", data: "command not found\n" }),
+            JSON.stringify({ command: { exitCode: 127 } }),
+          ].join("\n"),
+        ),
+      ),
+    );
+    await expect(executeLinux(config, "sbx_fixture", "missing-command")).resolves.toEqual({
+      output: "command not found\n",
+      exitCode: 127,
+    });
+  });
+
+  it("reports a safe provider HTTP error without exposing response details", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 400 })));
+    await expect(executeLinux(config, "sbx_fixture", "pwd")).rejects.toThrow(
+      "Sandbox request failed (HTTP 400).",
+    );
   });
 });
