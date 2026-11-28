@@ -95,37 +95,38 @@ export default async function HomePage() {
         className="risa-pathways-section py-20 sm:py-24"
       >
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div className="max-w-2xl">
-              <h2
-                id="courses-heading"
-                className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
-              >
-                Explore our courses
-              </h2>
-            </div>
-            <RisaChevronLink href="/programmes" label="More" />
-          </div>
+          <h2
+            id="courses-heading"
+            className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
+          >
+            Explore our courses
+          </h2>
 
-          {courses === null || modules === null ? (
-            <p
-              role="status"
-              className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
-            >
-              The course catalogue is temporarily unavailable. Please try again shortly.
-            </p>
-          ) : courses.length === 0 ? (
-            <p className="risa-glass-card mt-10 rounded-2xl p-7 text-slate-600">
-              No published courses yet. Courses will appear here once approved and
-              published by RISA administration.
-            </p>
-          ) : (
-            <RisaProgrammeCards
-              programmes={courses.slice(0, 3)}
-              modules={modules}
-              showDescriptions={false}
-            />
-          )}
+          <div className="mt-8 grid items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
+            {courses === null || modules === null ? (
+              <p
+                role="status"
+                className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-sm text-amber-900"
+              >
+                The course catalogue is temporarily unavailable. Please try again shortly.
+              </p>
+            ) : courses.length === 0 ? (
+              <p className="risa-glass-card rounded-2xl p-7 text-slate-600">
+                No published courses yet. Courses will appear here once approved and
+                published by RISA administration.
+              </p>
+            ) : (
+              <RisaProgrammeCards
+                programmes={courses.slice(0, 3)}
+                modules={modules}
+                  showDescriptions={false}
+                className="mt-0"
+              />
+            )}
+            <div className="justify-self-end">
+              <RisaChevronLink href="/programmes" label="More" />
+            </div>
+          </div>
         </div>
       </section>
 
