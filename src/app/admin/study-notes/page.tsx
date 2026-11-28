@@ -162,6 +162,18 @@ function WorkspaceSelection({
   );
 }
 
+function NotesUnavailable({
+  hasTopic,
+  hasNotes,
+}: {
+  hasTopic: boolean;
+  hasNotes: boolean;
+}) {
+  return hasTopic && !hasNotes ? (
+    <p role="status">Study notes are temporarily unavailable.</p>
+  ) : null;
+}
+
 export default async function AdminStudyNotesPage({
   searchParams,
 }: {
@@ -202,7 +214,7 @@ export default async function AdminStudyNotesPage({
           topicId={topic?.id}
         />
         <RisaStudyNotesStudio key={target.topicId} {...target} embedded />
-        {topic && !notes && <p role="status">Study notes are temporarily unavailable.</p>}
+        <NotesUnavailable hasTopic={Boolean(topic)} hasNotes={Boolean(notes)} />
       </RisaStudioNavigation>
     </main>
   );
